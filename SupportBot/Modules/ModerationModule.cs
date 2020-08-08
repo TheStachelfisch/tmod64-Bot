@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Net.Mime;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 
 namespace SupportBot.Modules
 {
+    [Group("Moderation"), Alias("")]
     public class ModerationModule : ModuleBase<SocketCommandContext>
     {
         //TODO: Add ban, kick etc.
 
-        [Command("suicide")]
+        [Command("restart"), Alias("r")]
+        [RequireOwner]
+        [Summary("Shuts down the bot")]
         public async Task HelpAsync()
         {
-            await Program.SetShuttingDown();
-            Environment.Exit(1);   
+            await Context.Client.SetStatusAsync(UserStatus.Invisible);
+            await Task.Delay(1000);
+            Program.StartBotAsync().GetAwaiter().GetResult();
         }
     }
 }

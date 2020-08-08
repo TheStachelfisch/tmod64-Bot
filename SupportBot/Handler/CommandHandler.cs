@@ -11,7 +11,7 @@ namespace SupportBot.Handler
         private DiscordSocketClient _client;
         private CommandServiceConfig _config;
         private IServiceProvider _service;
-        private CommandService _commands;
+        public static CommandService _commands;
 
         public CommandHandler(DiscordSocketClient client, CommandServiceConfig config = null)
         {

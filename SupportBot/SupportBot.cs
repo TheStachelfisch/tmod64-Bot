@@ -12,15 +12,15 @@ namespace SupportBot
         private static string _token = File.ReadAllText(@"token.txt");
 
         private static DiscordSocketClient _client;
-        private DiscordSocketConfig _config;
+        private static DiscordSocketConfig _config;
 
-        private CommandHandler _commandHandler;
+        private static CommandHandler _commandHandler;
 
         static void Main(string[] args)
-            => new Program().StartBotAsync().GetAwaiter().GetResult();
+            => StartBotAsync().GetAwaiter().GetResult();
 
 
-        private async Task StartBotAsync()
+        public static async Task StartBotAsync()
         {
             _client = new DiscordSocketClient();
             _config = new DiscordSocketConfig { MessageCacheSize = 100 };
@@ -28,6 +28,7 @@ namespace SupportBot
             await _client.LoginAsync(TokenType.Bot, _token);
 
             await _client.StartAsync();
+            await _client.SetStatusAsync(UserStatus.Online);
             await _client.SetGameAsync(".help");
 
             _client.Log += Log;
@@ -37,20 +38,15 @@ namespace SupportBot
         }
 
         //Add Handlers here
-        private async Task ReadyEvent()
+        private static async Task ReadyEvent()
         {
             _commandHandler = new CommandHandler(_client);
         }
 
-        private Task Log(LogMessage arg)
+        private static Task Log(LogMessage arg)
         {
             Console.WriteLine(arg);
             return Task.CompletedTask;
-        }
-
-        public static async Task SetShuttingDown()
-        {
-            await _client.SetStatusAsync(UserStatus.Invisible);
         }
     }
 }
