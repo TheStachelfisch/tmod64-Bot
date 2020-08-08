@@ -5,8 +5,8 @@ namespace SupportBot.Modules
 {
 	public class HelpModule : ModuleBase<SocketCommandContext>
 	{
-		[Command("help")]
+		[Command("ping")]
 		public async Task HelpAsync()
-			=> await ReplyAsync($"{Context.User.Mention} Gay!");
+			=> await ReplyAsync($"{Context.User.Mention} pong motherfucker");
 	}
 }
