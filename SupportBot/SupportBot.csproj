@@ -5,4 +5,9 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Discord.Net" Version="2.2.0" />
+      <PackageReference Include="Discord.Net.Commands" Version="2.2.0" />
+    </ItemGroup>
+
 </Project>
