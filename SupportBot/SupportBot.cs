@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using SupportBot.Handler;
 using System;
@@ -7,40 +7,45 @@ using System.Threading.Tasks;
 
 namespace SupportBot
 {
-	class Program
-	{
-		private static string _token = File.ReadAllText(@"token.txt");
+    class Program
+    {
+        private static string _token = File.ReadAllText(@"token.txt");
 
-		private DiscordSocketClient _client;
-		private DiscordSocketConfig _config;
+        private DiscordSocketClient _client;
+        private DiscordSocketConfig _config;
 
-		private CommandHandler _commandHandler;
+        private CommandHandler _commandHandler;
 
-		static void Main(string[] args)
-			=> new Program().StartBotAsync().GetAwaiter().GetResult();
+        static void Main(string[] args)
+            => new Program().StartBotAsync().GetAwaiter().GetResult();
 
 
-		private async Task StartBotAsync()
-		{
-			_client = new DiscordSocketClient();
-			_config = new DiscordSocketConfig { MessageCacheSize = 100 };
+        private async Task StartBotAsync()
+        {
+            _client = new DiscordSocketClient();
+            _config = new DiscordSocketConfig { MessageCacheSize = 100 };
 
-			_commandHandler = new CommandHandler(_client);
+            await _client.LoginAsync(TokenType.Bot, _token);
 
-			await _client.LoginAsync(TokenType.Bot, _token);
+            await _client.StartAsync();
+            await _client.SetGameAsync(".help");
 
-			await _client.StartAsync();
-			await _client.SetGameAsync(".help");
+            _client.Log += Log;
+            _client.Ready += ReadyEvent;
 
-			_client.Log += Log;
+            await Task.Delay(-1);
+        }
 
-			await Task.Delay(-1);
-		}
+        //Add Handlers here
+        private async Task ReadyEvent()
+        {
+            _commandHandler = new CommandHandler(_client);
+        }
 
-		private Task Log(LogMessage arg)
-		{
-			Console.WriteLine(arg);
-			return Task.CompletedTask;
-		}
-	}
+        private Task Log(LogMessage arg)
+        {
+            Console.WriteLine(arg);
+            return Task.CompletedTask;
+        }
+    }
 }
