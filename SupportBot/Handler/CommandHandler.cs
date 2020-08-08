@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
@@ -44,7 +43,6 @@ namespace SupportBot.Handler
                 if (!result.IsSuccess)
                 {
                     Console.WriteLine("Error happened while executing Command: " + result.ErrorReason + " ServerId: " + context.Guild.Id);
-                    await context.Channel.SendMessageAsync(result.ErrorReason);
                 }
             } 
         }

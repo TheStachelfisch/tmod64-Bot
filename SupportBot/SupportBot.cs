@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -12,21 +11,21 @@ namespace SupportBot
     {
         private static string _token = File.ReadAllText(@"token.txt");
         
-        private DiscordSocketClient _client;
+        private static DiscordSocketClient _client;
         private DiscordSocketConfig _config;
 
         private CommandHandler _commandHandler;
 
-        static void Main(string[] args) 
-            => new Program().StartBotAsync().GetAwaiter().GetResult();
+        static void Main(string[] args)
+        {
+            new Program().StartBotAsync().GetAwaiter().GetResult();
+        }
         
 
         private async Task StartBotAsync()
         {
             _client = new DiscordSocketClient();
             _config = new DiscordSocketConfig {MessageCacheSize = 100};
-            
-            _commandHandler = new CommandHandler(_client);
 
             await _client.LoginAsync(TokenType.Bot, _token);
             
@@ -34,8 +33,15 @@ namespace SupportBot
             await _client.SetGameAsync(".help");
 
             _client.Log += Log;
+            _client.Ready += ReadyEvent;
 
             await Task.Delay(-1);
+        }
+
+        //This is so Commands don't get executed when the bot is not ready
+        private async Task ReadyEvent()
+        {
+            _commandHandler = new CommandHandler(_client);
         }
 
         private Task Log(LogMessage arg)
