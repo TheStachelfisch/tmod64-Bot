@@ -42,7 +42,7 @@ namespace SupportBot.Handler
                 //Remove if you want
                 if (!result.IsSuccess)
                 {
-                    await context.Channel.SendMessageAsync(result.ErrorReason);
+                    Console.WriteLine("Error happened while executing Command: " + result.ErrorReason + " ServerId: " + context.Guild.Id);
                 }
             }
         }

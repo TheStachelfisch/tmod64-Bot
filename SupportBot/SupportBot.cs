@@ -11,7 +11,7 @@ namespace SupportBot
     {
         private static string _token = File.ReadAllText(@"token.txt");
 
-        private DiscordSocketClient _client;
+        private static DiscordSocketClient _client;
         private DiscordSocketConfig _config;
 
         private CommandHandler _commandHandler;
@@ -46,6 +46,11 @@ namespace SupportBot
         {
             Console.WriteLine(arg);
             return Task.CompletedTask;
+        }
+
+        public static async Task SetShuttingDown()
+        {
+            await _client.SetStatusAsync(UserStatus.Invisible);
         }
     }
 }
