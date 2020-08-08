@@ -1,8 +1,8 @@
-﻿using System;
-using System.Reflection;
-using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace SupportBot.Handler
 {
@@ -12,12 +12,12 @@ namespace SupportBot.Handler
         private CommandServiceConfig _config;
         private IServiceProvider _service;
         private CommandService _commands;
-        
+
         public CommandHandler(DiscordSocketClient client, CommandServiceConfig config = null)
         {
             _commands = new CommandService();
             _client = client;
-            
+
             //Check if null before doing anything with it
             config = _config;
 
@@ -30,9 +30,9 @@ namespace SupportBot.Handler
         {
             var msg = arg as SocketUserMessage;
             if (msg == null) return;
-            
+
             var context = new SocketCommandContext(_client, msg);
-            
+
             int argPos = 0;
             //TODO: Replace with prefix from Config
             if (msg.HasCharPrefix('.', ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
@@ -42,9 +42,9 @@ namespace SupportBot.Handler
                 //Remove if you want
                 if (!result.IsSuccess)
                 {
-                    Console.WriteLine("Error happened while executing Command: " + result.ErrorReason + " ServerId: " + context.Guild.Id);
+                    await context.Channel.SendMessageAsync(result.ErrorReason);
                 }
-            } 
+            }
         }
     }
 }

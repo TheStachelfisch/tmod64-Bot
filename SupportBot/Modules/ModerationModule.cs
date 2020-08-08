@@ -1,9 +1,7 @@
-﻿using Discord.Commands;
-
-namespace SupportBot.Modules
+﻿namespace SupportBot.Modules
 {
-    public class ModerationModule : ModuleBase<SocketCommandContext>
+    public class ModerationModule
     {
-        //TODO: Add ban and so on, not needed rn
+        //TODO: Add ban, kick etc.
     }
 }
