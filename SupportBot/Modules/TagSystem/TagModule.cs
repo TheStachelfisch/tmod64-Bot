@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace SupportBot.Modules.TagSystem
 {
@@ -68,8 +69,9 @@ namespace SupportBot.Modules.TagSystem
                 {
                     embedBuilder.WithTitle($"Tag: {tag.Name}");
                     embedBuilder.WithDescription(
-                        $"**Owner:** {tag.OwnerName}\n**Owner Id:** {tag.OwnerId}\n**Created at:** {Helper.UnixTimeStampToDateTime(tag.CreatedAt)} UTC");
+                        $"**Owner:** {tag.OwnerName}\n**Owner Id:** {tag.OwnerId}\n**Created at:** {DateTimeOffset.FromUnixTimeSeconds(tag.CreatedAt)} UTC");
                     embedBuilder.WithColor(Color.DarkGreen);
+                    embedBuilder.WithThumbnailUrl(Context.Client.GetUser(tag.OwnerId).GetAvatarUrl());
                     embedBuilder.WithFooter("Sent at ");
                     embedBuilder.WithCurrentTimestamp();
                     
