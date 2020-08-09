@@ -1,34 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Discord.Commands;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord;
-using tMod64Bot.Handler;
+using Discord.Commands;
 
 namespace tMod64Bot.Modules
 {
-	public class HelpModule : ModuleBase<SocketCommandContext>
-	{
-		[Command("help"), Alias("h")]
-		[Summary("Help command with all commands")]
-		public async Task Help()
-		{
-			List<CommandInfo> commands = CommandHandler._commands.Commands.ToList();
-			EmbedBuilder embedBuilder = new EmbedBuilder();
+    public class HelpModule : ModuleBase<SocketCommandContext>
+    {
+        [Command("help")]
+        [Alias("h")]
+        [Summary("Help command with all commands")]
+        public async Task Help()
+        {
+            var embedBuilder = new EmbedBuilder();
 
-			foreach (CommandInfo command in commands)
-			{
-				foreach (var aliases in command.Aliases.Where(x => !x.Equals(command.Name)))
-				{
-					//Dont add more than one Alias, that breaks stuff
-					string embedFieldText = command.Summary ?? "No description available";
+            embedBuilder.WithTitle("The Command Documentation can be found here");
+            embedBuilder.WithDescription($"[Command Documentation](https://github.com/TheStachelfisch/tmod64-Bot/tree/master/CommandDocumentation/)\n\nIf you experience any problems with the bot, please ping {MentionUtils.MentionUser(442639987180306432)}");
+            embedBuilder.WithColor(Color.DarkGreen);
+            embedBuilder.WithCurrentTimestamp();
+            embedBuilder.WithFooter("This message was sent by a bot");
 
-					embedBuilder.AddField($"{command.Name}/{aliases}", $"{embedFieldText}");
-				}
-			}
-			
-			await ReplyAsync("", false, embedBuilder.Build());
-		}
-	}
+            await Context.User.SendMessageAsync("", false, embedBuilder.Build());
+
+            await Context.Message.AddReactionAsync(new Emoji("✅"));
+        }
+    }
 }
