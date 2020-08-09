@@ -8,7 +8,6 @@ using Discord.Commands;
 
 namespace SupportBot.Modules
 {
-    [Group("Moderation"), Alias("")]
     public class ModerationModule : ModuleBase<SocketCommandContext>
     {
         //TODO: Add ban, kick etc.

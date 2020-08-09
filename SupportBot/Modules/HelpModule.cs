@@ -19,7 +19,7 @@ namespace SupportBot.Modules
 
 			foreach (CommandInfo command in commands)
 			{
-				foreach (var aliases in command.Aliases.Where(x => x.Equals(command.Name)))
+				foreach (var aliases in command.Aliases.Where(x => !x.Equals(command.Name)))
 				{
 					//Dont add more than one Alias, that breaks stuff
 					string embedFieldText = command.Summary ?? "No description available";
