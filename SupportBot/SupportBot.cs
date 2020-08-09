@@ -14,6 +14,7 @@ namespace SupportBot
         private static DiscordSocketClient _client;
         private static DiscordSocketConfig _config;
 
+        private static InviteHandler _inviteHandler;
         private static CommandHandler _commandHandler;
 
         static void Main(string[] args)
@@ -41,6 +42,7 @@ namespace SupportBot
         private static async Task ReadyEvent()
         {
             _commandHandler = new CommandHandler(_client);
+            _inviteHandler = new InviteHandler(_client);
         }
 
         private static Task Log(LogMessage arg)
