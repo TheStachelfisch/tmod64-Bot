@@ -63,5 +63,12 @@ namespace SupportBot.Modules
 			await Task.Delay(2500);
 			await MessageToDelete.DeleteAsync();
 		}
+		[Command("echo")]
+		[RequireUserPermission(GuildPermission.ManageMessages)]
+		[Summary("Makes the bot say something in the specified chat, anonymously")]
+		public async Task EchoAsync(IGuildChannel channel, [Remainder] string message)
+		{
+			await ReplyAsync(message);
+		}
 	}
 }
