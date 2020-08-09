@@ -69,12 +69,6 @@ namespace SupportBot.Modules.TagSystem
         public static async Task DeleteTagByName(string tagName)
         {
             List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
-            
-            Tag tagContent = new Tag
-            {
-                Name = "Hello", Content = "Die", OwnerName = "TheStachelfisch", OwnerId = 442639987180306432,
-                CreatedAt = 1596968881
-            };
 
             tags.RemoveAll(i => i.Name.Equals(tagName));
 
@@ -82,6 +76,12 @@ namespace SupportBot.Modules.TagSystem
             await WriteJsonData(jsonData);
         }
 
+        public static List<Tag> GetAllTags()
+        {
+            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
+            return tags;
+        }
+        
         public static bool GetIfTagExists(string tagName)
         {
             var objects = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
