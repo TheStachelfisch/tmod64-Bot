@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
-namespace SupportBot.Handler
+namespace tMod64Bot.Handler
 {
     public class InviteHandler
     {

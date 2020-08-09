@@ -1,11 +1,11 @@
 using Discord;
 using Discord.WebSocket;
-using SupportBot.Handler;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using tMod64Bot.Handler;
 
-namespace SupportBot
+namespace tMod64Bot
 {
     class Program
     {

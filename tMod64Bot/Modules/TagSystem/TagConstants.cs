@@ -1,4 +1,4 @@
-﻿namespace SupportBot.Modules.TagSystem
+﻿namespace tMod64Bot.Modules.TagSystem
 {
     public static class TagConstants
     {

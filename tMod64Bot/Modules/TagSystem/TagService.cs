@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace SupportBot.Modules.TagSystem
+namespace tMod64Bot.Modules.TagSystem
 {
     public class Tag
     {

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SupportBot.Handler
+namespace tMod64Bot.Handler
 {
     public class CommandHandler
     {

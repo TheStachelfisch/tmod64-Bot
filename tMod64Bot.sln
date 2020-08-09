@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportBot", "SupportBot\SupportBot.csproj", "{3D3194D3-111F-47E7-A225-918A246B365D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tMod64Bot", "tMod64Bot\tMod64Bot.csproj", "{3D3194D3-111F-47E7-A225-918A246B365D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

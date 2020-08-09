@@ -2,7 +2,7 @@
 using Discord.Commands;
 using System.Threading.Tasks;
 
-namespace SupportBot.Modules
+namespace tMod64Bot.Modules
 {
 	public class ModerationModule : ModuleBase<SocketCommandContext>
 	{

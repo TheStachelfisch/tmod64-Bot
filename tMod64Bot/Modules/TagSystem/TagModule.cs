@@ -7,7 +7,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace SupportBot.Modules.TagSystem
+namespace tMod64Bot.Modules.TagSystem
 {
     [Group("tag")]
     public class TagModule : ModuleBase<SocketCommandContext>

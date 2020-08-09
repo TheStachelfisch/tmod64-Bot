@@ -4,9 +4,9 @@ using System.Linq;
 using Discord.Commands;
 using System.Threading.Tasks;
 using Discord;
-using SupportBot.Handler;
+using tMod64Bot.Handler;
 
-namespace SupportBot.Modules
+namespace tMod64Bot.Modules
 {
 	public class HelpModule : ModuleBase<SocketCommandContext>
 	{
