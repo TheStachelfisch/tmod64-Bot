@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -10,58 +12,126 @@ namespace SupportBot.Modules.TagSystem
     [Group("tag")]
     public class TagModule : ModuleBase<SocketCommandContext>
     {
+        [Command("")]
+        public async Task TagCommand()
+        {
+            EmbedBuilder messageEmbed = new EmbedBuilder();
+
+            messageEmbed.WithTitle("Documentation for Tags");
+            messageEmbed.WithFooter("Sent at ");
+            messageEmbed.WithUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+            messageEmbed.WithCurrentTimestamp();
+
+            await ReplyAsync("", false, messageEmbed.Build());
+        }
+        
         [Command, Alias("t", "g", "get")]
         public async Task TagGetCommand(string tagName)
         {
+            var context = Context;
+            var tagUser = context.User;
+            
+            EmbedBuilder tagEmbed = new EmbedBuilder();
+            EmbedBuilder errorEmbed = new EmbedBuilder();
+            
             if (TagService.GetIfTagExists(tagName))
             {
+                foreach (var role in ((SocketGuildUser)Context.Message.Author).Roles)
+                {
+                    
+                }
+                
                 await TagService.IncreaseUsesForTag(tagName);
-                await ReplyAsync(TagService.GetTagContentByName(tagName));
+                tagEmbed.WithFooter($"Requested by {Context.User.Username}");
+                tagEmbed.WithCurrentTimestamp();
+                tagEmbed.WithColor(Color.DarkBlue);
+                await ReplyAsync(TagService.GetTagContentByName(tagName), false, tagEmbed.Build());
+                await Context.Message.DeleteAsync();
             }
             else
             {
-                await ReplyAsync($"Tag '**{tagName}**' doesn't exist");
+                errorEmbed.WithTitle("Error!");
+                errorEmbed.WithDescription($"Tag '**{tagName}**' doesn't exist");
+                errorEmbed.WithColor(Color.Red);
+                errorEmbed.WithFooter("Requested by " + Context.User.Username);
+                await ReplyAsync("", false, errorEmbed.Build());
+                await Context.Message.DeleteAsync();
             }
         }
         
         [Command("add"), Alias("Create")]
         public async Task TagCreateCommand(string tagName, [Remainder] string tagContent)
         {
-            await TagService.CreateTag(tagName, tagContent, Context.User.Username, Context.User.Id);
-            await ReplyAsync($"Tag '{tagName}' successfully created");
+            EmbedBuilder errorEmbed = new EmbedBuilder();
+            EmbedBuilder successEmbed = new EmbedBuilder();
+            
+            if (!TagService.GetIfTagExists(tagName))
+            {
+                await TagService.CreateTag(tagName, tagContent, Context.User.Username, Context.User.Id);
+                successEmbed.WithTitle("Success!");
+                successEmbed.WithDescription($"Tag '**{tagName}**' was successfully created");
+                successEmbed.WithColor(Color.DarkGreen);
+                await ReplyAsync("", false, successEmbed.Build());
+            }
+            else
+            {
+                errorEmbed.WithTitle("Error!");
+                errorEmbed.WithDescription($"Tag '**{tagName}**' already exists");
+                errorEmbed.WithColor(Color.Red);
+                await ReplyAsync("", false, errorEmbed.Build());
+            }
         }
 
         [Command("delete"), Alias("d", "remove", "r")]
         public async Task TagDeleteCommand(string tagName)
         {
+            EmbedBuilder errorEmbed = new EmbedBuilder();
+            EmbedBuilder successEmbed = new EmbedBuilder();
+            
             if (TagService.GetIfTagExists(tagName))
             {
                 await TagService.DeleteTagByName(tagName);
-                await ReplyAsync($"Tag '{tagName}' successfully deleted");
+                successEmbed.WithTitle("Success!");
+                successEmbed.WithDescription($"Tag '**{tagName}**' was successfully deleted");
+                successEmbed.WithColor(Color.DarkGreen);
+                await ReplyAsync("", false, successEmbed.Build());
             }
             else
             {
-                await ReplyAsync($"Tag '**{tagName}**' doesn't exists");
+                errorEmbed.WithTitle("Error!");
+                errorEmbed.WithDescription($"Tag '**{tagName}**' doesn't exists");
+                errorEmbed.WithColor(Color.Red);
+                await ReplyAsync("", false, errorEmbed.Build());
             }
         }
 
         [Command("edit"), Alias("e", "change")]
         public async Task TagEditCommand(string tagName, [Remainder]string tagNewContent)
         {
+            EmbedBuilder errorEmbed = new EmbedBuilder();
+            EmbedBuilder successEmbed = new EmbedBuilder();
+            
             if (TagService.GetIfTagExists(tagName))
             {
                 await TagService.EditTag(tagName, tagNewContent);
-                await ReplyAsync($"Edited tag '**{tagName}**' successfully");
+                successEmbed.WithTitle("Success!");
+                successEmbed.WithDescription($"Tag '**{tagName}**' was successfully edited");
+                successEmbed.WithColor(Color.DarkGreen);
+                await ReplyAsync("", false, successEmbed.Build());
             }
             else
             {
-                await ReplyAsync($"Tag '**{tagName}**' doesn't exist");
+                errorEmbed.WithTitle("Error!");
+                errorEmbed.WithDescription($"Tag '**{tagName}**' doesn't exists");
+                errorEmbed.WithColor(Color.Red);
+                await ReplyAsync("", false, errorEmbed.Build());
             }
         }
 
         [Command("info")]
         public async Task TagInfoCommand(string tagName)
         {               
+            EmbedBuilder errorEmbed = new EmbedBuilder();
             EmbedBuilder embedBuilder = new EmbedBuilder();
 
             if (TagService.GetIfTagExists(tagName))
@@ -81,7 +151,10 @@ namespace SupportBot.Modules.TagSystem
             }
             else
             {
-                await ReplyAsync($"Tag '**{tagName}**' doesn't exist");
+                errorEmbed.WithTitle("Error!");
+                errorEmbed.WithDescription($"Tag '**{tagName}**' doesn't exists");
+                errorEmbed.WithColor(Color.Red);
+                await ReplyAsync("", false, errorEmbed.Build());
             }
         }
     }

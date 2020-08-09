@@ -123,8 +123,7 @@ namespace SupportBot.Modules.TagSystem
         
         public static List<Tag> GetAllTags()
         {
-            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
-            return tags;
+            return JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
         }
         
         public static bool GetIfTagExists(string tagName)
