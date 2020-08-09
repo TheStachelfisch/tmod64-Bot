@@ -96,7 +96,7 @@ namespace SupportBot.Modules.TagSystem
 
             foreach (var tags in TagService.GetAllTags())
             {
-                embedBuilder.AddField(tags.Name, $"Owner: {tags.OwnerName}");
+                embedBuilder.AddField(tags.Name, $"Owner: {Context.Client.GetUser(tags.OwnerId).Mention}");
             }
 
             await ReplyAsync("", false, embedBuilder.Build());
