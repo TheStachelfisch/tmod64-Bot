@@ -40,14 +40,14 @@ namespace SupportBot.Modules.TagSystem
         public static async Task WriteJsonData(string jsonData)
             => await File.WriteAllTextAsync(TagConstants.FileName, jsonData);
 
-            public static string GetTagContentByName(string tagName)
+        public static string GetTagContentByName(string tagName)
         {
             string json = File.ReadAllText(TagConstants.FileName);
 
             var deserializedObject = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
 
             //FirstOrDefault can be used here since that field will only exist once per tag
-            return deserializedObject.Where(x => x.Name.Equals(tagName)).Select(i => i.Content).FirstOrDefault();
+            return deserializedObject.Where(x => x.Name.Equals(tagName.ToLower())).Select(i => i.Content).FirstOrDefault();
         }
 
         public static async Task CreateTag(string tagName, string content, string owner, ulong ownerId)
@@ -56,7 +56,7 @@ namespace SupportBot.Modules.TagSystem
             
             Tag tagContent = new Tag
             {
-                Name = tagName, Content = content, OwnerName = owner, OwnerId = ownerId,
+                Name = tagName.ToLower(), Content = content, OwnerName = owner, OwnerId = ownerId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
             
@@ -70,12 +70,22 @@ namespace SupportBot.Modules.TagSystem
         {
             List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
 
-            tags.RemoveAll(i => i.Name.Equals(tagName));
+            tags.RemoveAll(i => i.Name.Equals(tagName.ToLower()));
 
             string jsonData = JsonConvert.SerializeObject(tags, Formatting.Indented);
             await WriteJsonData(jsonData);
         }
 
+        public static async Task EditTag(string tagName, string newContent)
+        {
+            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
+
+            tags.Where(i => i.Name.Equals(tagName.ToLower())).Select(c => { c.Content = newContent; return c; }).ToList();
+            
+            string jsonData = JsonConvert.SerializeObject(tags, Formatting.Indented);
+            await WriteJsonData(jsonData);
+        }
+        
         public static List<Tag> GetAllTags()
         {
             List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
@@ -86,7 +96,7 @@ namespace SupportBot.Modules.TagSystem
         {
             var objects = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
 
-            return objects.Any(y => y.Name.Equals(tagName));
+            return objects.Any(y => y.Name.Equals(tagName.ToLower()));
         }
     }
 }
