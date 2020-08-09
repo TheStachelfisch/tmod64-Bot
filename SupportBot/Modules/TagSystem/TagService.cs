@@ -23,23 +23,70 @@ namespace SupportBot.Modules.TagSystem
 
         [JsonProperty("createdAt")]
         public long CreatedAt;
-
-        [JsonProperty("exclusiveTag")]
-        public bool ExclusiveTag;
     }
     
     public class TagService
     {
-        private static Tag _tagData;
-        
-        public static string GetTagContentByName(string TagName)
+        public static string GetJsonData()
         {
-            string Json = File.ReadAllText(@"tags.json");
+            using (StreamReader r = new StreamReader(TagConstants.FileName))
+            {
+                return r.ReadToEnd();
+            }
 
-            var deserializedObject = JsonConvert.DeserializeObject<List<Tag>>(Json);
+            return null;
+        }
+
+        public static async Task WriteJsonData(string jsonData)
+            => await File.WriteAllTextAsync(TagConstants.FileName, jsonData);
+
+            public static string GetTagContentByName(string tagName)
+        {
+            string json = File.ReadAllText(TagConstants.FileName);
+
+            var deserializedObject = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
 
             //FirstOrDefault can be used here since that field will only exist once per tag
-            return deserializedObject.Where(x => x.Name.Equals(TagName)).Select(i => i.Content).FirstOrDefault();
+            return deserializedObject.Where(x => x.Name.Equals(tagName)).Select(i => i.Content).FirstOrDefault();
+        }
+
+        public static async Task CreateTag(string tagName, string content, string owner, ulong ownerId)
+        {
+            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
+            
+            Tag tagContent = new Tag
+            {
+                Name = tagName, Content = content, OwnerName = owner, OwnerId = ownerId,
+                CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            };
+            
+            tags.Add(tagContent);
+
+            string jsonData = JsonConvert.SerializeObject(tags, Formatting.Indented);
+            await WriteJsonData(jsonData);
+        }
+        
+        public static async Task DeleteTagByName(string tagName)
+        {
+            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
+            
+            Tag tagContent = new Tag
+            {
+                Name = "Hello", Content = "Die", OwnerName = "TheStachelfisch", OwnerId = 442639987180306432,
+                CreatedAt = 1596968881
+            };
+
+            tags.RemoveAll(i => i.Name.Equals(tagName));
+
+            string jsonData = JsonConvert.SerializeObject(tags, Formatting.Indented);
+            await WriteJsonData(jsonData);
+        }
+
+        public static bool GetIfTagExists(string tagName)
+        {
+            var objects = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
+
+            return objects.Any(y => y.Name.Equals(tagName));
         }
     }
 }
