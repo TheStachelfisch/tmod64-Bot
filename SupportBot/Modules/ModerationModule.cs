@@ -6,7 +6,8 @@ namespace SupportBot.Modules
 {
 	public class ModerationModule : ModuleBase<SocketCommandContext>
 	{
-		//TODO: Add ban, kick etc. -Doing
+
+		private long TemporaryMutedRole = 742064452970741811; //NOTE: Stachel, once you add the config.json stuff, please delete this.
 
 		[Command("restart"), Alias("r")]
 		[RequireOwner]
@@ -28,7 +29,8 @@ namespace SupportBot.Modules
 			await Task.Delay(2500);
 			await MessageToDelete.DeleteAsync();
 		}
-		[Command("ban")]
+
+		[Command("ban"), Alias("b")]
 		[RequireUserPermission(GuildPermission.BanMembers)]
 		[Summary("Bans a user mentioned.")]
 		public async Task BanAsync(IGuildUser user, int daystoprune = 2, [Remainder] string reason = "No reason specified.")
@@ -37,6 +39,28 @@ namespace SupportBot.Modules
 			await user.BanAsync(daystoprune, reason);
 			IUserMessage MessageToDelete = await ReplyAsync("User " + user.Username + " has been banned. Reason: " + reason);
 			await Task.Delay(5000);
+			await MessageToDelete.DeleteAsync();
+		}
+
+		[Command("mute")]
+		[RequireUserPermission(GuildPermission.ManageRoles)]
+		[Summary("Adds a muted role onto the user.")]
+		public async Task MuteAsync(IGuildUser user, [Remainder] string reason = "No reason specified.") //TODO: temporary unmute, time to unmute
+		{
+			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole((ulong)TemporaryMutedRole));
+			IUserMessage MessageToDelete = await ReplyAsync("User " + user.Username + " was muted for " + "Infinity" + " seconds. Reason: " + reason);
+			await Task.Delay(2500);
+			await MessageToDelete.DeleteAsync();
+		}
+
+		[Command("softban"), Alias("sb")]
+		[RequireUserPermission(GuildPermission.BanMembers)]
+		[Summary("Banishes a user to the shadow realm!")]
+		public async Task SBanAsync(IGuildUser user, [Remainder] string reason = "No reason specified.") //Clone of MuteAsync LUL
+		{
+			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole((ulong)TemporaryMutedRole));
+			IUserMessage MessageToDelete = await ReplyAsync("User " + user.Username + " was banished to the Shadow Realm. Reason: " + reason);
+			await Task.Delay(2500);
 			await MessageToDelete.DeleteAsync();
 		}
 	}
