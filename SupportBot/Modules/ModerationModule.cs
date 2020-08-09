@@ -68,7 +68,7 @@ namespace SupportBot.Modules
 		[Summary("Makes the bot say something in the specified chat, anonymously")]
 		public async Task EchoAsync(IGuildChannel channel, [Remainder] string message)
 		{
-			await ReplyAsync(message);
+			await Context.Guild.GetTextChannel(channel.Id).SendMessageAsync(message);
 		}
 	}
 }
