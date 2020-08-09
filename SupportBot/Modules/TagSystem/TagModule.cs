@@ -56,6 +56,31 @@ namespace SupportBot.Modules.TagSystem
                 await ReplyAsync($"Tag '**{tagName}**' doesn't exist");
             }
         }
+
+        [Command("info")]
+        public async Task TagInfoCommand(string tagName)
+        {               
+            EmbedBuilder embedBuilder = new EmbedBuilder();
+
+            if (TagService.GetIfTagExists(tagName))
+            {
+                foreach (var tag in TagService.GetTag(tagName))
+                {
+                    embedBuilder.WithTitle($"Tag: {tag.Name}");
+                    embedBuilder.WithDescription(
+                        $"**Owner:** {tag.OwnerName}\n**Owner Id:** {tag.OwnerId}\n**Created at:** {Helper.UnixTimeStampToDateTime(tag.CreatedAt)} UTC");
+                    embedBuilder.WithColor(Color.DarkGreen);
+                    embedBuilder.WithFooter("Sent at ");
+                    embedBuilder.WithCurrentTimestamp();
+                    
+                    await ReplyAsync("", false, embedBuilder.Build());
+                }
+            }
+            else
+            {
+                await ReplyAsync($"Tag '**{tagName}**' doesn't exist");
+            }
+        }
     }
 
     [Group("tags")]
