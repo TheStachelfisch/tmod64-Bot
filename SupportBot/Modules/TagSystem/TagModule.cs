@@ -28,12 +28,24 @@ namespace SupportBot.Modules.TagSystem
         [Command, Alias("t", "g", "get")]
         public async Task TagGetCommand(string tagName)
         {
+            var context = Context;
+            var tagUser = context.User;
+            
+            EmbedBuilder tagEmbed = new EmbedBuilder();
             EmbedBuilder errorEmbed = new EmbedBuilder();
             
             if (TagService.GetIfTagExists(tagName))
             {
+                foreach (var role in ((SocketGuildUser)Context.Message.Author).Roles)
+                {
+                    
+                }
+                
                 await TagService.IncreaseUsesForTag(tagName);
-                await ReplyAsync(TagService.GetTagContentByName(tagName) + "\n\n**Requested by: " + Context.User.Username + "**\n**" + DateTimeOffset.Now + "**");
+                tagEmbed.WithFooter($"Requested by {Context.User.Username}");
+                tagEmbed.WithCurrentTimestamp();
+                tagEmbed.WithColor(Color.DarkBlue);
+                await ReplyAsync(TagService.GetTagContentByName(tagName), false, tagEmbed.Build());
                 await Context.Message.DeleteAsync();
             }
             else
