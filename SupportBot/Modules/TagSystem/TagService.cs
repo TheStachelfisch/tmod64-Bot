@@ -30,9 +30,11 @@ namespace SupportBot.Modules.TagSystem
     
     public class TagService
     {
+        private static string _fullPath = Path.GetFullPath($"{Environment.CurrentDirectory + @"\..\..\..\"}{TagConstants.FileName}");
+        
         public static string GetJsonData()
         {
-            using (StreamReader r = new StreamReader(TagConstants.FileName))
+            using (StreamReader r = new StreamReader(_fullPath))
             {
                 return r.ReadToEnd();
             }
@@ -41,11 +43,10 @@ namespace SupportBot.Modules.TagSystem
         }
 
         public static async Task WriteJsonData(string jsonData)
-            => await File.WriteAllTextAsync(TagConstants.FileName, jsonData);
+            => await File.WriteAllTextAsync(_fullPath, jsonData);
 
         public static string GetTagContentByName(string tagName)
         {
-            string json = File.ReadAllText(TagConstants.FileName);
             tagName = tagName.ToLower();
             
             var deserializedObject = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
@@ -122,8 +123,7 @@ namespace SupportBot.Modules.TagSystem
         
         public static List<Tag> GetAllTags()
         {
-            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
-            return tags;
+            return JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
         }
         
         public static bool GetIfTagExists(string tagName)
