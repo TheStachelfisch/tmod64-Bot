@@ -23,6 +23,9 @@ namespace SupportBot.Modules.TagSystem
 
         [JsonProperty("createdAt")]
         public long CreatedAt;
+
+        [JsonProperty("uses")]
+        public int Uses;
     }
     
     public class TagService
@@ -97,6 +100,24 @@ namespace SupportBot.Modules.TagSystem
             tagName = tagName.ToLower();
 
             return tags.Where(i => i.Name.Equals(tagName)).ToList();
+        }
+
+        public static int GetUsesForTag(string tagName)
+        {
+            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
+            tagName = tagName.ToLower();
+
+            return int.Parse(tags.Where(x => x.Name.Equals(tagName)).Select(i => i.Uses).FirstOrDefault().ToString());
+        }
+
+        public static async Task IncreaseUsesForTag(string tagName)
+        {
+            List<Tag> tags = JsonConvert.DeserializeObject<List<Tag>>(GetJsonData());
+            tagName = tagName.ToLower();
+
+            tags.Where(x => x.Name.Equals(tagName)).Select(c => { c.Uses = c.Uses + 1; return c; }).ToList();
+            string jsonData = JsonConvert.SerializeObject(tags, Formatting.Indented);
+            await WriteJsonData(jsonData);
         }
         
         public static List<Tag> GetAllTags()

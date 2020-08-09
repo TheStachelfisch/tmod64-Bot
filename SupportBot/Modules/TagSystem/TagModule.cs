@@ -15,6 +15,7 @@ namespace SupportBot.Modules.TagSystem
         {
             if (TagService.GetIfTagExists(tagName))
             {
+                await TagService.IncreaseUsesForTag(tagName);
                 await ReplyAsync(TagService.GetTagContentByName(tagName));
             }
             else
@@ -67,16 +68,16 @@ namespace SupportBot.Modules.TagSystem
             {
                 foreach (var tag in TagService.GetTag(tagName))
                 {
-                    embedBuilder.WithTitle($"Tag: {tag.Name}");
+                    embedBuilder.WithTitle(tag.Name);
                     embedBuilder.WithDescription(
-                        $"**Owner:** {tag.OwnerName}\n**Owner Id:** {tag.OwnerId}\n**Created at:** {DateTimeOffset.FromUnixTimeSeconds(tag.CreatedAt)} UTC");
+                        $"**Created By**\n {Context.Client.GetUser(tag.OwnerId).Mention}\n\n **Uses** \n{TagService.GetUsesForTag(tagName)}");
                     embedBuilder.WithColor(Color.DarkGreen);
-                    embedBuilder.WithThumbnailUrl(Context.Client.GetUser(tag.OwnerId).GetAvatarUrl());
-                    embedBuilder.WithFooter("Sent at ");
-                    embedBuilder.WithCurrentTimestamp();
-                    
-                    await ReplyAsync("", false, embedBuilder.Build());
+                    embedBuilder.WithAuthor($"{Context.User.Username}#{Context.User.Discriminator}", Context.Client.GetUser(tag.OwnerId).GetAvatarUrl());
+                    embedBuilder.WithFooter("Tag created at ");
+                    embedBuilder.WithTimestamp(DateTimeOffset.FromUnixTimeSeconds(tag.CreatedAt));
                 }
+
+                await ReplyAsync("", false, embedBuilder.Build());
             }
             else
             {
