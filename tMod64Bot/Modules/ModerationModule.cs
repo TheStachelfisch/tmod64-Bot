@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿using System;
+using System.Linq;
+using Discord;
 using Discord.Commands;
 using System.Threading.Tasks;
 
@@ -63,12 +65,169 @@ namespace tMod64Bot.Modules
 			await Task.Delay(2500);
 			await MessageToDelete.DeleteAsync();
 		}
+		
 		[Command("echo")]
 		[RequireUserPermission(GuildPermission.ManageMessages)]
 		[Summary("Makes the bot say something in the specified chat, anonymously")]
 		public async Task EchoAsync(IGuildChannel channel, [Remainder] string message)
 		{
 			await Context.Guild.GetTextChannel(channel.Id).SendMessageAsync(message);
+		}
+	}
+
+	[Group("purge")]
+	public class PurgeModule : ModuleBase<SocketCommandContext>
+	{
+		[Command]
+		[RequireUserPermission(GuildPermission.ManageMessages)]
+		[Summary("purges a specified amount of messages")]
+		public async Task PurgeMessageAsync(int amount)
+		{
+			//Embeds are pretty you know
+			EmbedBuilder amountErrorEmbed = new EmbedBuilder();
+			EmbedBuilder successEmbed = new EmbedBuilder();
+			
+			if (amount <= 0)
+			{
+				amountErrorEmbed.WithTitle("Error!");
+				amountErrorEmbed.WithDescription("The amount of messages cant be zero or negative");
+				amountErrorEmbed.WithColor(Color.Red);
+				amountErrorEmbed.WithCurrentTimestamp();
+				await ReplyAsync("", false, amountErrorEmbed.Build());
+			}
+
+			var messages = await Context.Channel.GetMessagesAsync(Context.Message, Direction.Before, amount).FlattenAsync();
+
+			var filteredMessages = messages.Where(x => (DateTimeOffset.Now - x.Timestamp).TotalDays <= 14);
+
+			var count = filteredMessages.Count();
+
+			if (count == 0)
+			{
+				amountErrorEmbed.WithTitle("Error!");
+				amountErrorEmbed.WithDescription("No messages found to delete");
+				amountErrorEmbed.WithColor(Color.Red);
+				amountErrorEmbed.WithCurrentTimestamp();
+				await ReplyAsync("", false, amountErrorEmbed.Build());
+			}
+			else
+			{
+				await (Context?.Channel as ITextChannel).DeleteMessagesAsync(filteredMessages);
+				successEmbed.WithTitle($"Successfully deleted {filteredMessages.Count()} messages");
+				successEmbed.WithColor(Color.DarkGreen);
+				successEmbed.WithCurrentTimestamp();
+
+				var embedMessage = await ReplyAsync("", false, successEmbed.Build());
+				await Task.Delay(2500);
+				
+				await embedMessage.DeleteAsync();
+				await Context.Message.DeleteAsync();
+			}
+		}
+
+		[Command("user")]
+		[RequireUserPermission(GuildPermission.ManageMessages)]
+		[Summary("purges a specified amount of messages from a specific user")]
+		public async Task PurgeUserAsync(IGuildUser user, int messageCount)
+		{
+			EmbedBuilder amountErrorEmbed = new EmbedBuilder();
+			EmbedBuilder successEmbed = new EmbedBuilder();
+			
+			if (messageCount <= 0)
+			{
+				amountErrorEmbed.WithTitle("Error!");
+				amountErrorEmbed.WithDescription("The amount of messages cant be zero or negative");
+				amountErrorEmbed.WithColor(Color.Red);
+				amountErrorEmbed.WithCurrentTimestamp();
+				var embedMessage = await ReplyAsync("", false, amountErrorEmbed.Build());
+				
+				await Task.Delay(2500);
+				
+				await embedMessage.DeleteAsync();
+				await Context.Message.DeleteAsync();
+			}
+
+			var messages = await Context.Channel.GetMessagesAsync(Context.Message, Direction.Before, messageCount).FlattenAsync();
+
+			var filteredMessages = messages.Where(x => (DateTimeOffset.Now - x.Timestamp).TotalDays <= 14).Where(u => u.Author.Id.Equals(user.Id));
+
+			var count = filteredMessages.Count();
+
+			if (count == 0)
+			{
+				amountErrorEmbed.WithTitle("Error!");
+				amountErrorEmbed.WithDescription("No messages found to delete");
+				amountErrorEmbed.WithColor(Color.Red);
+				amountErrorEmbed.WithCurrentTimestamp();
+				var embedMessage = await ReplyAsync("", false, amountErrorEmbed.Build());
+				
+				await Task.Delay(2500);
+				
+				await embedMessage.DeleteAsync();
+				await Context.Message.DeleteAsync();
+			}
+			else
+			{
+				await (Context?.Channel as ITextChannel).DeleteMessagesAsync(filteredMessages);
+				successEmbed.WithTitle($"Successfully deleted {filteredMessages.Count()} messages from");
+				successEmbed.WithDescription(MentionUtils.MentionUser(user.Id));
+				successEmbed.WithColor(Color.DarkGreen);
+				successEmbed.WithCurrentTimestamp();
+
+				var embedMessage = await ReplyAsync("", false, successEmbed.Build());
+				await Task.Delay(2500);
+				
+				await embedMessage.DeleteAsync();
+				await Context.Message.DeleteAsync();
+			}
+		}
+
+		[Command("contains"), Alias("contain")]
+		[Summary("Deletes a specified amount of message that contain a certain string")]
+		[RequireBotPermission(GuildPermission.ManageMessages)]
+		public async Task PurgeContainAsync(int amount, string contain)
+		{
+			contain = contain.ToLower();
+			
+			EmbedBuilder amountErrorEmbed = new EmbedBuilder();
+			EmbedBuilder successEmbed = new EmbedBuilder();
+			
+			if (amount <= 0)
+			{
+				amountErrorEmbed.WithTitle("Error!");
+				amountErrorEmbed.WithDescription("The amount of messages cant be zero or negative");
+				amountErrorEmbed.WithColor(Color.Red);
+				amountErrorEmbed.WithCurrentTimestamp();
+				await ReplyAsync("", false, amountErrorEmbed.Build());
+			}
+
+			var messages = await Context.Channel.GetMessagesAsync(Context.Message, Direction.Before, amount).FlattenAsync();
+
+			var filteredMessages = messages.Where(x => (DateTimeOffset.Now - x.Timestamp).TotalDays <= 14).Where(m => m.Content.ToLower().Contains(contain));
+
+			var count = filteredMessages.Count();
+
+			if (count == 0)
+			{
+				amountErrorEmbed.WithTitle("Error!");
+				amountErrorEmbed.WithDescription($"No messages found that contained **'{contain}'***");
+				amountErrorEmbed.WithColor(Color.Red);
+				amountErrorEmbed.WithCurrentTimestamp();
+				await ReplyAsync("", false, amountErrorEmbed.Build());
+			}
+			else
+			{
+				await (Context?.Channel as ITextChannel).DeleteMessagesAsync(filteredMessages);
+				successEmbed.WithTitle($"Successfully deleted {filteredMessages.Count()} messages that contained '**{contain}**'");
+				successEmbed.WithColor(Color.DarkGreen);
+				successEmbed.WithCurrentTimestamp();
+
+				var embedMessage = await ReplyAsync("", false, successEmbed.Build());
+				await Task.Delay(2500);
+				
+				await embedMessage.DeleteAsync();
+				await Context.Message.DeleteAsync();
+			}
 		}
 	}
 }
