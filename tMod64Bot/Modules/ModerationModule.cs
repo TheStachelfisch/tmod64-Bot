@@ -3,13 +3,13 @@ using System.Linq;
 using Discord;
 using Discord.Commands;
 using System.Threading.Tasks;
+using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Modules
 {
 	public class ModerationModule : ModuleBase<SocketCommandContext>
 	{
-
-		private long TemporaryMutedRole = 742064452970741811; //NOTE: Stachel, once you add the config.json stuff, please delete this.
+		private ulong MutedRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.MutedRole));
 
 		[Command("restart"), Alias("r")]
 		[RequireOwner]
@@ -49,7 +49,7 @@ namespace tMod64Bot.Modules
 		[Summary("Adds a muted role onto the user.")]
 		public async Task MuteAsync(IGuildUser user, [Remainder] string reason = "No reason specified.") //TODO: temporary unmute, time to unmute
 		{
-			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole((ulong)TemporaryMutedRole));
+			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(MutedRole));
 			IUserMessage MessageToDelete = await ReplyAsync("User " + user.Username + " was muted for " + "Infinity" + " seconds. Reason: " + reason);
 			await Task.Delay(2500);
 			await MessageToDelete.DeleteAsync();
@@ -60,7 +60,7 @@ namespace tMod64Bot.Modules
 		[Summary("Banishes a user to the shadow realm!")]
 		public async Task SBanAsync(IGuildUser user, [Remainder] string reason = "No reason specified.")
 		{
-			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole((ulong)TemporaryMutedRole));
+			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(MutedRole));
 			IUserMessage MessageToDelete = await ReplyAsync("User " + user.Username + " was banished to the Shadow Realm. Reason: " + reason);
 			await Task.Delay(2500);
 			await MessageToDelete.DeleteAsync();

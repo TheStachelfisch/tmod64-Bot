@@ -39,10 +39,9 @@ namespace tMod64Bot.Handler
             var context = new SocketCommandContext(_client, msg);
 
             int argPos = 0;
-            //TODO: Replace with prefix from Config
             if (msg.HasStringPrefix(ConfigService.GetConfig(ConfigEnum.BotPrefix), ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
-                var result = await _commands.ExecuteAsync(context, argPos, _service);
+                IResult result = await _commands.ExecuteAsync(context, argPos, _service);
 
                 //Remove if you want
                 if (!result.IsSuccess)
@@ -54,13 +53,10 @@ namespace tMod64Bot.Handler
                         errorEmbed.WithDescription($"{result.Error.ToString()}\n\n[Message Link]({context.Message.GetJumpUrl()})");
                         errorEmbed.WithCurrentTimestamp();
                         errorEmbed.WithColor(Color.Red);
-                        await context.Guild.GetTextChannel((ulong)AdminChannelID).SendMessageAsync(MentionUtils.MentionRole(AdminID), false, errorEmbed.Build());
+                        await context.Guild.GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.AdminChannel))).SendMessageAsync(MentionUtils.MentionRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.AdminRole))), false, errorEmbed.Build());
                     }
                 }
             }
         }
-        //TODO: Delete this
-        private ulong AdminID = 741727508306722849;
-        private ulong AdminChannelID = 741727264588169332;
     }
 }

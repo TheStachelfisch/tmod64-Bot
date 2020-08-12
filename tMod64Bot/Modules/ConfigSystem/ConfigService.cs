@@ -82,10 +82,74 @@ namespace tMod64Bot.Modules.ConfigSystem
             }
         }
 
+        public static async Task UpdateBotPrefix(string newPrefix)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["BotPrefix"] = newPrefix;
+
+            await WriteJsonData(rss.ToString());
+        }
+        
         public static async Task UpdateBotManager(long id)
         {
             JObject rss = JObject.Parse(GetJsonData());
-            var BotManager = rss["BotManagerRole"] = id;
+            rss["BotManagerRole"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+        
+        public static async Task UpdateLoggingChannel(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["LoggingChannel"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+        
+        public static async Task UpdateModLoggingChannel(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["ModLoggingChannel"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+        
+        public static async Task UpdateAdminChannel(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["AdminChannel"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+        
+        public static async Task UpdateAdminRole(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["AdminRole"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+        
+        public static async Task UpdateMutedRole(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["MutedRole"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+
+        public static async Task UpdateSoftbanRole(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["SoftbanRole"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+        
+        public static async Task UpdateSupportStaffRole(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            rss["SupportStaffRole"] = id;
 
             await WriteJsonData(rss.ToString());
         }
