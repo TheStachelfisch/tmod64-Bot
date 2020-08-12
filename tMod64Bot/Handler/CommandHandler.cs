@@ -1,20 +1,20 @@
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
 using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
 using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Handler
 {
     public class CommandHandler
     {
-        private DiscordSocketClient _client;
+        public static CommandService _commands;
+        private readonly DiscordSocketClient _client;
         private CommandServiceConfig _config;
         private IServiceProvider _service;
-        public static CommandService _commands;
 
         public CommandHandler(DiscordSocketClient client, CommandServiceConfig config = null)
         {
@@ -31,17 +31,18 @@ namespace tMod64Bot.Handler
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            EmbedBuilder errorEmbed = new EmbedBuilder();
-            
+            var errorEmbed = new EmbedBuilder();
+
             var msg = arg as SocketUserMessage;
             if (msg == null) return;
 
             var context = new SocketCommandContext(_client, msg);
 
-            int argPos = 0;
-            if (msg.HasStringPrefix(ConfigService.GetConfig(ConfigEnum.BotPrefix), ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            var argPos = 0;
+            if (msg.HasStringPrefix(ConfigService.GetConfig(ConfigEnum.BotPrefix), ref argPos) ||
+                msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
-                IResult result = await _commands.ExecuteAsync(context, argPos, _service);
+                var result = await _commands.ExecuteAsync(context, argPos, _service);
 
                 //Remove if you want
                 if (!result.IsSuccess)

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -15,7 +12,7 @@ namespace tMod64Bot.Modules.TagSystem
         [Command("")]
         public async Task TagCommand()
         {
-            EmbedBuilder messageEmbed = new EmbedBuilder();
+            var messageEmbed = new EmbedBuilder();
 
             messageEmbed.WithTitle("Documentation for Tags");
             messageEmbed.WithFooter("Sent at ");
@@ -24,23 +21,19 @@ namespace tMod64Bot.Modules.TagSystem
 
             await ReplyAsync("", false, messageEmbed.Build());
         }
-        
-        [Command, Alias("t", "g", "get")]
+
+        [Command]
+        [Alias("t", "g", "get")]
         public async Task TagGetCommand(string tagName)
         {
             var context = Context;
             var tagUser = context.User;
-            
-            EmbedBuilder tagEmbed = new EmbedBuilder();
-            EmbedBuilder errorEmbed = new EmbedBuilder();
-            
+
+            var tagEmbed = new EmbedBuilder();
+            var errorEmbed = new EmbedBuilder();
+
             if (TagService.GetIfTagExists(tagName))
             {
-                foreach (var role in ((SocketGuildUser)Context.Message.Author).Roles)
-                {
-                    
-                }
-                
                 await TagService.IncreaseUsesForTag(tagName);
                 tagEmbed.WithFooter($"Requested by {Context.User.Username}");
                 tagEmbed.WithCurrentTimestamp();
@@ -58,13 +51,14 @@ namespace tMod64Bot.Modules.TagSystem
                 await Context.Message.DeleteAsync();
             }
         }
-        
-        [Command("add"), Alias("Create")]
+
+        [Command("add")]
+        [Alias("Create")]
         public async Task TagCreateCommand(string tagName, [Remainder] string tagContent)
         {
-            EmbedBuilder errorEmbed = new EmbedBuilder();
-            EmbedBuilder successEmbed = new EmbedBuilder();
-            
+            var errorEmbed = new EmbedBuilder();
+            var successEmbed = new EmbedBuilder();
+
             if (!TagService.GetIfTagExists(tagName))
             {
                 await TagService.CreateTag(tagName, tagContent, Context.User.Username, Context.User.Id);
@@ -82,12 +76,13 @@ namespace tMod64Bot.Modules.TagSystem
             }
         }
 
-        [Command("delete"), Alias("d", "remove", "r")]
+        [Command("delete")]
+        [Alias("d", "remove", "r")]
         public async Task TagDeleteCommand(string tagName)
         {
-            EmbedBuilder errorEmbed = new EmbedBuilder();
-            EmbedBuilder successEmbed = new EmbedBuilder();
-            
+            var errorEmbed = new EmbedBuilder();
+            var successEmbed = new EmbedBuilder();
+
             if (TagService.GetIfTagExists(tagName))
             {
                 await TagService.DeleteTagByName(tagName);
@@ -105,12 +100,13 @@ namespace tMod64Bot.Modules.TagSystem
             }
         }
 
-        [Command("edit"), Alias("e", "change")]
-        public async Task TagEditCommand(string tagName, [Remainder]string tagNewContent)
+        [Command("edit")]
+        [Alias("e", "change")]
+        public async Task TagEditCommand(string tagName, [Remainder] string tagNewContent)
         {
-            EmbedBuilder errorEmbed = new EmbedBuilder();
-            EmbedBuilder successEmbed = new EmbedBuilder();
-            
+            var errorEmbed = new EmbedBuilder();
+            var successEmbed = new EmbedBuilder();
+
             if (TagService.GetIfTagExists(tagName))
             {
                 await TagService.EditTag(tagName, tagNewContent);
@@ -130,9 +126,9 @@ namespace tMod64Bot.Modules.TagSystem
 
         [Command("info")]
         public async Task TagInfoCommand(string tagName)
-        {               
-            EmbedBuilder errorEmbed = new EmbedBuilder();
-            EmbedBuilder embedBuilder = new EmbedBuilder();
+        {
+            var errorEmbed = new EmbedBuilder();
+            var embedBuilder = new EmbedBuilder();
 
             if (TagService.GetIfTagExists(tagName))
             {
@@ -142,7 +138,8 @@ namespace tMod64Bot.Modules.TagSystem
                     embedBuilder.WithDescription(
                         $"**Created By**\n {Context.Client.GetUser(tag.OwnerId).Mention}\n\n **Uses** \n{TagService.GetUsesForTag(tagName)}");
                     embedBuilder.WithColor(Color.DarkGreen);
-                    embedBuilder.WithAuthor($"{Context.User.Username}#{Context.User.Discriminator}", Context.Client.GetUser(tag.OwnerId).GetAvatarUrl());
+                    embedBuilder.WithAuthor($"{Context.User.Username}#{Context.User.Discriminator}",
+                        Context.Client.GetUser(tag.OwnerId).GetAvatarUrl());
                     embedBuilder.WithFooter("Tag created at ");
                     embedBuilder.WithTimestamp(DateTimeOffset.FromUnixTimeSeconds(tag.CreatedAt));
                 }
@@ -165,12 +162,9 @@ namespace tMod64Bot.Modules.TagSystem
         [Command]
         public async Task TagGetAll()
         {
-            EmbedBuilder embedBuilder = new EmbedBuilder();
+            var embedBuilder = new EmbedBuilder();
 
-            foreach (var tags in TagService.GetAllTags())
-            {
-                embedBuilder.AddField(tags.Name, $"Owner: {Context.Client.GetUser(tags.OwnerId).Mention}");
-            }
+            foreach (var tags in TagService.GetAllTags()) embedBuilder.AddField(tags.Name, $"Owner: {Context.Client.GetUser(tags.OwnerId).Mention}");
 
             await ReplyAsync("", false, embedBuilder.Build());
         }

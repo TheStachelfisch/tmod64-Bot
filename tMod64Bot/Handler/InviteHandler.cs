@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 
@@ -7,8 +6,8 @@ namespace tMod64Bot.Handler
 {
     public class InviteHandler
     {
-        private DiscordSocketClient _client;
-        
+        private readonly DiscordSocketClient _client;
+
         public InviteHandler(DiscordSocketClient client)
         {
             _client = client;
@@ -19,8 +18,8 @@ namespace tMod64Bot.Handler
         //TODO: Check if user has role that allows to send invite
         private async Task OnMessageReceive(SocketMessage arg)
         {
-            EmbedBuilder dmEmbed = new EmbedBuilder();
-            
+            var dmEmbed = new EmbedBuilder();
+
             if (MessageContainsInvite(arg.Content))
             {
                 dmEmbed.WithTitle("Your message was Deleted");
@@ -28,9 +27,9 @@ namespace tMod64Bot.Handler
                 dmEmbed.WithColor(Color.Red);
                 dmEmbed.WithCurrentTimestamp();
                 dmEmbed.WithFooter("This message was sent by a bot");
-                
+
                 await arg.DeleteAsync();
-                
+
                 await arg.Author.SendMessageAsync("", false, dmEmbed.Build());
             }
         }
@@ -41,6 +40,5 @@ namespace tMod64Bot.Handler
 
             return false;
         }
-            
     }
 }

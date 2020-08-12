@@ -1,17 +1,15 @@
-using Discord;
-using Discord.WebSocket;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+using Discord;
+using Discord.WebSocket;
 using tMod64Bot.Handler;
-using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot
 {
-    class Program
+    internal class Program
     {
-        private static string _token = File.ReadAllText(@"token.txt");
+        private static readonly string _token = File.ReadAllText(@"token.txt");
 
         private static DiscordSocketClient _client;
         private static DiscordSocketConfig _config;
@@ -19,13 +17,14 @@ namespace tMod64Bot
         private static InviteHandler _inviteHandler;
         private static CommandHandler _commandHandler;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
             => StartBotAsync().GetAwaiter().GetResult();
+        
 
         public static async Task StartBotAsync()
         {
             _client = new DiscordSocketClient();
-            _config = new DiscordSocketConfig { MessageCacheSize = 100 };
+            _config = new DiscordSocketConfig {MessageCacheSize = 100};
 
             await _client.LoginAsync(TokenType.Bot, _token);
 

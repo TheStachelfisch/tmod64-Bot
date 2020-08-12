@@ -1,30 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Discord;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using tMod64Bot.Modules.TagSystem;
 
 namespace tMod64Bot.Modules.ConfigSystem
 {
     public class Config
     {
-        public char BotPrefix;
-        
+        public long AdminChannel;
+
+        public long AdminRole;
+
         public long BotManagerRole;
 
         public long BotOwner;
+        public char BotPrefix;
 
         public long LoggingChannel;
 
         public long ModLoggingChannel;
-
-        public long AdminChannel;
-
-        public long AdminRole;
 
         public long MutedRole;
 
@@ -32,24 +27,26 @@ namespace tMod64Bot.Modules.ConfigSystem
 
         public long SupportStaffRole;
     }
-    
+
     public class ConfigService
     {
         //TODO: Remove this cancer as soon as we can
-        private static string _fullPath = Path.GetFullPath($"{Environment.CurrentDirectory + @"\..\..\..\"}{ConfigConstants.ConfigFileName}");
-        
+        private static readonly string _fullPath = Path.GetFullPath($"{Environment.CurrentDirectory + @"\..\..\..\"}{ConfigConstants.ConfigFileName}");
+
         public static string GetJsonData()
         {
-            using (StreamReader r = new StreamReader(_fullPath))
+            using (var r = new StreamReader(_fullPath))
             {
                 return r.ReadToEnd();
             }
 
             return null;
         }
-        
+
         public static async Task WriteJsonData(string jsonData)
-            => await File.WriteAllTextAsync(_fullPath, jsonData);
+        {
+            await File.WriteAllTextAsync(_fullPath, jsonData);
+        }
 
         public static string GetConfig(ConfigEnum config)
         {
@@ -85,55 +82,55 @@ namespace tMod64Bot.Modules.ConfigSystem
 
         public static async Task UpdateBotPrefix(string newPrefix)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["BotPrefix"] = newPrefix;
 
             await WriteJsonData(rss.ToString());
         }
-        
+
         public static async Task UpdateBotManager(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["BotManagerRole"] = id;
 
             await WriteJsonData(rss.ToString());
         }
-        
+
         public static async Task UpdateLoggingChannel(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["LoggingChannel"] = id;
 
             await WriteJsonData(rss.ToString());
         }
-        
+
         public static async Task UpdateModLoggingChannel(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["ModLoggingChannel"] = id;
 
             await WriteJsonData(rss.ToString());
         }
-        
+
         public static async Task UpdateAdminChannel(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["AdminChannel"] = id;
 
             await WriteJsonData(rss.ToString());
         }
-        
+
         public static async Task UpdateAdminRole(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["AdminRole"] = id;
 
             await WriteJsonData(rss.ToString());
         }
-        
+
         public static async Task UpdateMutedRole(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["MutedRole"] = id;
 
             await WriteJsonData(rss.ToString());
@@ -141,15 +138,15 @@ namespace tMod64Bot.Modules.ConfigSystem
 
         public static async Task UpdateSoftbanRole(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["SoftbanRole"] = id;
 
             await WriteJsonData(rss.ToString());
         }
-        
+
         public static async Task UpdateSupportStaffRole(long id)
         {
-            JObject rss = JObject.Parse(GetJsonData());
+            var rss = JObject.Parse(GetJsonData());
             rss["SupportStaffRole"] = id;
 
             await WriteJsonData(rss.ToString());
