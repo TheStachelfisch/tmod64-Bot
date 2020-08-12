@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using tMod64Bot.Modules.TagSystem;
 
 namespace tMod64Bot.Modules.ConfigSystem
 {
     public class Config
     {
+        public char BotPrefix;
+        
         public long BotManagerRole;
 
         public long BotOwnerId;
@@ -46,35 +50,44 @@ namespace tMod64Bot.Modules.ConfigSystem
         public static async Task WriteJsonData(string jsonData)
             => await File.WriteAllTextAsync(_fullPath, jsonData);
 
-        public static long GetConfig(ConfigEnum config)
+        public static string GetConfig(ConfigEnum config)
         {
             var deserializedObject = JsonConvert.DeserializeObject<Config>(GetJsonData());
 
             switch (config)
             {
                 //break; isn't needed since return makes everything after that unreachable
+                case ConfigEnum.BotPrefix:
+                    return deserializedObject.BotPrefix.ToString();
                 case ConfigEnum.BotManagerRole:
-                    return long.Parse(deserializedObject.BotManagerRole.ToString());
+                    return deserializedObject.BotManagerRole.ToString();
                 case ConfigEnum.BotOwner:
-                    return long.Parse(deserializedObject.BotOwnerId.ToString());
+                    return deserializedObject.BotOwnerId.ToString();
                 case ConfigEnum.LoggingChannel:
-                    return long.Parse(deserializedObject.LoggingChannelId.ToString());
+                    return deserializedObject.LoggingChannelId.ToString();
                 case ConfigEnum.ModLogChannel:
-                    return long.Parse(deserializedObject.ModLoggingChannelId.ToString());
+                    return deserializedObject.ModLoggingChannelId.ToString();
                 case ConfigEnum.AdminChannel:
-                    return long.Parse(deserializedObject.AdminChannelId.ToString());
+                    return deserializedObject.AdminChannelId.ToString();
                 case ConfigEnum.AdminRole:
-                    return long.Parse(deserializedObject.AdminRoleId.ToString());
+                    return deserializedObject.AdminRoleId.ToString();
                 case ConfigEnum.MutedRole:
-                    return long.Parse(deserializedObject.MutedRole.ToString());
+                    return deserializedObject.MutedRole.ToString();
                 case ConfigEnum.SoftbanRole:
-                    return long.Parse(deserializedObject.SoftbanRole.ToString());
+                    return deserializedObject.SoftbanRole.ToString();
                 case ConfigEnum.SupportStaffRole:
-                    return long.Parse(deserializedObject.SupportStaffRole.ToString());
+                    return deserializedObject.SupportStaffRole.ToString();
                 default:
-                    return 0;
-
+                    return null;
             }
+        }
+
+        public static async Task UpdateBotManager(long id)
+        {
+            JObject rss = JObject.Parse(GetJsonData());
+            var BotManager = rss["BotManagerRole"] = id;
+
+            await WriteJsonData(rss.ToString());
         }
     }
 }

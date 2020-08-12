@@ -4,6 +4,7 @@
     // TagChange and shit methods are still needed...
     public enum ConfigEnum
     {
+        BotPrefix,
         BotManagerRole,
         BotOwner,
         LoggingChannel,

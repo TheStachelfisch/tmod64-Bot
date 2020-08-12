@@ -1,5 +1,6 @@
-﻿{
-  "BotManagerRole": 0,
+{
+  "BotPrefix": ".",
+  "BotManagerRole": 743117534768660501,
   "BotOwnerId": 442639987180306432,
   "LoggingChannelId": 0,
   "ModLoggingChannelId": 0,

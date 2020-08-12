@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
+using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Handler
 {
@@ -39,7 +40,7 @@ namespace tMod64Bot.Handler
 
             int argPos = 0;
             //TODO: Replace with prefix from Config
-            if (msg.HasCharPrefix('.', ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            if (msg.HasStringPrefix(ConfigService.GetConfig(ConfigEnum.BotPrefix), ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var result = await _commands.ExecuteAsync(context, argPos, _service);
 
