@@ -21,7 +21,7 @@ namespace tMod64Bot.Handler
             _client = client;
 
             //Check if null before doing anything with it
-            config = _config;
+            _config = config;
 
             _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _service);
 

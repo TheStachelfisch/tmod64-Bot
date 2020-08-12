@@ -58,7 +58,7 @@ namespace tMod64Bot.Modules
 		[Command("softban"), Alias("sb")]
 		[RequireUserPermission(GuildPermission.BanMembers)]
 		[Summary("Banishes a user to the shadow realm!")]
-		public async Task SBanAsync(IGuildUser user, [Remainder] string reason = "No reason specified.") //Clone of MuteAsync LUL
+		public async Task SBanAsync(IGuildUser user, [Remainder] string reason = "No reason specified.")
 		{
 			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole((ulong)TemporaryMutedRole));
 			IUserMessage MessageToDelete = await ReplyAsync("User " + user.Username + " was banished to the Shadow Realm. Reason: " + reason);
