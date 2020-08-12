@@ -16,15 +16,15 @@ namespace tMod64Bot.Modules.ConfigSystem
         
         public long BotManagerRole;
 
-        public long BotOwnerId;
+        public long BotOwner;
 
-        public long LoggingChannelId;
+        public long LoggingChannel;
 
-        public long ModLoggingChannelId;
+        public long ModLoggingChannel;
 
-        public long AdminChannelId;
+        public long AdminChannel;
 
-        public long AdminRoleId;
+        public long AdminRole;
 
         public long MutedRole;
 
@@ -35,6 +35,7 @@ namespace tMod64Bot.Modules.ConfigSystem
     
     public class ConfigService
     {
+        //TODO: Remove this cancer as soon as we can
         private static string _fullPath = Path.GetFullPath($"{Environment.CurrentDirectory + @"\..\..\..\"}{ConfigConstants.ConfigFileName}");
         
         public static string GetJsonData()
@@ -62,15 +63,15 @@ namespace tMod64Bot.Modules.ConfigSystem
                 case ConfigEnum.BotManagerRole:
                     return deserializedObject.BotManagerRole.ToString();
                 case ConfigEnum.BotOwner:
-                    return deserializedObject.BotOwnerId.ToString();
+                    return deserializedObject.BotOwner.ToString();
                 case ConfigEnum.LoggingChannel:
-                    return deserializedObject.LoggingChannelId.ToString();
+                    return deserializedObject.LoggingChannel.ToString();
                 case ConfigEnum.ModLogChannel:
-                    return deserializedObject.ModLoggingChannelId.ToString();
+                    return deserializedObject.ModLoggingChannel.ToString();
                 case ConfigEnum.AdminChannel:
-                    return deserializedObject.AdminChannelId.ToString();
+                    return deserializedObject.AdminChannel.ToString();
                 case ConfigEnum.AdminRole:
-                    return deserializedObject.AdminRoleId.ToString();
+                    return deserializedObject.AdminRole.ToString();
                 case ConfigEnum.MutedRole:
                     return deserializedObject.MutedRole.ToString();
                 case ConfigEnum.SoftbanRole:

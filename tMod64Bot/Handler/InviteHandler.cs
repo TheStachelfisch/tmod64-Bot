@@ -37,10 +37,7 @@ namespace tMod64Bot.Handler
 
         private static bool MessageContainsInvite(string message)
         {
-            if (message.Contains("discord.gg/") || message.Contains("https://discord.gg/") || message.Contains("discord.com/invite/"))
-            {
-                return true;
-            }
+            if (message.Contains("discord.gg/") || message.Contains("https://discord.gg/") || message.Contains("discord.com/invite/")) return true;
 
             return false;
         }

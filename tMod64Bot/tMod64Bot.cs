@@ -42,6 +42,7 @@ namespace tMod64Bot
         //Add Handlers here
         private static async Task ReadyEvent()
         {
+            await _client.SetStatusAsync(UserStatus.Online);
             _commandHandler = new CommandHandler(_client);
             _inviteHandler = new InviteHandler(_client);
         }
