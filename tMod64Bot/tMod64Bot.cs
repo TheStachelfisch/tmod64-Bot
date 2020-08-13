@@ -7,7 +7,7 @@ using tMod64Bot.Handler;
 
 namespace tMod64Bot
 {
-    internal class Program
+    internal class tMod64bot
     {
         private static readonly string _token = File.ReadAllText(@"token.txt");
 
@@ -16,6 +16,7 @@ namespace tMod64Bot
 
         private static InviteHandler _inviteHandler;
         private static CommandHandler _commandHandler;
+        private static BadWordHandler _badWordHandler;
 
         private static void Main(string[] args)
             => StartBotAsync().GetAwaiter().GetResult();
@@ -42,6 +43,7 @@ namespace tMod64Bot
         private static async Task ReadyEvent()
         {
             await _client.SetStatusAsync(UserStatus.Online);
+            _badWordHandler = new BadWordHandler(_client);
             _commandHandler = new CommandHandler(_client);
             _inviteHandler = new InviteHandler(_client);
         }

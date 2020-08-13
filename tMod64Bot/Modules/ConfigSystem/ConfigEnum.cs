@@ -5,6 +5,7 @@
     public enum ConfigEnum
     {
         BotPrefix,
+        GuildId,
         BotManagerRole,
         BotOwner,
         LoggingChannel,

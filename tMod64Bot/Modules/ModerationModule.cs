@@ -21,7 +21,7 @@ namespace tMod64Bot.Modules
         {
             await Context.Client.SetStatusAsync(UserStatus.Invisible);
             await Task.Delay(1000);
-            Program.StartBotAsync().GetAwaiter().GetResult();
+            tMod64bot.StartBotAsync().GetAwaiter().GetResult();
         }
 
         [Command("kick")]

@@ -8,6 +8,8 @@ namespace tMod64Bot.Modules.ConfigSystem
 {
     public class Config
     {
+        public long GuildId;
+        
         public long AdminChannel;
 
         public long AdminRole;
@@ -15,7 +17,8 @@ namespace tMod64Bot.Modules.ConfigSystem
         public long BotManagerRole;
 
         public long BotOwner;
-        public char BotPrefix;
+        
+        public string BotPrefix;
 
         public long LoggingChannel;
 
@@ -56,7 +59,9 @@ namespace tMod64Bot.Modules.ConfigSystem
             {
                 //break; isn't needed since return makes everything after that unreachable
                 case ConfigEnum.BotPrefix:
-                    return deserializedObject.BotPrefix.ToString();
+                    return deserializedObject.BotPrefix;
+                case ConfigEnum.GuildId:
+                    return deserializedObject.GuildId.ToString();
                 case ConfigEnum.BotManagerRole:
                     return deserializedObject.BotManagerRole.ToString();
                 case ConfigEnum.BotOwner:
@@ -148,6 +153,14 @@ namespace tMod64Bot.Modules.ConfigSystem
         {
             var rss = JObject.Parse(GetJsonData());
             rss["SupportStaffRole"] = id;
+
+            await WriteJsonData(rss.ToString());
+        }
+
+        public static async Task SetGuildId(long id)
+        {
+            var rss = JObject.Parse(GetJsonData());
+            rss["GuildId"] = id;
 
             await WriteJsonData(rss.ToString());
         }

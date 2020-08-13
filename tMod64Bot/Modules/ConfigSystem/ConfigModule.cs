@@ -321,5 +321,22 @@ namespace tMod64Bot.Modules.ConfigSystem
                 await ReplyAsync("", false, errorEmbed.Build());
             }
         }
+        
+        [Command("guild"), Alias("id")]
+        [RequireUserPermission(GuildPermission.Administrator)]
+        public async Task SetGuildId()
+        {
+            var successEmbed = new EmbedBuilder();
+            var errorEmbed = new EmbedBuilder();
+
+            await ConfigService.SetGuildId((long) Context.Guild.Id);
+
+            successEmbed.WithTitle("Success!");
+            successEmbed.WithDescription($"Guild id has successfully been changed to '**{Context.Guild.Id}**'");
+            successEmbed.WithColor(Color.Green);
+            successEmbed.WithCurrentTimestamp();
+
+            await ReplyAsync("", false, successEmbed.Build());
+        }
     }
 }
