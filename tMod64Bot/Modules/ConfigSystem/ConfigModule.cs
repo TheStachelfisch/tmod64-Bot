@@ -31,13 +31,29 @@ namespace tMod64Bot.Modules.ConfigSystem
 
             var configEmbed = new EmbedBuilder();
 
-            configEmbed.WithColor(Color.Green);
-            configEmbed.WithTitle("Config");
-            configEmbed.WithDescription("Values with **'0'** or **'null'** have not been added yet.");
+            var user = Context.User as SocketGuildUser;
 
-            foreach (var property in rss.Properties()) configEmbed.AddField(property.Name, property.Value);
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
 
-            await ReplyAsync("", false, configEmbed.Build());
+            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            {
+                configEmbed.WithColor(Color.Green);
+                configEmbed.WithTitle("Config");
+                configEmbed.WithDescription("Values with **'0'** or **'null'** have not been added yet.");
+
+                foreach (var property in rss.Properties()) configEmbed.AddField(property.Name, property.Value);
+
+                await ReplyAsync("", false, configEmbed.Build());
+            }
+            else
+            {
+                configEmbed.WithTitle("Error!");
+                configEmbed.WithDescription("Missing Bot Manager permissions");
+                configEmbed.WithColor(Color.Red);
+                configEmbed.WithCurrentTimestamp();
+
+                await ReplyAsync("", false, configEmbed.Build());
+            }
         }
 
         [Command("BotPrefix")]
@@ -329,14 +345,30 @@ namespace tMod64Bot.Modules.ConfigSystem
             var successEmbed = new EmbedBuilder();
             var errorEmbed = new EmbedBuilder();
 
-            await ConfigService.SetGuildId((long) Context.Guild.Id);
+            var user = Context.User as SocketGuildUser;
 
-            successEmbed.WithTitle("Success!");
-            successEmbed.WithDescription($"Guild id has successfully been changed to '**{Context.Guild.Id}**'");
-            successEmbed.WithColor(Color.Green);
-            successEmbed.WithCurrentTimestamp();
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
 
-            await ReplyAsync("", false, successEmbed.Build());
+            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            {
+                await ConfigService.SetGuildId((long) Context.Guild.Id);
+
+                successEmbed.WithTitle("Success!");
+                successEmbed.WithDescription($"Guild id has successfully been changed to '**{Context.Guild.Id}**'");
+                successEmbed.WithColor(Color.Green);
+                successEmbed.WithCurrentTimestamp();
+
+                await ReplyAsync("", false, successEmbed.Build());
+            }
+            else
+            {
+                errorEmbed.WithTitle("Error!");
+                errorEmbed.WithDescription("Missing Bot Manager permissions");
+                errorEmbed.WithColor(Color.Red);
+                errorEmbed.WithCurrentTimestamp();
+
+                await ReplyAsync("", false, errorEmbed.Build());
+            }
         }
     }
 }

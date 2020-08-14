@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Net;
 using Discord.WebSocket;
 using Newtonsoft.Json;
 using tMod64Bot.Modules.ConfigSystem;
@@ -120,23 +121,27 @@ namespace tMod64Bot.Handler
             var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId))).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)));
             
             var user = arg.Author as SocketGuildUser;
-            
-            //It somehow doesn't work the other way around
-            if (user.Roles.Contains(botManagerRole) || user.Roles.Contains(supportStaffRole) || user.GuildPermissions.ManageMessages)
+
+            // "TrY TO REDUcE NeSTeD if StATEMEnts"
+            if (!arg.Author.IsWebhook && !arg.Author.IsBot)
             {
-                return;
-            }
-            else
-            {
-                if (StringContainsWord(arg.Content))
+                //It somehow doesn't work the other way around
+                if (user.Roles.Contains(botManagerRole) || user.Roles.Contains(supportStaffRole) || user.GuildPermissions.ManageMessages)
                 {
-                    try
+                    return;
+                }
+                else
+                {
+                    if (arg.Embeds.Count() == 0 && StringContainsWord(arg.Content))
                     {
-                        await arg.DeleteAsync();
-                    }
-                    // This error is thrown when a message contains multiple banned words
-                    catch (Discord.Net.HttpException e)
-                    {
+                        try
+                        {
+                            await arg.DeleteAsync();
+                        }
+                        // This error is thrown when a message contains multiple banned words
+                        catch (HttpException e)
+                        {
+                        }
                     }
                 }
             }

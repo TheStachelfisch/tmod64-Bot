@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Handler
 {
@@ -18,19 +20,32 @@ namespace tMod64Bot.Handler
         //TODO: Check if user has role that allows to send invite
         private async Task OnMessageReceive(SocketMessage arg)
         {
+            var botManagerRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId))).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
+            var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId))).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)));
+            
+            var user = arg.Author as SocketGuildUser;
+            
             var dmEmbed = new EmbedBuilder();
 
-            if (MessageContainsInvite(arg.Content))
+            if (!arg.Author.IsWebhook && !arg.Author.IsBot)
             {
-                dmEmbed.WithTitle("Your message was Deleted");
-                dmEmbed.WithDescription($"Your message was deleted because it may have contained a Invite\n\n{arg.Content}");
-                dmEmbed.WithColor(Color.Red);
-                dmEmbed.WithCurrentTimestamp();
-                dmEmbed.WithFooter("This message was sent by a bot");
+                //It somehow doesn't work the other way around
+                if (user.Roles.Contains(botManagerRole) || user.Roles.Contains(supportStaffRole) || user.GuildPermissions.ManageMessages)
+                {
+                    return;
+                }
+                else if (MessageContainsInvite(arg.Content))
+                {
+                    dmEmbed.WithTitle("Your message was Deleted");
+                    dmEmbed.WithDescription($"Your message was deleted because it may have contained a Invite\n\n{arg.Content}");
+                    dmEmbed.WithColor(Color.Red);
+                    dmEmbed.WithCurrentTimestamp();
+                    dmEmbed.WithFooter("This message was sent by a bot");
 
-                await arg.DeleteAsync();
+                    await arg.DeleteAsync();
 
-                await arg.Author.SendMessageAsync("", false, dmEmbed.Build());
+                    await arg.Author.SendMessageAsync("", false, dmEmbed.Build());
+                }
             }
         }
 
