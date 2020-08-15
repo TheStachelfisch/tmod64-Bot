@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Modules.TagSystem
 {
@@ -26,28 +28,24 @@ namespace tMod64Bot.Modules.TagSystem
         [Alias("t", "g", "get")]
         public async Task TagGetCommand(string tagName)
         {
-            var context = Context;
-            var tagUser = context.User;
-
-            var tagEmbed = new EmbedBuilder();
-            var errorEmbed = new EmbedBuilder();
+            var embed = new EmbedBuilder();
 
             if (TagService.GetIfTagExists(tagName))
             {
                 await TagService.IncreaseUsesForTag(tagName);
-                tagEmbed.WithFooter($"Requested by {Context.User.Username}");
-                tagEmbed.WithCurrentTimestamp();
-                tagEmbed.WithColor(Color.DarkBlue);
-                await ReplyAsync(TagService.GetTagContentByName(tagName), false, tagEmbed.Build());
+                embed.WithFooter($"Requested by {Context.User.Username}");
+                embed.WithCurrentTimestamp();
+                embed.WithColor(Color.DarkBlue);
+                await ReplyAsync(TagService.GetTagContentByName(tagName), false, embed.Build());
                 await Context.Message.DeleteAsync();
             }
             else
             {
-                errorEmbed.WithTitle("Error!");
-                errorEmbed.WithDescription($"Tag '**{tagName}**' doesn't exist");
-                errorEmbed.WithColor(Color.Red);
-                errorEmbed.WithFooter("Requested by " + Context.User.Username);
-                await ReplyAsync("", false, errorEmbed.Build());
+                embed.WithTitle("Error!");
+                embed.WithDescription($"Tag '**{tagName}**' doesn't exist");
+                embed.WithColor(Color.Red);
+                embed.WithFooter("Requested by " + Context.User.Username);
+                await ReplyAsync("", false, embed.Build());
                 await Context.Message.DeleteAsync();
             }
         }
@@ -56,72 +54,113 @@ namespace tMod64Bot.Modules.TagSystem
         [Alias("Create")]
         public async Task TagCreateCommand(string tagName, [Remainder] string tagContent)
         {
-            var errorEmbed = new EmbedBuilder();
-            var successEmbed = new EmbedBuilder();
+            var embed = new EmbedBuilder();
 
-            if (!TagService.GetIfTagExists(tagName))
+            var user = Context.User as SocketGuildUser;
+
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
+
+            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
             {
-                await TagService.CreateTag(tagName, tagContent, Context.User.Username, Context.User.Id);
-                successEmbed.WithTitle("Success!");
-                successEmbed.WithDescription($"Tag '**{tagName}**' was successfully created");
-                successEmbed.WithColor(Color.DarkGreen);
-                await ReplyAsync("", false, successEmbed.Build());
+                if (!TagService.GetIfTagExists(tagName))
+                {
+                    await TagService.CreateTag(tagName, tagContent, Context.User.Username, Context.User.Id);
+                    embed.WithTitle("Success!");
+                    embed.WithDescription($"Tag '**{tagName}**' was successfully created");
+                    embed.WithColor(Color.DarkGreen);
+                }
+                else
+                {
+                    embed.WithTitle("Error!");
+                    embed.WithDescription($"Tag '**{tagName}**' already exists");
+                    embed.WithColor(Color.Red);
+                }
             }
             else
             {
-                errorEmbed.WithTitle("Error!");
-                errorEmbed.WithDescription($"Tag '**{tagName}**' already exists");
-                errorEmbed.WithColor(Color.Red);
-                await ReplyAsync("", false, errorEmbed.Build());
+                embed.WithTitle("Error!");
+                embed.WithDescription("Missing Bot Manager permissions");
+                embed.WithColor(Color.Red);
+                embed.WithCurrentTimestamp();
             }
+            
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("delete")]
         [Alias("d", "remove", "r")]
         public async Task TagDeleteCommand(string tagName)
         {
-            var errorEmbed = new EmbedBuilder();
-            var successEmbed = new EmbedBuilder();
+            var embed = new EmbedBuilder();
 
-            if (TagService.GetIfTagExists(tagName))
+            var user = Context.User as SocketGuildUser;
+
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
+
+            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
             {
-                await TagService.DeleteTagByName(tagName);
-                successEmbed.WithTitle("Success!");
-                successEmbed.WithDescription($"Tag '**{tagName}**' was successfully deleted");
-                successEmbed.WithColor(Color.DarkGreen);
-                await ReplyAsync("", false, successEmbed.Build());
+                if (TagService.GetIfTagExists(tagName))
+                {
+                    await TagService.DeleteTagByName(tagName);
+                    embed.WithTitle("Success!");
+                    embed.WithDescription($"Tag '**{tagName}**' was successfully deleted");
+                    embed.WithColor(Color.DarkGreen);
+                    embed.WithCurrentTimestamp();
+                }
+                else
+                {
+                    embed.WithTitle("Error!");
+                    embed.WithDescription($"Tag '**{tagName}**' doesn't exists");
+                    embed.WithColor(Color.Red);
+                    embed.WithCurrentTimestamp();
+                }
             }
             else
             {
-                errorEmbed.WithTitle("Error!");
-                errorEmbed.WithDescription($"Tag '**{tagName}**' doesn't exists");
-                errorEmbed.WithColor(Color.Red);
-                await ReplyAsync("", false, errorEmbed.Build());
+                embed.WithTitle("Error!");
+                embed.WithDescription("Missing Bot Manager permissions");
+                embed.WithColor(Color.Red);
+                embed.WithCurrentTimestamp();
             }
+            
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("edit")]
         [Alias("e", "change")]
         public async Task TagEditCommand(string tagName, [Remainder] string tagNewContent)
         {
-            var errorEmbed = new EmbedBuilder();
-            var successEmbed = new EmbedBuilder();
+            var embed = new EmbedBuilder();
 
-            if (TagService.GetIfTagExists(tagName))
+            var user = Context.User as SocketGuildUser;
+
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
+
+            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
             {
-                await TagService.EditTag(tagName, tagNewContent);
-                successEmbed.WithTitle("Success!");
-                successEmbed.WithDescription($"Tag '**{tagName}**' was successfully edited");
-                successEmbed.WithColor(Color.DarkGreen);
-                await ReplyAsync("", false, successEmbed.Build());
+                if (TagService.GetIfTagExists(tagName))
+                {
+                    await TagService.EditTag(tagName, tagNewContent);
+                    embed.WithTitle("Success!");
+                    embed.WithDescription($"Tag '**{tagName}**' was successfully edited");
+                    embed.WithColor(Color.DarkGreen);
+                }
+                else
+                {
+                    embed.WithTitle("Error!");
+                    embed.WithDescription($"Tag '**{tagName}**' doesn't exists");
+                    embed.WithColor(Color.Red);
+                }
             }
             else
             {
-                errorEmbed.WithTitle("Error!");
-                errorEmbed.WithDescription($"Tag '**{tagName}**' doesn't exists");
-                errorEmbed.WithColor(Color.Red);
-                await ReplyAsync("", false, errorEmbed.Build());
+                embed.WithTitle("Error!");
+                embed.WithDescription("Missing Bot Manager permissions");
+                embed.WithColor(Color.Red);
+                embed.WithCurrentTimestamp();
             }
+            
+            await ReplyAsync("", false, embed.Build());
         }
 
         [Command("info")]
