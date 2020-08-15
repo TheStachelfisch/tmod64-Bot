@@ -44,6 +44,8 @@ namespace tMod64Bot.Modules
             }
             else
             {
+                // How the fuck do I check if a user exists, Everything I tried doesn't work
+
                 await user.KickAsync(reason);
                 await ReplyAsync("User " + user.Username + " has been kicked. Reason: " + reason);
             }

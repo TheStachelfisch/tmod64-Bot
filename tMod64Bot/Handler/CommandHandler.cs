@@ -43,12 +43,12 @@ namespace tMod64Bot.Handler
                 msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var result = await _commands.ExecuteAsync(context, argPos, _service);
-
-                //Remove if you want
+                
                 if (!result.IsSuccess)
                 {
-                    Debug.WriteLine("Error happened while executing Command: " + result.ErrorReason + " ServerId: " + context.Guild.Id);
-                    if (result.Error != (CommandError.BadArgCount | CommandError.UnknownCommand | CommandError.ObjectNotFound))
+                    Console.WriteLine("Error happened while executing Command: " + result.ErrorReason + " ServerId: " + context.Guild.Id);
+                    // Plant, your shit didn't work, mine works
+                    if (result.Error != CommandError.BadArgCount && result.Error != CommandError.UnknownCommand && result.Error != CommandError.UnmetPrecondition && result.Error != CommandError.ObjectNotFound)
                     {
                         errorEmbed.WithTitle("Error Encountered");
                         errorEmbed.WithDescription($"{result.Error.ToString()}\n\n[Message Link]({context.Message.GetJumpUrl()})");
