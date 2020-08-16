@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using tMod64Bot.Modules.ConfigSystem;
@@ -14,6 +15,24 @@ namespace tMod64Bot.Handler
             _client = client;
 
             _client.MessageDeleted += OnMessageDelete;
+            _client.UserJoined += OnUserJoin;
+        }
+
+        private Task OnUserJoin(SocketGuildUser user)
+        {
+            EmbedBuilder embed = new EmbedBuilder();
+
+            embed.WithAuthor(user);
+            embed.WithTitle("Member joined");
+            embed.WithDescription($"{user.Mention} \n Created at {user.CreatedAt.ToString("MM/dd/yyyy")}\n Now at: {user.Guild.MemberCount} members");
+            embed.WithColor(Color.Green);
+            embed.WithFooter(user.Id.ToString());
+            embed.WithCurrentTimestamp();
+            
+            _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)))
+                .SendMessageAsync("", false, embed.Build());
+            return Task.CompletedTask;
         }
 
         private Task OnMessageDelete(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
