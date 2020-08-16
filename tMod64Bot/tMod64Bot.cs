@@ -30,6 +30,7 @@ namespace tMod64Bot
         {
             _config = new DiscordSocketConfig();
             _config.MessageCacheSize = 250;
+            _config.ExclusiveBulkDelete = true;
             
             _client = new DiscordSocketClient(_config);
             _commandConfig = new CommandServiceConfig();
