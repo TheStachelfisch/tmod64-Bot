@@ -337,38 +337,5 @@ namespace tMod64Bot.Modules.ConfigSystem
                 await ReplyAsync("", false, errorEmbed.Build());
             }
         }
-        
-        [Command("guild"), Alias("id")]
-        [RequireUserPermission(GuildPermission.Administrator)]
-        public async Task SetGuildId()
-        {
-            var successEmbed = new EmbedBuilder();
-            var errorEmbed = new EmbedBuilder();
-
-            var user = Context.User as SocketGuildUser;
-
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
-
-            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
-            {
-                await ConfigService.SetGuildId((long) Context.Guild.Id);
-
-                successEmbed.WithTitle("Success!");
-                successEmbed.WithDescription($"Guild id has successfully been changed to '**{Context.Guild.Id}**'");
-                successEmbed.WithColor(Color.Green);
-                successEmbed.WithCurrentTimestamp();
-
-                await ReplyAsync("", false, successEmbed.Build());
-            }
-            else
-            {
-                errorEmbed.WithTitle("Error!");
-                errorEmbed.WithDescription("Missing Bot Manager permissions");
-                errorEmbed.WithColor(Color.Red);
-                errorEmbed.WithCurrentTimestamp();
-
-                await ReplyAsync("", false, errorEmbed.Build());
-            }
-        }
     }
 }

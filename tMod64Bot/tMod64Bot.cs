@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using tMod64Bot.Handler;
+using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot
 {
@@ -13,10 +15,12 @@ namespace tMod64Bot
 
         private static DiscordSocketClient _client;
         private static DiscordSocketConfig _config;
+        private static CommandServiceConfig _commandConfig;
 
         private static InviteHandler _inviteHandler;
         private static CommandHandler _commandHandler;
         private static BadWordHandler _badWordHandler;
+        private static LoggingHandler _loggingHandler;
 
         private static void Main(string[] args)
             => StartBotAsync().GetAwaiter().GetResult();
@@ -24,8 +28,11 @@ namespace tMod64Bot
 
         public static async Task StartBotAsync()
         {
-            _client = new DiscordSocketClient();
-            _config = new DiscordSocketConfig {MessageCacheSize = 100};
+            _config = new DiscordSocketConfig();
+            _config.MessageCacheSize = 250;
+            
+            _client = new DiscordSocketClient(_config);
+            _commandConfig = new CommandServiceConfig();
 
             await _client.LoginAsync(TokenType.Bot, _token);
 
@@ -44,8 +51,9 @@ namespace tMod64Bot
         {
             await _client.SetStatusAsync(UserStatus.Online);
             _badWordHandler = new BadWordHandler(_client);
-            _commandHandler = new CommandHandler(_client);
+            _commandHandler = new CommandHandler(_client, _commandConfig);
             _inviteHandler = new InviteHandler(_client);
+            _loggingHandler = new LoggingHandler(_client);
         }
 
         private static Task Log(LogMessage arg)

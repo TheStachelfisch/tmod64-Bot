@@ -16,7 +16,7 @@ namespace tMod64Bot.Handler
         private CommandServiceConfig _config;
         private IServiceProvider _service;
 
-        public CommandHandler(DiscordSocketClient client, CommandServiceConfig config = null)
+        public CommandHandler(DiscordSocketClient client, CommandServiceConfig config)
         {
             _commands = new CommandService();
             _client = client;
@@ -27,6 +27,8 @@ namespace tMod64Bot.Handler
             _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _service);
 
             _client.MessageReceived += HandleCommandAsync;
+
+            _config.DefaultRunMode = RunMode.Async;
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
