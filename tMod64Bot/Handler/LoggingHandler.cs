@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using tMod64Bot.Modules.ConfigSystem;
+using tMod64Bot.Utils;
 
 namespace tMod64Bot.Handler
 {
@@ -24,7 +26,7 @@ namespace tMod64Bot.Handler
 
             embed.WithAuthor(user);
             embed.WithTitle("Member joined");
-            embed.WithDescription($"{user.Mention} \n Created at {user.CreatedAt.ToString("MM/dd/yyyy")}\n Now at: {user.Guild.MemberCount} members");
+            embed.WithDescription($"{user.Mention} \n Created at {user.CreatedAt.ToString("MM/dd/yyyy")}\n {user.Guild.MemberCount.ToString("n0")}{NumberUtil.NumberEnding(user.Guild.MemberCount)} to join");
             embed.WithColor(Color.Green);
             embed.WithFooter(user.Id.ToString());
             embed.WithCurrentTimestamp();
