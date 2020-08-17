@@ -33,7 +33,7 @@ namespace tMod64Bot.Handler
             if (userAfter.Username != userBefore.Username)
             {
                 embed.WithAuthor(userAfter);
-                embed.WithTitle("Username updated");
+                embed.WithTitle("Username update");
                 embed.WithDescription($"Before: {userBefore.Username}\nAfter: {userAfter.Username}");
                 embed.WithColor(255, 192, 203); // Pink
                 embed.WithFooter($"Id: {userAfter.Id}");
@@ -42,9 +42,19 @@ namespace tMod64Bot.Handler
             else if (userAfter.Discriminator != userBefore.Discriminator)
             {
                 embed.WithAuthor(userAfter);
-                embed.WithTitle("Discriminator updated");
+                embed.WithTitle("Discriminator update");
                 embed.WithDescription($"Before: {userBefore.Username}#{userBefore.Discriminator}\nAfter: {userAfter.Username}#{userAfter.Discriminator}");
                 embed.WithColor(128,0,128); // Purple
+                embed.WithFooter($"Id: {userAfter.Id}");
+                embed.WithCurrentTimestamp();
+            }
+            else if (userAfter.GetAvatarUrl() != userBefore.GetAvatarUrl())
+            {
+                embed.WithAuthor(userAfter);
+                embed.WithTitle("Avatar update");
+                embed.WithDescription($"[Avatar Before]({userBefore.GetAvatarUrl()})\n[Avatar After]({userAfter.GetAvatarUrl()})");
+                embed.WithThumbnailUrl(userAfter.GetAvatarUrl());
+                embed.WithColor(255,255,255); // White
                 embed.WithFooter($"Id: {userAfter.Id}");
                 embed.WithCurrentTimestamp();
             }
