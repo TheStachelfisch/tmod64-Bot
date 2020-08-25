@@ -15,7 +15,7 @@ namespace tMod64Bot.Handler
     public class BadWordHandler
     {
         private const string FileName = "badWords.json";
-        private static string _fullPath = Path.GetFullPath($"{Environment.CurrentDirectory + @"\..\..\..\"}{FileName}");
+        private static readonly string FullPath = Path.GetFullPath($"{Environment.CurrentDirectory + @"\..\..\..\"}{FileName}");
         
         private static List<string> _badWords = new List<string>();
         
@@ -30,11 +30,11 @@ namespace tMod64Bot.Handler
             _badWords = JsonConvert.DeserializeObject<List<string>>(GetJson());
         }
 
-        private string GetJson() => File.ReadAllText(_fullPath);
+        private string GetJson() => File.ReadAllText(FullPath);
 
         private static async Task WriteJsonData(string jsonData)
         {
-            await File.WriteAllTextAsync(_fullPath, jsonData);
+            await File.WriteAllTextAsync(FullPath, jsonData);
         }
         
         public async static Task<bool> AddBadWord(string word)
@@ -121,8 +121,7 @@ namespace tMod64Bot.Handler
             var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId))).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)));
             
             var user = arg.Author as SocketGuildUser;
-
-            // "TrY TO REDUcE NeSTeD if StATEMEnts"
+            
             if (!arg.Author.IsWebhook && !arg.Author.IsBot)
             {
                 //It somehow doesn't work the other way around

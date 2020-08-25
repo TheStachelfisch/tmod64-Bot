@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -21,6 +25,46 @@ namespace tMod64Bot.Handler
             _client.UserLeft += OnUserLeave;
             _client.MessageUpdated += OnMessageUpdate;
             _client.UserUpdated += OnUserUpdate;
+            _client.MessagesBulkDeleted += OnBulkDelete;
+        }
+
+        private async Task OnBulkDelete(IReadOnlyCollection<Cacheable<IMessage, ulong>> message, ISocketMessageChannel channel)
+        {
+            TextBuilder text = new TextBuilder();
+            
+            foreach (var messages in message.Reverse())
+            {
+                if (messages.HasValue)
+                {
+                    if (messages.Value.Embeds.Count >= 1)
+                    {
+                        text.AddField("<Embed>", $"{messages.Value.Author.Mention}\nSent at: {messages.Value.CreatedAt.ToString("g")}\nId: {messages.Value.Id}");
+                    }
+                    else
+                    {
+                        
+                        text.WithTitle($"Messages purged in #{channel.Name}");
+                        text.AddField($"'{messages.Value.Content}'", $"Author Id: {messages.Value.Author.Id}\nAuthor Name: {messages.Value.Author.Username}\nSent at: {messages.Value.CreatedAt.ToString("g")}\nMessage Id: {messages.Value.Id}");
+                    }
+                }
+            }
+
+            try
+            {
+                using (StreamWriter writer = new StreamWriter("purged.txt"))
+                {
+                    writer.Write("");
+                    writer.Write(text.Build());
+                    writer.Close();
+                }
+
+                await channel.SendFileAsync("purged.txt");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         private async Task OnUserUpdate(SocketUser userBefore, SocketUser userAfter)
