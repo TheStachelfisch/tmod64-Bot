@@ -8,20 +8,38 @@ using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Modules
 {
+	public class ModEventArgs : EventArgs
+	{
+		public IGuildUser VictimUser { get; set; }
+		public SocketUser Author { get; set; }
+		public string Reason { get; set; }
+	}
+
+	public class MuteEventArgs : EventArgs
+	{
+		public IGuildUser VictimUser { get; set; }
+		public SocketUser Author { get; set; }
+		public string Reason { get; set; }
+		public string Time { get; set; }
+	}
+	
 	public class ModerationModule : ModuleBase<SocketCommandContext>
 	{
+		public delegate void KickEventHandler(object source, ModEventArgs args);
+		public static event KickEventHandler UserKicked;
+
+		public delegate void BanEventHandler(object source, ModEventArgs args);
+		public static event BanEventHandler UserBanned;
+		
+		public delegate void SoftBanEventHandler(object source, ModEventArgs args);
+		public static event SoftBanEventHandler UserSoftBanned;
+
+		public delegate void MuteEventHandler(object source, MuteEventArgs args);
+
+		public static event MuteEventHandler UserMuted;
+
 		private ulong MutedRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.MutedRole));
 		private ulong SoftBanRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.SoftbanRole));
-
-		[Command("restart"), Alias("r")]
-		[RequireOwner]
-		[Summary("Restarts the bot")]
-		public async Task RestartAsync()
-		{
-			await Context.Client.SetStatusAsync(UserStatus.Invisible);
-			await Task.Delay(1000);
-			Program.StartBotAsync().GetAwaiter().GetResult();
-		}
 
 		[Command("kick")]
 		[RequireUserPermission(GuildPermission.KickMembers)]
@@ -42,6 +60,7 @@ namespace tMod64Bot.Modules
 			else
 			{
 				await user.KickAsync(reason);
+				UserKicked?.Invoke(this, new ModEventArgs() {VictimUser = user, Author = Context.User, Reason = reason});
 				await ReplyAsync("User " + user.Username + " has been kicked. Reason: " + reason);
 			}
 		}
@@ -49,7 +68,7 @@ namespace tMod64Bot.Modules
 		[Command("ban"), Alias("b")]
 		[RequireUserPermission(GuildPermission.BanMembers)]
 		[Summary("Bans a user mentioned.")]
-		public async Task BanAsync(IGuildUser user, int daystoprune = 2, [Remainder] string reason = "No reason specified.")
+		public async Task BanAsync(IGuildUser user, [Remainder] string reason = "No reason specified.")
 		{
 			var victim = user as SocketGuildUser;
 			var author = Context.User as SocketGuildUser;
@@ -64,7 +83,8 @@ namespace tMod64Bot.Modules
 				await ReplyAsync("You are not high enough in the Role Hierarchy to do that");
 			else
 			{
-				await user.BanAsync(daystoprune ,reason);
+				await user.BanAsync(0 ,reason);
+				UserBanned?.Invoke(this, new ModEventArgs(){VictimUser = user, Author =  Context.User, Reason = reason});
 				await ReplyAsync("User " + user.Username + " has been banned. Reason: " + reason);
 			}
 		}
@@ -72,10 +92,11 @@ namespace tMod64Bot.Modules
 		[Command("mute")]
 		[RequireUserPermission(GuildPermission.ManageRoles)]
 		[Summary("Adds a muted role onto the user.")]
-		public async Task MuteAsync(IGuildUser user, [Remainder] string reason = "No reason specified.") //TODO: temporary unmute, time to unmute
+		public async Task MuteAsync(IGuildUser user, string time,[Remainder] string reason = "No reason specified.") //TODO: temporary unmute, time to unmute
 		{
 			await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(MutedRole));
-			IUserMessage MessageToDelete = await ReplyAsync("User " + user.Username + " was muted for " + "Infinity" + " seconds. Reason: " + reason);
+			UserMuted?.Invoke(this, new MuteEventArgs(){VictimUser = user, Author = Context.User, Reason = reason, Time = time});
+			IUserMessage MessageToDelete = await ReplyAsync($"User {user.Username} was muted for {time}, Reason: {reason}");
 			await Task.Delay(2500);
 			await MessageToDelete.DeleteAsync();
 		}
@@ -99,6 +120,7 @@ namespace tMod64Bot.Modules
 			else
 			{
 				await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(SoftBanRole));
+				UserSoftBanned?.Invoke(this, new ModEventArgs(){VictimUser = user, Author = Context.User, Reason = reason});
 				await ReplyAsync("User " + user.Username + " was banished to the Shadow Realm. Reason: " + reason);
 			}
 		}
