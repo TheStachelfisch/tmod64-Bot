@@ -58,7 +58,7 @@ namespace tMod64Bot.Modules.TagSystem
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
 
             if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
             {
@@ -95,7 +95,7 @@ namespace tMod64Bot.Modules.TagSystem
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
 
             if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
             {
@@ -134,7 +134,7 @@ namespace tMod64Bot.Modules.TagSystem
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
+            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
 
             if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
             {

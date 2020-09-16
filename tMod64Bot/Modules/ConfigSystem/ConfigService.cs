@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,6 +31,8 @@ namespace tMod64Bot.Modules.ConfigSystem
         public long SoftbanRole;
 
         public long SupportStaffRole;
+
+        public List<ulong> BadWordChannelWhitelist;
     }
 
     public class ConfigService
@@ -51,7 +55,7 @@ namespace tMod64Bot.Modules.ConfigSystem
             await File.WriteAllTextAsync(_fullPath, jsonData);
         }
 
-        public static string GetConfig(ConfigEnum config)
+        public static object GetConfig(ConfigEnum config)
         {
             var deserializedObject = JsonConvert.DeserializeObject<Config>(GetJsonData());
 
@@ -61,30 +65,91 @@ namespace tMod64Bot.Modules.ConfigSystem
                 case ConfigEnum.BotPrefix:
                     return deserializedObject.BotPrefix;
                 case ConfigEnum.GuildId:
-                    return deserializedObject.GuildId.ToString();
+                    return deserializedObject.GuildId;
                 case ConfigEnum.BotManagerRole:
-                    return deserializedObject.BotManagerRole.ToString();
+                    return deserializedObject.BotManagerRole;
                 case ConfigEnum.BotOwner:
-                    return deserializedObject.BotOwner.ToString();
+                    return deserializedObject.BotOwner;
                 case ConfigEnum.LoggingChannel:
-                    return deserializedObject.LoggingChannel.ToString();
+                    return deserializedObject.LoggingChannel;
                 case ConfigEnum.ModLogChannel:
-                    return deserializedObject.ModLoggingChannel.ToString();
+                    return deserializedObject.ModLoggingChannel;
                 case ConfigEnum.AdminChannel:
-                    return deserializedObject.AdminChannel.ToString();
+                    return deserializedObject.AdminChannel;
                 case ConfigEnum.AdminRole:
-                    return deserializedObject.AdminRole.ToString();
+                    return deserializedObject.AdminRole;
                 case ConfigEnum.MutedRole:
-                    return deserializedObject.MutedRole.ToString();
+                    return deserializedObject.MutedRole;
                 case ConfigEnum.SoftbanRole:
-                    return deserializedObject.SoftbanRole.ToString();
+                    return deserializedObject.SoftbanRole;
                 case ConfigEnum.SupportStaffRole:
-                    return deserializedObject.SupportStaffRole.ToString();
+                    return deserializedObject.SupportStaffRole;
                 default:
                     return null;
             }
         }
 
+        public static List<ulong> GetBadWordChannelWhitelist()
+        {
+            return JsonConvert.DeserializeObject<Config>(GetJsonData()).BadWordChannelWhitelist;
+        }
+
+        public static async Task<bool> AddToBadWordChannelWhitelist(ulong id)
+        {
+            try
+            {
+                if (!BadWordChannelWhitelistContainsChannel(id))
+                {
+                    var json = JsonConvert.DeserializeObject<Config>(GetJsonData());
+            
+                    json.BadWordChannelWhitelist.Add(id);
+
+                    string jsonData = JsonConvert.SerializeObject(json, Formatting.Indented);
+                    await WriteJsonData(jsonData);
+                    return true;   
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return false;
+        }
+        
+        public static async Task<bool> RemoveFromBadWordChannelWhitelist(ulong id)
+        {
+            try
+            {
+                if (BadWordChannelWhitelistContainsChannel(id))
+                {
+                    var json = JsonConvert.DeserializeObject<Config>(GetJsonData());
+            
+                    json.BadWordChannelWhitelist.Remove(id);
+
+                    string jsonData = JsonConvert.SerializeObject(json, Formatting.Indented);
+                    await WriteJsonData(jsonData);
+                    return true;   
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+            return false;
+        }
+
+        public static bool BadWordChannelWhitelistContainsChannel(ulong id)
+        {
+            try { if (JsonConvert.DeserializeObject<Config>(GetJsonData()).BadWordChannelWhitelist.Contains(id)) return true; }
+            catch (Exception e) { Console.WriteLine(e); }
+
+            return false;
+        }
+        
         public static async Task UpdateBotPrefix(string newPrefix)
         {
             var rss = JObject.Parse(GetJsonData());

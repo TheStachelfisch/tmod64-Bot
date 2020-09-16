@@ -69,7 +69,7 @@ namespace tMod64Bot.Handler
 
         private async Task OnUserUpdate(SocketUser userBefore, SocketUser userAfter)
         {
-            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)) == 0)
+            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return;
             
             EmbedBuilder embed = new EmbedBuilder();
@@ -103,19 +103,19 @@ namespace tMod64Bot.Handler
                 embed.WithCurrentTimestamp();
             }
             
-            await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)))
-                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)))
+            await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
         }
 
         private async Task OnMessageUpdate(Cacheable<IMessage, ulong> oldMessage, SocketMessage newMessage, ISocketMessageChannel channel)
         {
-            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)) == 0)
+            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return;
             
             EmbedBuilder embed = new EmbedBuilder();
 
-            if (newMessage.Channel.Id == ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)) || newMessage.Embeds.Count >= 1 || oldMessage.Value.Embeds.Count >= 1);
+            if (newMessage.Channel.Id == ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) || newMessage.Embeds.Count >= 1 || oldMessage.Value.Embeds.Count >= 1);
                 return;
 
             if (oldMessage.HasValue)
@@ -137,14 +137,14 @@ namespace tMod64Bot.Handler
                 embed.WithCurrentTimestamp();
             }
             
-            await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)))
-                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)))
+            await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
         }
 
         private Task OnUserLeave(SocketGuildUser user)
         {
-            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)) == 0)
+            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return Task.CompletedTask;
             
             EmbedBuilder embed = new EmbedBuilder();
@@ -156,15 +156,15 @@ namespace tMod64Bot.Handler
             embed.WithFooter(user.Id.ToString());
             embed.WithCurrentTimestamp();
             
-            _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)))
-                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)))
+            _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
             return Task.CompletedTask;
         }
 
         private Task OnUserJoin(SocketGuildUser user)
         {
-            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)) == 0)
+            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return Task.CompletedTask;
             
             EmbedBuilder embed = new EmbedBuilder();
@@ -176,15 +176,15 @@ namespace tMod64Bot.Handler
             embed.WithFooter(user.Id.ToString());
             embed.WithCurrentTimestamp();
             
-            _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)))
-                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)))
+            _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
             return Task.CompletedTask;
         }
 
         private async Task OnMessageDelete(Cacheable<IMessage, ulong> message, ISocketMessageChannel channel)
         {
-            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)) == 0)
+            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return;
 
             EmbedBuilder embed = new EmbedBuilder();
@@ -210,8 +210,8 @@ namespace tMod64Bot.Handler
             }
 
 
-            await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)))
-                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)))
+            await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
         }
     }

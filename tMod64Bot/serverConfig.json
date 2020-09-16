@@ -1,13 +1,16 @@
 {
-  "BotPrefix": ".",
   "GuildId": 474686433563508737,
-  "BotManagerRole": 745350220359008378,
-  "BotOwner": 442639987180306432,
-  "LoggingChannel": 745349524888879326,
-  "ModLoggingChannel": 745352014762082326,
   "AdminChannel": 745349741902299346,
   "AdminRole": 474687952497147905,
+  "BotManagerRole": 745350220359008378,
+  "BotOwner": 442639987180306432,
+  "BotPrefix": ".",
+  "LoggingChannel": 745349524888879326,
+  "ModLoggingChannel": 745352014762082326,
   "MutedRole": 745351135069470771,
   "SoftbanRole": 745351135069470771,
-  "SupportStaffRole": 745350286956036157
+  "SupportStaffRole": 745350286956036157,
+  "BadWordChannelWhitelist": [
+    420
+  ]
 }

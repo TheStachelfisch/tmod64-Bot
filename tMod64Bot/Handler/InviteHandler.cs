@@ -20,8 +20,8 @@ namespace tMod64Bot.Handler
         //TODO: Check if user has role that allows to send invite
         private async Task OnMessageReceive(SocketMessage arg)
         {
-            var botManagerRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId))).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)));
-            var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId))).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)));
+            var botManagerRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
+            var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)?.ToString()));
             
             var user = arg.Author as SocketGuildUser;
             

@@ -39,7 +39,7 @@ namespace tMod64Bot.Handler
             var context = new SocketCommandContext(_client, msg);
 
             var argPos = 0;
-            if (msg.HasStringPrefix(ConfigService.GetConfig(ConfigEnum.BotPrefix), ref argPos) ||
+            if (msg.HasStringPrefix(ConfigService.GetConfig(ConfigEnum.BotPrefix).ToString(), ref argPos) ||
                 msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var result = await _commands.ExecuteAsync(context, argPos, _service);
@@ -54,7 +54,7 @@ namespace tMod64Bot.Handler
                         errorEmbed.WithDescription($"{result.Error.ToString()}\n\n[Message Link]({context.Message.GetJumpUrl()})");
                         errorEmbed.WithCurrentTimestamp();
                         errorEmbed.WithColor(Color.Red);
-                        await context.Guild.GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.AdminChannel))).SendMessageAsync(MentionUtils.MentionRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.AdminRole))), false, errorEmbed.Build());
+                        await context.Guild.GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.AdminChannel)?.ToString())).SendMessageAsync("", false, errorEmbed.Build());
                     }
                 }
             }

@@ -38,8 +38,8 @@ namespace tMod64Bot.Modules
 
 		public static event MuteEventHandler UserMuted;
 
-		private ulong MutedRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.MutedRole));
-		private ulong SoftBanRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.SoftbanRole));
+		private ulong MutedRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.MutedRole)?.ToString());
+		private ulong SoftBanRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.SoftbanRole)?.ToString());
 
 		[Command("kick")]
 		[RequireUserPermission(GuildPermission.KickMembers)]
