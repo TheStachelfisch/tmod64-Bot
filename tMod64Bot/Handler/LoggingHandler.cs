@@ -26,6 +26,46 @@ namespace tMod64Bot.Handler
             _client.MessageUpdated += OnMessageUpdate;
             _client.UserUpdated += OnUserUpdate;
             _client.MessagesBulkDeleted += OnBulkDelete;
+            _client.UserBanned += OnUserBanned;
+            _client.UserUnbanned += OnUserUnbanned;
+        }
+
+        private async Task OnUserUnbanned(SocketUser user, SocketGuild guild)
+        {
+            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
+                return;
+            
+            EmbedBuilder embed = new EmbedBuilder();
+
+            embed.WithAuthor(user);
+            embed.WithTitle("Member unbanned");
+            embed.WithDescription($"{user.Mention}");
+            embed.WithColor(Color.DarkBlue);
+            embed.WithFooter(user.Id.ToString());
+            embed.WithCurrentTimestamp();
+            
+            _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
+                .SendMessageAsync("", false, embed.Build());
+        }
+
+        private async Task OnUserBanned(SocketUser user, SocketGuild guild)
+        {
+            if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
+                return;
+            
+            EmbedBuilder embed = new EmbedBuilder();
+
+            embed.WithAuthor(user);
+            embed.WithTitle("Member banned");
+            embed.WithDescription($"{user.Mention}");
+            embed.WithColor(Color.Red);
+            embed.WithFooter(user.Id.ToString());
+            embed.WithCurrentTimestamp();
+            
+            _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
+                .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
+                .SendMessageAsync("", false, embed.Build());
         }
 
         private async Task OnBulkDelete(IReadOnlyCollection<Cacheable<IMessage, ulong>> message, ISocketMessageChannel channel)
