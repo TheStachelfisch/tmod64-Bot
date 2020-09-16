@@ -107,6 +107,9 @@ namespace tMod64Bot.Modules
                 await ReplyAsync("", false, embed.Build());
             }
 
+            [Command("add"), Alias("a")]
+            public async Task AddChannel([Remainder] SocketTextChannel channel) => await AddChannel(channel.Id.ToString());
+
             [Command("remove"), Alias("r", "delete", "d")]
             public async Task RemoveChannel([Remainder] string channelString)
             {

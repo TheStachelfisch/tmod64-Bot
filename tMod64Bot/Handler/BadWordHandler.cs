@@ -117,6 +117,8 @@ namespace tMod64Bot.Handler
 
         private async Task OnMessage(SocketMessage arg)
         {
+            if (ConfigService.GetBadWordChannelWhitelist().Contains(arg.Channel.Id)) return;
+
             var botManagerRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
             var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)?.ToString()));
             
