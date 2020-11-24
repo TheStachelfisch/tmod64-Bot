@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 using tMod64Bot.Modules.ConfigSystem;
 using tMod64Bot.Utils;
 
@@ -15,7 +13,7 @@ namespace tMod64Bot.Handler
     public class LoggingHandler
     {
         private DiscordSocketClient _client;
-        
+
         public LoggingHandler(DiscordSocketClient client)
         {
             _client = client;
@@ -34,7 +32,7 @@ namespace tMod64Bot.Handler
         {
             if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return;
-            
+
             EmbedBuilder embed = new EmbedBuilder();
 
             embed.WithAuthor(user);
@@ -43,7 +41,7 @@ namespace tMod64Bot.Handler
             embed.WithColor(Color.DarkBlue);
             embed.WithFooter(user.Id.ToString());
             embed.WithCurrentTimestamp();
-            
+
             _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
                 .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
@@ -53,7 +51,7 @@ namespace tMod64Bot.Handler
         {
             if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return;
-            
+
             EmbedBuilder embed = new EmbedBuilder();
 
             embed.WithAuthor(user);
@@ -62,7 +60,7 @@ namespace tMod64Bot.Handler
             embed.WithColor(Color.Red);
             embed.WithFooter(user.Id.ToString());
             embed.WithCurrentTimestamp();
-            
+
             _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
                 .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
@@ -71,7 +69,7 @@ namespace tMod64Bot.Handler
         private async Task OnBulkDelete(IReadOnlyCollection<Cacheable<IMessage, ulong>> message, ISocketMessageChannel channel)
         {
             TextBuilder text = new TextBuilder();
-            
+
             foreach (var messages in message.Reverse())
             {
                 if (messages.HasValue)
@@ -82,7 +80,7 @@ namespace tMod64Bot.Handler
                     }
                     else
                     {
-                        
+
                         text.WithTitle($"Messages purged in #{channel.Name}");
                         text.AddField($"'{messages.Value.Content}'", $"Author Id: {messages.Value.Author.Id}\nAuthor Name: {messages.Value.Author.Username}\nSent at: {messages.Value.CreatedAt.ToString("g")}\nMessage Id: {messages.Value.Id}");
                     }
@@ -111,9 +109,9 @@ namespace tMod64Bot.Handler
         {
             if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return;
-            
+
             EmbedBuilder embed = new EmbedBuilder();
-            
+
             if (userAfter.Username != userBefore.Username)
             {
                 embed.WithAuthor(userAfter);
@@ -128,7 +126,7 @@ namespace tMod64Bot.Handler
                 embed.WithAuthor(userAfter);
                 embed.WithTitle("Discriminator update");
                 embed.WithDescription($"Before: {userBefore.Username}#{userBefore.Discriminator}\nAfter: {userAfter.Username}#{userAfter.Discriminator}");
-                embed.WithColor(128,0,128); // Purple
+                embed.WithColor(128, 0, 128); // Purple
                 embed.WithFooter($"Id: {userAfter.Id}");
                 embed.WithCurrentTimestamp();
             }
@@ -138,11 +136,11 @@ namespace tMod64Bot.Handler
                 embed.WithTitle("Avatar update");
                 embed.WithDescription($"[Avatar Before]({userBefore.GetAvatarUrl()})\n[Avatar After]({userAfter.GetAvatarUrl()})");
                 embed.WithThumbnailUrl(userAfter.GetAvatarUrl());
-                embed.WithColor(255,255,255); // White
+                embed.WithColor(255, 255, 255); // White
                 embed.WithFooter($"Id: {userAfter.Id}");
                 embed.WithCurrentTimestamp();
             }
-            
+
             await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
                 .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
@@ -152,11 +150,12 @@ namespace tMod64Bot.Handler
         {
             if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return;
-            
+
             EmbedBuilder embed = new EmbedBuilder();
 
-            if (newMessage.Channel.Id == ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) || newMessage.Embeds.Count >= 1 || oldMessage.Value.Embeds.Count >= 1);
-                return;
+            if (newMessage.Channel.Id == ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) || newMessage.Embeds.Count >= 1 || oldMessage.Value.Embeds.Count >= 1)
+                ;
+            return;
 
             if (oldMessage.HasValue)
             {
@@ -176,7 +175,7 @@ namespace tMod64Bot.Handler
                 embed.WithColor(Color.Orange);
                 embed.WithCurrentTimestamp();
             }
-            
+
             await _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
                 .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
@@ -186,16 +185,16 @@ namespace tMod64Bot.Handler
         {
             if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return Task.CompletedTask;
-            
+
             EmbedBuilder embed = new EmbedBuilder();
 
             embed.WithAuthor(user);
             embed.WithTitle("Member left");
             embed.WithDescription($"{user.Mention} \n Joined at {user.JoinedAt}\n");
-            embed.WithColor(255,255,0); // Yellow
+            embed.WithColor(255, 255, 0); // Yellow
             embed.WithFooter(user.Id.ToString());
             embed.WithCurrentTimestamp();
-            
+
             _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
                 .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
@@ -206,7 +205,7 @@ namespace tMod64Bot.Handler
         {
             if (ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()) == 0)
                 return Task.CompletedTask;
-            
+
             EmbedBuilder embed = new EmbedBuilder();
 
             embed.WithAuthor(user);
@@ -215,7 +214,7 @@ namespace tMod64Bot.Handler
             embed.WithColor(Color.Green);
             embed.WithFooter(user.Id.ToString());
             embed.WithCurrentTimestamp();
-            
+
             _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString()))
                 .GetTextChannel(ulong.Parse(ConfigService.GetConfig(ConfigEnum.LoggingChannel)?.ToString()))
                 .SendMessageAsync("", false, embed.Build());
@@ -228,12 +227,12 @@ namespace tMod64Bot.Handler
                 return;
 
             EmbedBuilder embed = new EmbedBuilder();
-            
+
             if (message.HasValue)
             {
                 if (message.Value.Embeds.Count >= 1)
                     return;
-                
+
                 embed.WithAuthor(message.Value.Author);
                 embed.WithTitle($"Message deleted in #{channel.Name}");
                 embed.WithDescription(message.Value.Content);

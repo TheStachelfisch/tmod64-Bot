@@ -1,10 +1,9 @@
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Handler
@@ -20,9 +19,9 @@ namespace tMod64Bot.Handler
         {
             _client = client;
             _config = config;
-            
+
             _config.DefaultRunMode = RunMode.Async;
-            
+
             _commands = new CommandService(_config);
             _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _service);
 
@@ -34,7 +33,8 @@ namespace tMod64Bot.Handler
             var errorEmbed = new EmbedBuilder();
 
             var msg = arg as SocketUserMessage;
-            if (msg == null) return;
+            if (msg == null)
+                return;
 
             var context = new SocketCommandContext(_client, msg);
 
@@ -43,7 +43,7 @@ namespace tMod64Bot.Handler
                 msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var result = await _commands.ExecuteAsync(context, argPos, _service);
-                
+
                 if (!result.IsSuccess)
                 {
                     Console.WriteLine("Error happened while executing Command: " + result.ErrorReason + " ServerId: " + context.Guild.Id);

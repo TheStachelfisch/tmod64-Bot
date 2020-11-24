@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualBasic;
 
 namespace tMod64Bot.Utils
 {
@@ -17,8 +15,8 @@ namespace tMod64Bot.Utils
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public void AddField(string  name, string value) => _fields.Add(name, value);
-        
+        public void AddField(string name, string value) => _fields.Add(name, value);
+
         /// <summary>
         /// Adds a title to the text
         /// </summary>
@@ -37,7 +35,7 @@ namespace tMod64Bot.Utils
         public string Build()
         {
             string fullString = $"{_title}\n\n";
-            
+
             if (_fields.Count.Equals(null))
                 throw new ArgumentException("Fields cant be null");
 

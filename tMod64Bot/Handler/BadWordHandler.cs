@@ -1,24 +1,22 @@
-﻿using System;
+﻿using Discord.Net;
+using Discord.WebSocket;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.Net;
-using Discord.WebSocket;
-using Newtonsoft.Json;
 using tMod64Bot.Modules.ConfigSystem;
-using tMod64Bot.Modules.TagSystem;
 
 namespace tMod64Bot.Handler
 {
-
     public class BadWordHandler
     {
         private const string FileName = "badWords.json";
         private static readonly string FullPath = Path.GetFullPath($"{Environment.CurrentDirectory + @"\..\..\..\"}{FileName}");
-        
+
         private static List<string> _badWords = new List<string>();
-        
+
         private DiscordSocketClient _client;
 
         public BadWordHandler(DiscordSocketClient client)
@@ -36,11 +34,11 @@ namespace tMod64Bot.Handler
         {
             await File.WriteAllTextAsync(FullPath, jsonData);
         }
-        
+
         public async static Task<bool> AddBadWord(string word)
         {
             word = word.ToLower();
-            
+
             if (!ContainsWord(word))
             {
                 try
@@ -56,7 +54,7 @@ namespace tMod64Bot.Handler
                     return false;
                 }
             }
- 
+
             return false;
         }
 
@@ -71,7 +69,7 @@ namespace tMod64Bot.Handler
                 try
                 {
                     _badWords.Remove(word);
-                
+
                     string json = JsonConvert.SerializeObject(_badWords, Formatting.Indented);
                     await WriteJsonData(json);
                     return true;
@@ -117,13 +115,14 @@ namespace tMod64Bot.Handler
 
         private async Task OnMessage(SocketMessage arg)
         {
-            if (ConfigService.GetBadWordChannelWhitelist().Contains(arg.Channel.Id)) return;
+            if (ConfigService.GetBadWordChannelWhitelist().Contains(arg.Channel.Id))
+                return;
 
             var botManagerRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
             var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)?.ToString()));
-            
+
             var user = arg.Author as SocketGuildUser;
-            
+
             if (!arg.Author.IsWebhook && !arg.Author.IsBot)
             {
                 //It somehow doesn't work the other way around

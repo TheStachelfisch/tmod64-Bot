@@ -1,13 +1,10 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using tMod64Bot.Handler;
-using tMod64Bot.Modules.ConfigSystem;
-using tMod64Bot.Utils;
 
 namespace tMod64Bot
 {
@@ -26,7 +23,7 @@ namespace tMod64Bot
 
         private static void Main(string[] args)
             => StartBotAsync().GetAwaiter().GetResult();
-        
+
 
 
         public static async Task StartBotAsync()
@@ -34,7 +31,7 @@ namespace tMod64Bot
             _config = new DiscordSocketConfig();
             _config.MessageCacheSize = 250;
             _config.ExclusiveBulkDelete = true;
-            
+
             _client = new DiscordSocketClient(_config);
             _commandConfig = new CommandServiceConfig();
 

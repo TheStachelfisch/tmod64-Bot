@@ -1,17 +1,16 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace tMod64Bot.Modules.ConfigSystem
 {
     public class Config
     {
         public long GuildId;
-        
+
         public long AdminChannel;
 
         public long AdminRole;
@@ -19,7 +18,7 @@ namespace tMod64Bot.Modules.ConfigSystem
         public long BotManagerRole;
 
         public long BotOwner;
-        
+
         public string BotPrefix;
 
         public long LoggingChannel;
@@ -101,12 +100,12 @@ namespace tMod64Bot.Modules.ConfigSystem
                 if (!BadWordChannelWhitelistContainsChannel(id))
                 {
                     var json = JsonConvert.DeserializeObject<Config>(GetJsonData());
-            
+
                     json.BadWordChannelWhitelist.Add(id);
 
                     string jsonData = JsonConvert.SerializeObject(json, Formatting.Indented);
                     await WriteJsonData(jsonData);
-                    return true;   
+                    return true;
                 }
             }
             catch (Exception e)
@@ -117,7 +116,7 @@ namespace tMod64Bot.Modules.ConfigSystem
 
             return false;
         }
-        
+
         public static async Task<bool> RemoveFromBadWordChannelWhitelist(ulong id)
         {
             try
@@ -125,12 +124,12 @@ namespace tMod64Bot.Modules.ConfigSystem
                 if (BadWordChannelWhitelistContainsChannel(id))
                 {
                     var json = JsonConvert.DeserializeObject<Config>(GetJsonData());
-            
+
                     json.BadWordChannelWhitelist.Remove(id);
 
                     string jsonData = JsonConvert.SerializeObject(json, Formatting.Indented);
                     await WriteJsonData(jsonData);
-                    return true;   
+                    return true;
                 }
             }
             catch (Exception e)
@@ -144,12 +143,13 @@ namespace tMod64Bot.Modules.ConfigSystem
 
         public static bool BadWordChannelWhitelistContainsChannel(ulong id)
         {
-            try { if (JsonConvert.DeserializeObject<Config>(GetJsonData()).BadWordChannelWhitelist.Contains(id)) return true; }
+            try
+            { if (JsonConvert.DeserializeObject<Config>(GetJsonData()).BadWordChannelWhitelist.Contains(id)) return true; }
             catch (Exception e) { Console.WriteLine(e); }
 
             return false;
         }
-        
+
         public static async Task UpdateBotPrefix(string newPrefix)
         {
             var rss = JObject.Parse(GetJsonData());

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Modules.TagSystem
@@ -83,7 +83,7 @@ namespace tMod64Bot.Modules.TagSystem
                 embed.WithColor(Color.Red);
                 embed.WithCurrentTimestamp();
             }
-            
+
             await ReplyAsync("", false, embed.Build());
         }
 
@@ -122,7 +122,7 @@ namespace tMod64Bot.Modules.TagSystem
                 embed.WithColor(Color.Red);
                 embed.WithCurrentTimestamp();
             }
-            
+
             await ReplyAsync("", false, embed.Build());
         }
 
@@ -159,7 +159,7 @@ namespace tMod64Bot.Modules.TagSystem
                 embed.WithColor(Color.Red);
                 embed.WithCurrentTimestamp();
             }
-            
+
             await ReplyAsync("", false, embed.Build());
         }
 
@@ -203,7 +203,8 @@ namespace tMod64Bot.Modules.TagSystem
         {
             var embedBuilder = new EmbedBuilder();
 
-            foreach (var tags in TagService.GetAllTags()) embedBuilder.AddField(tags.Name, $"Owner: {Context.Client.GetUser(tags.OwnerId).Mention}");
+            foreach (var tags in TagService.GetAllTags())
+                embedBuilder.AddField(tags.Name, $"Owner: {Context.Client.GetUser(tags.OwnerId).Mention}");
 
             await ReplyAsync("", false, embedBuilder.Build());
         }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using tMod64Bot.Handler;
 using tMod64Bot.Modules.ConfigSystem;
 
@@ -37,7 +37,7 @@ namespace tMod64Bot.Modules
                 var user = Context.User as SocketGuildUser;
 
                 var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-            
+
                 if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
                 {
                     wordEmbed.WithTitle("Channels:");
@@ -52,7 +52,7 @@ namespace tMod64Bot.Modules
                     wordEmbed.WithColor(Color.Red);
                     wordEmbed.WithCurrentTimestamp();
                 }
-            
+
                 await ReplyAsync("", false, wordEmbed.Build());
             }
 
@@ -61,11 +61,12 @@ namespace tMod64Bot.Modules
             {
                 EmbedBuilder embed = new EmbedBuilder();
 
-                
+
                 ulong channel = 0;
-                try { channel = ulong.Parse(channelString); }
-                catch (Exception e) 
-                {                         
+                try
+                { channel = ulong.Parse(channelString); }
+                catch (Exception e)
+                {
                     embed.WithTitle("Error!");
                     embed.WithDescription($"'**{channelString}**' isn't a unsigned long");
                     embed.WithColor(Color.Red);
@@ -74,7 +75,7 @@ namespace tMod64Bot.Modules
                     await ReplyAsync("", false, embed.Build());
                     return;
                 }
-                
+
                 var user = Context.User as SocketGuildUser;
 
                 var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
@@ -115,11 +116,12 @@ namespace tMod64Bot.Modules
             {
                 EmbedBuilder embed = new EmbedBuilder();
 
-                
+
                 ulong channel = 0;
-                try { channel = ulong.Parse(channelString); }
-                catch (Exception e) 
-                {                         
+                try
+                { channel = ulong.Parse(channelString); }
+                catch (Exception e)
+                {
                     embed.WithTitle("Error!");
                     embed.WithDescription($"'**{channelString}**' isn't a unsigned long");
                     embed.WithColor(Color.Red);
@@ -128,7 +130,7 @@ namespace tMod64Bot.Modules
                     await ReplyAsync("", false, embed.Build());
                     return;
                 }
-            
+
                 var user = Context.User as SocketGuildUser;
 
                 var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
@@ -161,7 +163,7 @@ namespace tMod64Bot.Modules
                 await ReplyAsync("", false, embed.Build());
             }
         }
-        
+
         [Command("")]
         public async Task BadWordCommand()
         {
@@ -174,7 +176,7 @@ namespace tMod64Bot.Modules
 
             await ReplyAsync("", false, messageEmbed.Build());
         }
-        
+
         [Command("all"), Alias("get", "list")]
         public async Task BadWords()
         {
@@ -183,7 +185,7 @@ namespace tMod64Bot.Modules
             var user = Context.User as SocketGuildUser;
 
             var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-            
+
             if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
             {
                 wordEmbed.WithTitle("Words:");
@@ -198,15 +200,15 @@ namespace tMod64Bot.Modules
                 wordEmbed.WithColor(Color.Red);
                 wordEmbed.WithCurrentTimestamp();
             }
-            
+
             await ReplyAsync("", false, wordEmbed.Build());
         }
-        
+
         [Command("add"), Alias("a")]
-        public async Task AddWord([Remainder]string word)
+        public async Task AddWord([Remainder] string word)
         {
             EmbedBuilder embed = new EmbedBuilder();
-            
+
             var user = Context.User as SocketGuildUser;
 
             var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
@@ -240,10 +242,10 @@ namespace tMod64Bot.Modules
         }
 
         [Command("remove"), Alias("r", "delete", "d")]
-        public async Task RemoveWord([Remainder]string word)
+        public async Task RemoveWord([Remainder] string word)
         {
             EmbedBuilder embed = new EmbedBuilder();
-            
+
             var user = Context.User as SocketGuildUser;
 
             var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));

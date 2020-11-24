@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
+using System.Linq;
+using System.Threading.Tasks;
 using tMod64Bot.Modules.ConfigSystem;
 
 namespace tMod64Bot.Handler
@@ -16,14 +16,14 @@ namespace tMod64Bot.Handler
 
             _client.MessageReceived += OnMessageReceive;
         }
-        
+
         private async Task OnMessageReceive(SocketMessage arg)
         {
             var botManagerRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
             var supportStaffRole = _client.GetGuild(ulong.Parse(ConfigService.GetConfig(ConfigEnum.GuildId)?.ToString())).GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.SupportStaffRole)?.ToString()));
-            
+
             var user = arg.Author as SocketGuildUser;
-            
+
             var dmEmbed = new EmbedBuilder();
 
             if (!arg.Author.IsWebhook && !arg.Author.IsBot)
@@ -50,7 +50,8 @@ namespace tMod64Bot.Handler
 
         private static bool MessageContainsInvite(string message)
         {
-            if (message.Contains("discord.gg/") || message.Contains("https://discord.gg/") || message.Contains("discord.com/invite/")) return true;
+            if (message.Contains("discord.gg/") || message.Contains("https://discord.gg/") || message.Contains("discord.com/invite/"))
+                return true;
 
             return false;
         }

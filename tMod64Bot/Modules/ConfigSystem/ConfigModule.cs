@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace tMod64Bot.Modules.ConfigSystem
 {
@@ -41,7 +41,8 @@ namespace tMod64Bot.Modules.ConfigSystem
                 configEmbed.WithTitle("Config");
                 configEmbed.WithDescription("Values with **'0'** or **'null'** have not been added yet.");
 
-                foreach (var property in rss.Properties()) configEmbed.AddField(property.Name, property.Value);
+                foreach (var property in rss.Properties())
+                    configEmbed.AddField(property.Name, property.Value);
 
                 await ReplyAsync("", false, configEmbed.Build());
             }

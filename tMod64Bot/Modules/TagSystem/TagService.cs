@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace tMod64Bot.Modules.TagSystem
 {
@@ -58,7 +58,10 @@ namespace tMod64Bot.Modules.TagSystem
 
             var tagContent = new Tag
             {
-                Name = tagName, Content = content, OwnerName = owner, OwnerId = ownerId,
+                Name = tagName,
+                Content = content,
+                OwnerName = owner,
+                OwnerId = ownerId,
                 CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
@@ -121,7 +124,7 @@ namespace tMod64Bot.Modules.TagSystem
                 c.Uses = c.Uses + 1;
                 return c;
             }).ToList();
-            
+
             var jsonData = JsonConvert.SerializeObject(tags, Formatting.Indented);
             await WriteJsonData(jsonData);
         }
