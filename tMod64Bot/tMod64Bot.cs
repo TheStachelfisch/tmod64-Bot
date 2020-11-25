@@ -1,66 +1,106 @@
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.IO;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
-using tMod64Bot.Handler;
+using tMod64Bot.Services;
 
 namespace tMod64Bot
 {
-    internal class tMod64bot
+    internal sealed class tMod64bot
     {
-        private static readonly string _token = File.ReadAllText(@"token.txt");
+        private static readonly ServiceProvider _services = BuildServiceProvider();
+        private readonly DiscordSocketClient _client = _services.GetRequiredService<DiscordSocketClient>();
+        private readonly CommandService _commands = _services.GetRequiredService<CommandService>();
+        private readonly LoggingService _log = _services.GetRequiredService<LoggingService>();
 
-        private static DiscordSocketClient _client;
-        private static DiscordSocketConfig _config;
-        private static CommandServiceConfig _commandConfig;
-
-        private static InviteHandler _inviteHandler;
-        private static CommandHandler _commandHandler;
-        private static BadWordHandler _badWordHandler;
-        private static LoggingHandler _loggingHandler;
-
-        private static void Main(string[] args)
-            => StartBotAsync().GetAwaiter().GetResult();
-
-
-
-        public static async Task StartBotAsync()
+        public async Task StartAsync()
         {
-            _config = new DiscordSocketConfig();
-            _config.MessageCacheSize = 250;
-            _config.ExclusiveBulkDelete = true;
-
-            _client = new DiscordSocketClient(_config);
-            _commandConfig = new CommandServiceConfig();
-
-            await _client.LoginAsync(TokenType.Bot, _token);
-
+            await _client.LoginAsync(TokenType.Bot, Program.GatewayToken);
             await _client.StartAsync();
-            await _client.SetStatusAsync(UserStatus.Online);
-            await _client.SetGameAsync(".help");
 
-            _client.Log += Log;
-            _client.Ready += ReadyEvent;
+            HandleCmdLn();
 
-            await Task.Delay(-1);
+            await ShutdownAsync();
         }
 
-        //Add Handlers here
-        private static async Task ReadyEvent()
+        private async Task SetupAsync()
         {
-            await _client.SetStatusAsync(UserStatus.Online);
-            _badWordHandler = new BadWordHandler(_client);
-            _commandHandler = new CommandHandler(_client, _commandConfig);
-            _inviteHandler = new InviteHandler(_client);
-            _loggingHandler = new LoggingHandler(_client);
+            var sw = Stopwatch.StartNew();
+
+            var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+
+            sw.Stop();
+
+            await _log.Log(LogSeverity.Info, LogSource.Self,
+                $"Loaded {modules.Count()} modules and {modules.Sum(m => m.Commands.Count)}" +
+                $" commands loaded in {sw.ElapsedMilliseconds}ms.");
         }
 
-        private static Task Log(LogMessage arg)
+        private void HandleCmdLn()
         {
-            Console.WriteLine(arg);
-            return Task.CompletedTask;
+            string cmd = Console.ReadLine();
+            while (cmd != "stop")
+            {
+                var args = cmd.Split(' ');
+                int index = 0;
+                try
+                {
+                    do
+                    {
+                        switch (args[index++])
+                        {
+                            default:
+                                Console.WriteLine($"Unknown command `{cmd}`");
+                                break;
+                        }
+                    }
+                    while (index < args.Length);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                cmd = Console.ReadLine();
+            }
         }
+
+        private async Task ShutdownAsync()
+        {
+            await _client.StopAsync();
+            _services.Dispose();
+            Environment.Exit(0);
+        }
+
+
+        private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
+            .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+            {
+#if DEBUG
+                LogLevel = LogSeverity.Verbose,
+#else
+                LogLevel = LogSeverity.Info,
+#endif
+                AlwaysDownloadUsers = true,
+                ConnectionTimeout = 10000,
+                MessageCacheSize = 50
+            }))
+            .AddSingleton(new CommandService(new CommandServiceConfig
+            {
+                CaseSensitiveCommands = false,
+                IgnoreExtraArgs = true,
+                DefaultRunMode = RunMode.Sync
+            }))
+
+            // base services
+            .AddSingleton<ConfigService>()
+            .AddSingleton<CommandHandler>()
+            .AddSingleton<InviteBlockerService>()
+
+            .BuildServiceProvider();
     }
 }

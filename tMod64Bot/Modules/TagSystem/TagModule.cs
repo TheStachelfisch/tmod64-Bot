@@ -4,13 +4,15 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using tMod64Bot.Modules.ConfigSystem;
+using tMod64Bot.Services;
 
 namespace tMod64Bot.Modules.TagSystem
 {
     [Group("tag")]
     public class TagModule : ModuleBase<SocketCommandContext>
     {
+        public ConfigService Config { get; set; }
+
         [Command("")]
         public async Task TagCommand()
         {
@@ -58,9 +60,7 @@ namespace tMod64Bot.Modules.TagSystem
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
             {
                 if (!TagService.GetIfTagExists(tagName))
                 {
@@ -95,9 +95,7 @@ namespace tMod64Bot.Modules.TagSystem
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
             {
                 if (TagService.GetIfTagExists(tagName))
                 {
@@ -134,9 +132,7 @@ namespace tMod64Bot.Modules.TagSystem
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
             {
                 if (TagService.GetIfTagExists(tagName))
                 {

@@ -4,18 +4,22 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using tMod64Bot.Handler;
-using tMod64Bot.Modules.ConfigSystem;
+using tMod64Bot.Services;
 
 namespace tMod64Bot.Modules
 {
     [Group("badword"), Alias("bw", "bannedwords", "badwords", "b")]
     public class BadWordModule : ModuleBase<SocketCommandContext>
     {
+        public ConfigService Config { get; set; }
+
+        public CensureshipService BadWordsService { get; set; }
 
         [Group("channel"), Alias("ch", "channels")]
         class Channel : ModuleBase<SocketCommandContext>
         {
+            public ConfigService Config { get; set; }
+
             [Command("")]
             public async Task BadWordCommandChannel()
             {
@@ -36,12 +40,10 @@ namespace tMod64Bot.Modules
 
                 var user = Context.User as SocketGuildUser;
 
-                var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-                if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+                if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
                 {
                     wordEmbed.WithTitle("Channels:");
-                    wordEmbed.WithDescription(string.Join(", ", ConfigService.GetBadWordChannelWhitelist()));
+                    wordEmbed.WithDescription(string.Join(", ", Config.BadWordChannelWhitelist));
                     wordEmbed.WithColor(Color.Green);
                     wordEmbed.WithCurrentTimestamp();
                 }
@@ -60,12 +62,14 @@ namespace tMod64Bot.Modules
             public async Task AddChannel([Remainder] string channelString)
             {
                 EmbedBuilder embed = new EmbedBuilder();
+                ulong channel;
 
-
-                ulong channel = 0;
                 try
-                { channel = ulong.Parse(channelString); }
-                catch (Exception e)
+                { 
+                    channel = ulong.Parse(channelString); 
+                }
+
+                catch (Exception)
                 {
                     embed.WithTitle("Error!");
                     embed.WithDescription($"'**{channelString}**' isn't a unsigned long");
@@ -78,11 +82,9 @@ namespace tMod64Bot.Modules
 
                 var user = Context.User as SocketGuildUser;
 
-                var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-                if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+                if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
                 {
-                    if (ConfigService.AddToBadWordChannelWhitelist(channel).Result)
+                    if (Config.BadWordChannelWhitelist.Add(channel))
                     {
                         embed.WithTitle("Success!");
                         embed.WithDescription($"Successfully added '**{channel}**' to banned words");
@@ -133,11 +135,9 @@ namespace tMod64Bot.Modules
 
                 var user = Context.User as SocketGuildUser;
 
-                var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-                if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+                if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
                 {
-                    if (ConfigService.RemoveFromBadWordChannelWhitelist(channel).Result)
+                    if (Config.BadWordChannelWhitelist.Remove(channel))
                     {
                         embed.WithTitle("Success!");
                         embed.WithDescription($"Successfully removed '**{channel}**' from whitelisted channels");
@@ -184,12 +184,10 @@ namespace tMod64Bot.Modules
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
             {
-                wordEmbed.WithTitle("Words:");
-                wordEmbed.WithDescription(string.Join(", ", BadWordHandler.GetList().ToArray()));
+                wordEmbed.WithTitle("Words: ");
+                wordEmbed.WithDescription(string.Join(", ", BadWordsService.Words));
                 wordEmbed.WithColor(Color.Green);
                 wordEmbed.WithCurrentTimestamp();
             }
@@ -211,11 +209,9 @@ namespace tMod64Bot.Modules
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
             {
-                if (BadWordHandler.AddBadWord(word).Result)
+                if (BadWordsService.Words.Add(word))
                 {
                     embed.WithTitle("Success!");
                     embed.WithDescription($"Successfully added '**{word.ToLower()}**' to banned words");
@@ -248,11 +244,9 @@ namespace tMod64Bot.Modules
 
             var user = Context.User as SocketGuildUser;
 
-            var role = Context.Guild.GetRole(ulong.Parse(ConfigService.GetConfig(ConfigEnum.BotManagerRole)?.ToString()));
-
-            if (user.Roles.Contains(role) || user.GuildPermissions.Administrator)
+            if (user.Roles.Contains(Config.ManagerRole) || user.GuildPermissions.Administrator)
             {
-                if (BadWordHandler.RemoveBadWord(word).Result)
+                if (BadWordsService.Words.Remove(word))
                 {
                     embed.WithTitle("Success!");
                     embed.WithDescription($"Successfully removed '**{word.ToLower()}**' from banned words");

@@ -4,27 +4,26 @@ using Discord.WebSocket;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using tMod64Bot.Modules.ConfigSystem;
+using tMod64Bot.Services;
 
 namespace tMod64Bot.Modules
 {
     public class ModEventArgs : EventArgs
     {
-        public IGuildUser VictimUser { get; set; }
-        public SocketUser Author { get; set; }
+        public IGuildUser OffendingUser { get; set; }
+        public SocketUser ResponsibleModerator { get; set; }
         public string Reason { get; set; }
     }
 
-    public class MuteEventArgs : EventArgs
+    public class MuteEventArgs : ModEventArgs
     {
-        public IGuildUser VictimUser { get; set; }
-        public SocketUser Author { get; set; }
-        public string Reason { get; set; }
         public string Time { get; set; }
     }
 
     public class ModerationModule : ModuleBase<SocketCommandContext>
     {
+        public ConfigService Config { get; set; }
+
         public delegate void KickEventHandler(object source, ModEventArgs args);
         public static event KickEventHandler UserKicked;
 
@@ -37,9 +36,6 @@ namespace tMod64Bot.Modules
         public delegate void MuteEventHandler(object source, MuteEventArgs args);
 
         public static event MuteEventHandler UserMuted;
-
-        private ulong MutedRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.MutedRole)?.ToString());
-        private ulong SoftBanRole = ulong.Parse(ConfigService.GetConfig(ConfigEnum.SoftbanRole)?.ToString());
 
         [Command("kick")]
         [RequireUserPermission(GuildPermission.KickMembers)]
@@ -60,7 +56,7 @@ namespace tMod64Bot.Modules
             else
             {
                 await user.KickAsync(reason);
-                UserKicked?.Invoke(this, new ModEventArgs() { VictimUser = user, Author = Context.User, Reason = reason });
+                UserKicked?.Invoke(this, new ModEventArgs() { OffendingUser = user, ResponsibleModerator = Context.User, Reason = reason });
                 await ReplyAsync("User " + user.Username + " has been kicked. Reason: " + reason);
             }
         }
@@ -84,7 +80,7 @@ namespace tMod64Bot.Modules
             else
             {
                 await user.BanAsync(0, reason);
-                UserBanned?.Invoke(this, new ModEventArgs() { VictimUser = user, Author = Context.User, Reason = reason });
+                UserBanned?.Invoke(this, new ModEventArgs() { OffendingUser = user, ResponsibleModerator = Context.User, Reason = reason });
                 await ReplyAsync("User " + user.Username + " has been banned. Reason: " + reason);
             }
         }
@@ -94,8 +90,8 @@ namespace tMod64Bot.Modules
         [Summary("Adds a muted role onto the user.")]
         public async Task MuteAsync(IGuildUser user, string time, [Remainder] string reason = "No reason specified.") //TODO: temporary unmute, time to unmute
         {
-            await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(MutedRole));
-            UserMuted?.Invoke(this, new MuteEventArgs() { VictimUser = user, Author = Context.User, Reason = reason, Time = time });
+            await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(Config.MutedRole));
+            UserMuted?.Invoke(this, new MuteEventArgs() { OffendingUser = user, ResponsibleModerator = Context.User, Reason = reason, Time = time });
             IUserMessage MessageToDelete = await ReplyAsync($"User {user.Username} was muted for {time}, Reason: {reason}");
             await Task.Delay(2500);
             await MessageToDelete.DeleteAsync();
@@ -119,8 +115,8 @@ namespace tMod64Bot.Modules
                 await ReplyAsync("You are not high enough in the Role Hierarchy to do that");
             else
             {
-                await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(SoftBanRole));
-                UserSoftBanned?.Invoke(this, new ModEventArgs() { VictimUser = user, Author = Context.User, Reason = reason });
+                await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(Config.SoftbanRole));
+                UserSoftBanned?.Invoke(this, new ModEventArgs() { OffendingUser = user, ResponsibleModerator = Context.User, Reason = reason });
                 await ReplyAsync("User " + user.Username + " was banished to the Shadow Realm. Reason: " + reason);
             }
         }

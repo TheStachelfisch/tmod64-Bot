@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace tMod64Bot.Utils
+namespace tMod64Bot.Helpers
 {
     public class TextBuilder
     {
