@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace tMod64Bot.Services
 {
-    public sealed class CensureshipService : ServiceBase
+    public sealed class CensorshipService : ServiceBase
     {
         private static readonly string BAD_WORDS_PATH = Utils.SourceFileName("badWords.json");
 
@@ -19,7 +19,7 @@ namespace tMod64Bot.Services
 
         public HashSet<string> Words { get; }
 
-        public CensureshipService(IServiceProvider services) : base(services)
+        public CensorshipService(IServiceProvider services) : base(services)
         {
             _config = services.GetRequiredService<ConfigService>();
 

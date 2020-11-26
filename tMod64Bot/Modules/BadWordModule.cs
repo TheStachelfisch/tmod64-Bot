@@ -13,7 +13,7 @@ namespace tMod64Bot.Modules
     {
         public ConfigService Config { get; set; }
 
-        public CensureshipService BadWordsService { get; set; }
+        public CensorshipService BadWordsService { get; set; }
 
         [Group("channel"), Alias("ch", "channels")]
         class Channel : ModuleBase<SocketCommandContext>
