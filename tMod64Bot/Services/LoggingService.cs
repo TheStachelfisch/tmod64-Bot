@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace tMod64Bot.Services
 {
-    public sealed class LoggingService : ServiceBase
+    public sealed class LoggingService : ServiceBase, IDisposable
     {
         private const string PATH = @"log.txt";
 
@@ -117,6 +117,11 @@ namespace tMod64Bot.Services
                 default:
                     return ConsoleColor.Gray;
             }
+        }
+
+        public void Dispose()
+        {
+            writer?.Dispose();
         }
     }
 

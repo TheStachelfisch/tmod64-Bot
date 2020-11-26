@@ -67,9 +67,6 @@ namespace tMod64Bot
                             case "clear":
                                 Console.Clear();
                                 break;
-                            case "setup": 
-                                SetupAsync().GetAwaiter().GetResult();
-                                break;
                         }
                     } while (index < args.Length);
                 }
