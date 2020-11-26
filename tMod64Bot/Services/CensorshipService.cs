@@ -23,19 +23,21 @@ namespace tMod64Bot.Services
         {
             _config = services.GetRequiredService<ConfigService>();
 
-            _client.MessageReceived += CensureMessages;
-
             Words = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText(BAD_WORDS_PATH));
         }
 
-
-        private async Task CensureMessages(SocketMessage msg)
+        public async Task InitializeAsync() => _client.MessageReceived += CensorMessages;
+        
+        private async Task CensorMessages(SocketMessage msg)
         {
             if (_config.BadWordChannelWhitelist.Contains(msg.Channel.Id))
                 return;
 
             var user = msg.Author as SocketGuildUser;
 
+            if (user == null)
+                return;
+            
             if (user.IsWebhook || user.IsBot || _config.IsExempt(user))
                 return;
 

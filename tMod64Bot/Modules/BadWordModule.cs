@@ -164,19 +164,6 @@ namespace tMod64Bot.Modules
             }
         }
 
-        [Command("")]
-        public async Task BadWordCommand()
-        {
-            var messageEmbed = new EmbedBuilder();
-
-            messageEmbed.WithTitle("Documentation for Bad words");
-            messageEmbed.WithFooter("Sent at ");
-            messageEmbed.WithUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-            messageEmbed.WithCurrentTimestamp();
-
-            await ReplyAsync("", false, messageEmbed.Build());
-        }
-
         [Command("all"), Alias("get", "list")]
         public async Task BadWords()
         {
@@ -270,6 +257,20 @@ namespace tMod64Bot.Modules
             }
 
             await ReplyAsync("", false, embed.Build());
+        }
+        
+        
+        [Command("")]
+        public async Task BadWordCommand()
+        {
+            var messageEmbed = new EmbedBuilder();
+
+            messageEmbed.WithTitle("Documentation for Bad words");
+            messageEmbed.WithFooter("Sent at ");
+            messageEmbed.WithUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+            messageEmbed.WithCurrentTimestamp();
+
+            await ReplyAsync("", false, messageEmbed.Build());
         }
     }
 }

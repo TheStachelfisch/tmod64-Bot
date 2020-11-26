@@ -7,7 +7,7 @@ namespace tMod64Bot.Services
 {
     public sealed class LoggingService : ServiceBase
     {
-        private const string PATH = @".log.txt";
+        private const string PATH = @"log.txt";
 
         private readonly TextWriter writer;
 

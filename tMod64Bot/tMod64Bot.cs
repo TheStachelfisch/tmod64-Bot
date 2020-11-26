@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using tMod64Bot.Services;
 
@@ -22,7 +23,13 @@ namespace tMod64Bot
         {
             await _client.LoginAsync(TokenType.Bot, Program.GatewayToken);
             await _client.StartAsync();
-
+            _client.Ready += () =>
+            {
+                InitializeServicesAsync().GetAwaiter().GetResult();
+                SetupAsync().GetAwaiter().GetResult();
+                return Task.CompletedTask;
+            };
+            
             HandleCmdLn();
 
             await ShutdownAsync();
@@ -43,11 +50,11 @@ namespace tMod64Bot
 
         private void HandleCmdLn()
         {
-            string cmd = Console.ReadLine();
+            var cmd = Console.ReadLine();
             while (cmd != "stop")
             {
                 var args = cmd.Split(' ');
-                int index = 0;
+                var index = 0;
                 try
                 {
                     do
@@ -57,50 +64,65 @@ namespace tMod64Bot
                             default:
                                 Console.WriteLine($"Unknown command `{cmd}`");
                                 break;
+                            case "clear":
+                                Console.Clear();
+                                break;
+                            case "setup": 
+                                SetupAsync().GetAwaiter().GetResult();
+                                break;
                         }
-                    }
-                    while (index < args.Length);
+                    } while (index < args.Length);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
+
                 cmd = Console.ReadLine();
             }
         }
 
         private async Task ShutdownAsync()
         {
+            await _log.Log(LogSeverity.Info, LogSource.Self, "Shutdown requested by Command");
             await _client.StopAsync();
-            _services.Dispose();
+            await _services.DisposeAsync();
+
             Environment.Exit(0);
         }
 
-
-        private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
-            .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
-            {
+        private static async Task InitializeServicesAsync()
+        {
+            await _services.GetRequiredService<CensorshipService>().InitializeAsync();
+            await _services.GetRequiredService<CommandHandler>().InitializeAsync();
+            await _services.GetRequiredService<InviteBlockerService>().InitializeAsync();
+        }
+        
+        private static ServiceProvider BuildServiceProvider() => new ServiceCollection().AddSingleton(
+                new DiscordSocketClient(new DiscordSocketConfig
+                {
 #if DEBUG
-                LogLevel = LogSeverity.Verbose,
+                    LogLevel = LogSeverity.Verbose,
 #else
-                LogLevel = LogSeverity.Info,
+                    LogLevel = LogSeverity.Info,
 #endif
-                AlwaysDownloadUsers = true,
-                ConnectionTimeout = 10000,
-                MessageCacheSize = 50
-            }))
+                    AlwaysDownloadUsers = true,
+                    ConnectionTimeout = 10000,
+                    MessageCacheSize = 100
+                }))
             .AddSingleton(new CommandService(new CommandServiceConfig
             {
                 CaseSensitiveCommands = false,
-                IgnoreExtraArgs = true,
-                DefaultRunMode = RunMode.Sync
+                //IgnoreExtraArgs = true,
+                DefaultRunMode = RunMode.Async
             }))
 
             // base services
             .AddSingleton<ConfigService>()
             .AddSingleton<CommandHandler>()
             .AddSingleton<InviteBlockerService>()
-
+            .AddSingleton<LoggingService>()
+            .AddSingleton<CensorshipService>()
             .BuildServiceProvider();
     }
 }

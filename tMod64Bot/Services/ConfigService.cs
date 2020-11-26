@@ -17,7 +17,7 @@ namespace tMod64Bot.Services
             JsonConvert.PopulateObject(File.ReadAllText(PATH), this);
 
             Guild = _client.GetGuild(GuildId);
-            ManagerRole = Guild.GetRole(ManagerRoleId);
+            ManagerRole = Guild.GetRole(BotManagerRoleId);
             SupportStaffRole = Guild.GetRole(SupportStaffRoleId);
         }
 
@@ -34,9 +34,9 @@ namespace tMod64Bot.Services
 
         public ulong AdminChannel { get; set; }
 
-        public ulong AdminRole { get; set; }
+        public ulong AdminRoleId { get; set; }
 
-        public ulong ManagerRoleId { get; set; }
+        public ulong BotManagerRoleId { get; set; }
 
         public ulong BotOwner { get; set; }
 
@@ -46,9 +46,9 @@ namespace tMod64Bot.Services
 
         public ulong ModLoggingChannel { get; set; }
 
-        public ulong MutedRole { get; set; }
+        public ulong MutedRoleId { get; set; }
 
-        public ulong SoftbanRole { get; set; }
+        public ulong SoftbanRoleId { get; set; }
 
         public ulong SupportStaffRoleId { get; set; }
 
@@ -77,7 +77,7 @@ namespace tMod64Bot.Services
             set
             {
                 managerRole = value;
-                ManagerRoleId = value.Id;
+                BotManagerRoleId = value.Id;
             }
         }
 

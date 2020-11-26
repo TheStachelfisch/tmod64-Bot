@@ -1,13 +1,13 @@
 ﻿namespace tMod64Bot.Helpers
 {
-    public class NumberUtil
+    public static class NumberUtil
     {
-        public static int GetLastDigit(int number) => (number % 10);
+        public static int LastDigit(this int number) => (number % 10);
 
         // No idea what I should call this
-        public static string NumberEnding(int number)
+        public static string NumberEnding(this int number)
         {
-            switch (GetLastDigit(number))
+            switch (number.LastDigit())
             {
                 case 0:
                     return "th";

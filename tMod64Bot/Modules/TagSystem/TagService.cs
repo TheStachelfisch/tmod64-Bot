@@ -32,8 +32,6 @@ namespace tMod64Bot.Modules.TagSystem
             {
                 return r.ReadToEnd();
             }
-
-            return null;
         }
 
         public static async Task WriteJsonData(string jsonData)

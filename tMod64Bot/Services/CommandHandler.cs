@@ -3,6 +3,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace tMod64Bot.Services
@@ -13,17 +15,19 @@ namespace tMod64Bot.Services
 
         private readonly CommandService _commands;
         private readonly ConfigService _config;
+        private readonly LoggingService _loggingService;
 
         private string prefix;
 
         public CommandHandler(IServiceProvider services) : base(services)
         {
-            _client.MessageReceived += HandleCommandAsync;
-
+            _commands = services.GetRequiredService<CommandService>();
+            
             _config = services.GetRequiredService<ConfigService>();
             prefix = _config.BotPrefix;
         }
-
+        
+        public async Task InitializeAsync() => _client.MessageReceived += HandleCommandAsync;
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {

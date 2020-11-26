@@ -10,12 +10,9 @@ namespace tMod64Bot.Services
     {
         private readonly ConfigService _config;
 
-        public InviteBlockerService(IServiceProvider services) : base(services)
-        {
-            _config = services.GetRequiredService<ConfigService>();
-
-            _client.MessageReceived += BlockInvites;
-        }
+        public InviteBlockerService(IServiceProvider services) : base(services) => _config = services.GetRequiredService<ConfigService>();
+        
+        public async Task InitializeAsync() => _client.MessageReceived += BlockInvites;
 
         private async Task BlockInvites(SocketMessage msg)
         {

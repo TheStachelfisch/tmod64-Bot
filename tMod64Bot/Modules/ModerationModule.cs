@@ -90,7 +90,7 @@ namespace tMod64Bot.Modules
         [Summary("Adds a muted role onto the user.")]
         public async Task MuteAsync(IGuildUser user, string time, [Remainder] string reason = "No reason specified.") //TODO: temporary unmute, time to unmute
         {
-            await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(Config.MutedRole));
+            await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(Config.MutedRoleId));
             UserMuted?.Invoke(this, new MuteEventArgs() { OffendingUser = user, ResponsibleModerator = Context.User, Reason = reason, Time = time });
             IUserMessage MessageToDelete = await ReplyAsync($"User {user.Username} was muted for {time}, Reason: {reason}");
             await Task.Delay(2500);
@@ -115,7 +115,7 @@ namespace tMod64Bot.Modules
                 await ReplyAsync("You are not high enough in the Role Hierarchy to do that");
             else
             {
-                await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(Config.SoftbanRole));
+                await user.AddRoleAsync(Context.Client.GetGuild(Context.Guild.Id).GetRole(Config.SoftbanRoleId));
                 UserSoftBanned?.Invoke(this, new ModEventArgs() { OffendingUser = user, ResponsibleModerator = Context.User, Reason = reason });
                 await ReplyAsync("User " + user.Username + " was banished to the Shadow Realm. Reason: " + reason);
             }
