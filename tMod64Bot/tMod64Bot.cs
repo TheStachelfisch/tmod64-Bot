@@ -19,6 +19,8 @@ namespace tMod64Bot
         private readonly CommandService _commands = _services.GetRequiredService<CommandService>();
         private readonly LoggingService _log = _services.GetRequiredService<LoggingService>();
 
+        private static bool _shuttingDown = false;
+
         public async Task StartAsync()
         {
             await _client.LoginAsync(TokenType.Bot, Program.GatewayToken);
@@ -27,6 +29,12 @@ namespace tMod64Bot
             {
                 InitializeServicesAsync().GetAwaiter().GetResult();
                 SetupAsync().GetAwaiter().GetResult();
+                //Prevents Program from exiting without disposing services and disconnecting from gateway
+                AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
+                {
+                    if (!_shuttingDown)
+                        ShutdownAsync().GetAwaiter().GetResult();
+                }; 
                 return Task.CompletedTask;
             };
             
@@ -81,6 +89,8 @@ namespace tMod64Bot
 
         private async Task ShutdownAsync()
         {
+            _shuttingDown = true;
+            
             await _log.Log(LogSeverity.Info, LogSource.Self, "Shutdown requested by Command");
             await _client.StopAsync();
             await _services.DisposeAsync();
