@@ -1,4 +1,4 @@
-﻿namespace tMod64Bot.Utils
+﻿namespace tMod64Bot.Helpers
 {
     public class NumberUtil
     {
