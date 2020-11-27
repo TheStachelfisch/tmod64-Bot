@@ -3,8 +3,7 @@
     public static class NumberUtil
     {
         public static int LastDigit(this int number) => (number % 10);
-
-        // No idea what I should call this
+        
         public static string NumberEnding(this int number)
         {
             switch (number.LastDigit())
@@ -29,9 +28,9 @@
                     return "th";
                 case 9:
                     return "th";
+                default:
+                    return null;
             }
-
-            return "";
         }
     }
 }

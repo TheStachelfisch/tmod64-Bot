@@ -1,16 +1,13 @@
-﻿using Discord.WebSocket;
-using System;
+﻿using System;
 using System.IO;
 
 namespace tMod64Bot
 {
     public static class Utils
     {
-        
-
-        // Retrieves a file from the actual top level source
+#if DEBUG
         public static string SourceFileName(string file) => Path.GetFullPath($@"{Environment.CurrentDirectory}\..\..\..\{file}");
-
+#endif
         public static bool IsNullOrWhitespace(this string str) => string.IsNullOrWhiteSpace(str);
     }
 }

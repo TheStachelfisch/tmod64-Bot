@@ -40,9 +40,8 @@ namespace tMod64Bot.Helpers
                 throw new ArgumentException("Fields cant be null");
 
             foreach (var field in _fields)
-            {
                 fullString += $"{field.Key}\n{field.Value}\n\n";
-            }
+            
 
             return fullString;
         }

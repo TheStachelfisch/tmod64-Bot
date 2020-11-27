@@ -6,7 +6,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using tMod64Bot.Services;
 
@@ -29,6 +28,7 @@ namespace tMod64Bot
             {
                 InitializeServicesAsync().GetAwaiter().GetResult();
                 SetupAsync().GetAwaiter().GetResult();
+                
                 //Prevents Program from exiting without disposing services and disconnecting from gateway
                 AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
                 {
