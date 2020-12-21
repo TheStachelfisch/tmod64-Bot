@@ -11,7 +11,6 @@ namespace tMod64Bot.Services
     {
         private static readonly string PATH = Utils.SourceFileName("serverConfig.json");
 
-
         public ConfigService(IServiceProvider services) : base(services)
         {
             JsonConvert.PopulateObject(File.ReadAllText(PATH), this);
@@ -53,10 +52,10 @@ namespace tMod64Bot.Services
         public ulong SupportStaffRoleId { get; set; }
 
         public HashSet<ulong> BadWordChannelWhitelist { get; set; }
-
-
+        
         [JsonIgnore]
         private SocketGuild guild;
+        
         [JsonIgnore]
         public SocketGuild Guild
         {
@@ -70,6 +69,7 @@ namespace tMod64Bot.Services
 
         [JsonIgnore]
         private SocketRole managerRole;
+        
         [JsonIgnore]
         public SocketRole ManagerRole
         {
@@ -83,6 +83,7 @@ namespace tMod64Bot.Services
 
         [JsonIgnore]
         private SocketRole supportStaffRole;
+        
         [JsonIgnore]
         public SocketRole SupportStaffRole
         {

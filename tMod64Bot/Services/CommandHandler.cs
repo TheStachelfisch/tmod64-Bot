@@ -35,8 +35,7 @@ namespace tMod64Bot.Services
             var context = new SocketCommandContext(_client, msg);
 
             var argPos = 0;
-            if (msg.HasStringPrefix(prefix, ref argPos) ||
-                msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
+            if (msg.HasStringPrefix(prefix, ref argPos) || msg.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var result = await _commands.ExecuteAsync(context, argPos, _services);
 

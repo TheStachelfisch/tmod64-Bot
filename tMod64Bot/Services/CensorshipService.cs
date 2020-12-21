@@ -13,11 +13,10 @@ namespace tMod64Bot.Services
     public sealed class CensorshipService : ServiceBase
     {
         private static readonly string BAD_WORDS_PATH = Utils.SourceFileName("badWords.json");
-
-
+        
         private readonly ConfigService _config;
 
-        public HashSet<string> Words { get; }
+        public HashSet<string> Words { get; private set; }
 
         public CensorshipService(IServiceProvider services) : base(services)
         {
@@ -25,6 +24,8 @@ namespace tMod64Bot.Services
 
             Words = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText(BAD_WORDS_PATH));
         }
+        
+        public void Reload() => Words = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText(BAD_WORDS_PATH));
 
         public async Task InitializeAsync() => _client.MessageReceived += CensorMessages;
         
@@ -41,16 +42,11 @@ namespace tMod64Bot.Services
             if (user.IsWebhook || user.IsBot || _config.IsExempt(user))
                 return;
 
-            if (msg.Embeds.Count() == 0 && StringContainsWord(msg.Content))
+            if (!msg.Embeds.Any() && StringContainsWord(msg.Content))
             {
-                try
-                {
-                    await msg.DeleteAsync();
-                }
+                try { await msg.DeleteAsync(); }
                 // TODO: This error is thrown when a message contains multiple banned words
-                catch (HttpException)
-                {
-                }
+                catch (HttpException) { }
             }
         }
 
@@ -59,12 +55,8 @@ namespace tMod64Bot.Services
             text = text.ToLower();
 
             foreach (var words in Words)
-            {
                 if (text.Contains(words.ToLower()))
-                {
                     return true;
-                }
-            }
 
             return false;
         }
