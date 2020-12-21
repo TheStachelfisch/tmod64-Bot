@@ -18,7 +18,7 @@ namespace tMod64Bot
         private readonly CommandService _commands = _services.GetRequiredService<CommandService>();
         private readonly LoggingService _log = _services.GetRequiredService<LoggingService>();
 
-        private static bool _shuttingDown = false;
+        private static bool _shuttingDown;
 
         public async Task StartAsync()
         {
@@ -28,16 +28,16 @@ namespace tMod64Bot
             {
                 InitializeServicesAsync().GetAwaiter().GetResult();
                 SetupAsync().GetAwaiter().GetResult();
-                
+
                 //Prevents Program from exiting without disposing services and disconnecting from gateway
                 AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
                 {
                     if (!_shuttingDown)
                         ShutdownAsync().GetAwaiter().GetResult();
-                }; 
+                };
                 return Task.CompletedTask;
             };
-            
+
             HandleCmdLn();
 
             await ShutdownAsync();
@@ -90,7 +90,7 @@ namespace tMod64Bot
         private async Task ShutdownAsync()
         {
             _shuttingDown = true;
-            
+
             await _log.Log(LogSeverity.Info, LogSource.Self, "Shutdown requested by Command");
             await _client.StopAsync();
             await _services.DisposeAsync();
@@ -100,23 +100,21 @@ namespace tMod64Bot
 
         private static async Task InitializeServicesAsync()
         {
-            await _services.GetRequiredService<CensorshipService>().InitializeAsync();
             await _services.GetRequiredService<CommandHandler>().InitializeAsync();
-            await _services.GetRequiredService<InviteBlockerService>().InitializeAsync();
         }
-        
-        private static ServiceProvider BuildServiceProvider() => new ServiceCollection().AddSingleton(
-                new DiscordSocketClient(new DiscordSocketConfig
-                {
+
+        private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
+            .AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+            {
 #if DEBUG
-                    LogLevel = LogSeverity.Verbose,
+                LogLevel = LogSeverity.Verbose,
 #else
                     LogLevel = LogSeverity.Info,
 #endif
-                    AlwaysDownloadUsers = true,
-                    ConnectionTimeout = 10000,
-                    MessageCacheSize = 100
-                }))
+                AlwaysDownloadUsers = true,
+                ConnectionTimeout = 10000,
+                MessageCacheSize = 100
+            }))
             .AddSingleton(new CommandService(new CommandServiceConfig
             {
                 CaseSensitiveCommands = false,
@@ -125,11 +123,8 @@ namespace tMod64Bot
             }))
 
             // base services
-            .AddSingleton<ConfigService>()
             .AddSingleton<CommandHandler>()
-            .AddSingleton<InviteBlockerService>()
             .AddSingleton<LoggingService>()
-            .AddSingleton<CensorshipService>()
             .BuildServiceProvider();
     }
 }
