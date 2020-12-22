@@ -5,31 +5,27 @@ using System.Threading.Tasks;
 
 namespace tMod64Bot.Services
 {
-    public sealed class LoggingService : ServiceBase, IDisposable
+    public sealed class LoggingService : ServiceBase
     {
         private const string PATH = @"log.txt";
-
-        private readonly TextWriter writer;
 
         public LoggingService(IServiceProvider services) : base(services)
         {
             if (File.Exists(PATH))
                 File.Delete(PATH);
 
-            writer = new StreamWriter(File.Open("./log.txt", FileMode.CreateNew));
-
             _client.Log += Log;
         }
 
         public Task Log(LogSeverity severity, LogSource source, string msg, Exception e = null)
         {
-            LogInternal(severity, source, msg, e);
+            Task.Run(() => LogInternal(severity, source, msg, e));
             return Task.CompletedTask;
         }
 
         public Task Log(LogMessage m)
         {
-            LogInternal(m.Severity, GetLogSrc(m), m.Message, m.Exception);
+            Task.Run(() => LogInternal(m.Severity, GetLogSrc(m), m.Message, m.Exception));
             return Task.CompletedTask;
 
             static LogSource GetLogSrc(LogMessage msg) => msg.Source switch
@@ -43,6 +39,8 @@ namespace tMod64Bot.Services
 
         private void LogInternal(LogSeverity severity, LogSource source, string msg, Exception e)
         {
+            using var writer = File.AppendText(PATH);
+            
             var color = VerifySeverity(severity);
             AppendText(severity.ToString(), color);
             AppendText("->", ConsoleColor.White);
@@ -117,11 +115,6 @@ namespace tMod64Bot.Services
                 default:
                     return ConsoleColor.Gray;
             }
-        }
-
-        public void Dispose()
-        {
-            writer?.Dispose();
         }
     }
 
