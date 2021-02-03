@@ -1,18 +1,19 @@
 ﻿using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using tMod64Bot.Services.Config;
 
 namespace tMod64Bot.Services
 {
     public abstract class ServiceBase
     {
-        protected readonly IServiceProvider _services;
-        protected readonly DiscordSocketClient _client;
+        protected readonly IServiceProvider Services;
+        protected readonly DiscordSocketClient Client;
 
         public ServiceBase(IServiceProvider services)
         {
-            _services = services;
-            _client = services.GetRequiredService<DiscordSocketClient>();
+            Services = services;
+            Client = services.GetRequiredService<DiscordSocketClient>();
         }
     }
 }

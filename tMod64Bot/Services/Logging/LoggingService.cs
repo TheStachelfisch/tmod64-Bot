@@ -1,28 +1,41 @@
-﻿using Discord;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Discord;
 
-namespace tMod64Bot.Services
+namespace tMod64Bot.Services.Logging
 {
     public sealed class LoggingService : ServiceBase
     {
-        private const string PATH = @"log.txt";
+        private readonly string _path = $"{ServiceConstants.DATA_DIR}log.txt";
 
         public LoggingService(IServiceProvider services) : base(services)
         {
-            if (File.Exists(PATH))
-                File.Delete(PATH);
+            if (File.Exists(_path))
+                File.Delete(_path);
 
-            _client.Log += Log;
+            Client.Log += Log;
         }
 
+        /// <summary>
+        /// Logs a message to the Console
+        /// </summary>
+        /// <param name="severity">Severity of the Message</param>
+        /// <param name="source">Source of the Message</param>
+        /// <param name="msg">The Message</param>
+        /// <param name="e">Exception attached to Log message</param>
+        /// <returns></returns>
         public Task Log(LogSeverity severity, LogSource source, string msg, Exception e = null)
         {
             Task.Run(() => LogInternal(severity, source, msg, e));
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Logs a message to the Console
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
         public Task Log(LogMessage m)
         {
             Task.Run(() => LogInternal(m.Severity, GetLogSrc(m), m.Message, m.Exception));
@@ -36,10 +49,17 @@ namespace tMod64Bot.Services
                 _ => LogSource.Unknown,
             };
         }
+        
+        /// <summary>
+        /// Standard Log message with Severity as Info and Source as Self.
+        /// </summary>
+        /// <param name="m">The message</param>
+        /// <returns></returns>
+        public Task Log(string m) => Log(LogSeverity.Info, LogSource.Self, m);
 
         private void LogInternal(LogSeverity severity, LogSource source, string msg, Exception e)
         {
-            using var writer = File.AppendText(PATH);
+            using var writer = File.AppendText(_path);
             
             var color = VerifySeverity(severity);
             AppendText(severity.ToString(), color);

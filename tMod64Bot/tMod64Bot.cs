@@ -4,25 +4,35 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using tMod64Bot.Services;
+using tMod64Bot.Services.Config;
+using tMod64Bot.Services.Logging;
 
 namespace tMod64Bot
 {
+    //TODO: Log disconnects from Discord Gateway
+    
     internal sealed class tMod64bot
     {
-        private static readonly ServiceProvider _services = BuildServiceProvider();
+        public static readonly string GatewayToken = File.ReadAllText(@"token.txt");
+        
+        internal static readonly ServiceProvider _services = BuildServiceProvider();
         private readonly DiscordSocketClient _client = _services.GetRequiredService<DiscordSocketClient>();
         private readonly CommandService _commands = _services.GetRequiredService<CommandService>();
         private readonly LoggingService _log = _services.GetRequiredService<LoggingService>();
 
-        private static bool _shuttingDown;
+        private bool _shuttingDown;
 
         public async Task StartAsync()
         {
-            await _client.LoginAsync(TokenType.Bot, Program.GatewayToken);
+            if (!Directory.Exists(ServiceConstants.DATA_DIR))
+                Directory.CreateDirectory(ServiceConstants.DATA_DIR);
+            
+            await _client.LoginAsync(TokenType.Bot, GatewayToken);
             await _client.StartAsync();
             _client.Ready += () =>
             {
@@ -37,6 +47,7 @@ namespace tMod64Bot
                 };
                 return Task.CompletedTask;
             };
+            
 
             HandleCmdLn();
 
@@ -51,9 +62,8 @@ namespace tMod64Bot
 
             sw.Stop();
 
-            await _log.Log(LogSeverity.Info, LogSource.Self,
-                $"Loaded {modules.Count()} modules and {modules.Sum(m => m.Commands.Count)}" +
-                $" commands loaded in {sw.ElapsedMilliseconds}ms.");
+            await _log.Log($"Loaded {modules.Count()} modules and {modules.Sum(m => m.Commands.Count)}" +
+                           $" commands loaded in {sw.ElapsedMilliseconds}ms.");
         }
 
         private void HandleCmdLn()
@@ -75,6 +85,9 @@ namespace tMod64Bot
                             case "clear":
                                 Console.Clear();
                                 break;
+                            case "stop":
+                                ShutdownAsync().GetAwaiter();
+                                break;
                         }
                     } while (index < args.Length);
                 }
@@ -90,8 +103,7 @@ namespace tMod64Bot
         private async Task ShutdownAsync()
         {
             _shuttingDown = true;
-
-            await _log.Log(LogSeverity.Info, LogSource.Self, "Shutdown requested by Command");
+            
             await _client.StopAsync();
             await _services.DisposeAsync();
 
@@ -109,7 +121,7 @@ namespace tMod64Bot
 #if DEBUG
                 LogLevel = LogSeverity.Verbose,
 #else
-                    LogLevel = LogSeverity.Info,
+                LogLevel = LogSeverity.Info,
 #endif
                 AlwaysDownloadUsers = true,
                 ConnectionTimeout = 10000,
@@ -125,6 +137,7 @@ namespace tMod64Bot
             // base services
             .AddSingleton<CommandHandler>()
             .AddSingleton<LoggingService>()
+            .AddSingleton<ConfigService>()
             .BuildServiceProvider();
     }
 }
