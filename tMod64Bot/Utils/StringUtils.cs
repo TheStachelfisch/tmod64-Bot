@@ -3,7 +3,7 @@ using System.IO;
 
 namespace tMod64Bot
 {
-    public static class Utils
+    public static class StringUtils
     {
 #if DEBUG
         public static string SourceFileName(string file) => Path.GetFullPath($@"{Environment.CurrentDirectory}\..\..\..\{file}");
