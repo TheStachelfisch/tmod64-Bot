@@ -63,7 +63,7 @@ namespace tMod64Bot
             sw.Stop();
 
             await _log.Log($"Loaded {modules.Count()} modules and {modules.Sum(m => m.Commands.Count)}" +
-                           $" commands loaded in {sw.ElapsedMilliseconds}ms.");
+                           $" commands in {sw.ElapsedMilliseconds}ms.");
         }
 
         private void HandleCmdLn()
