@@ -27,8 +27,21 @@ namespace tMod64Bot.Services
         public async Task InitializeAsync()
         {
             Client.MessageReceived += HandleCommandAsync;
+
+#if DEBUG
+            _commands.CommandExecuted += CommandExecutedAsync;      
+#endif
+        }
+
+        public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        {
+            if (!command.IsSpecified)
+                return;
             
-            _commands.
+            if (result.IsSuccess)
+                return;
+            
+            await context.Channel.SendMessageAsync($"error: {result}");
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)

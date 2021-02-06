@@ -7,11 +7,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Caching;
 using System.Threading.Tasks;
 using tMod64Bot.Services;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
-using tMod64Bot.Services.Logging.UserLogging;
+using tMod64Bot.Services.Logging.BotLogging;
 
 namespace tMod64Bot
 {
@@ -109,7 +110,7 @@ namespace tMod64Bot
             
             await _client.StopAsync();
             sw.Stop();
-            await _log.Log(LogSeverity.Verbose, LogSource.Self, $"Successfully Disconnected in {sw.ElapsedMilliseconds}ms");
+            await _log.Log(LogSeverity.Info, LogSource.Self, $"Successfully Disconnected in {sw.ElapsedMilliseconds}ms");
 
             await _services.DisposeAsync();
 
@@ -119,7 +120,7 @@ namespace tMod64Bot
         private static async Task InitializeServicesAsync()
         {
             await _services.GetRequiredService<CommandHandler>().InitializeAsync();
-            await _services.GetRequiredService<UserLoggingService>().InitializeAsync();
+            await _services.GetRequiredService<BotLoggingService>().InitializeAsync();
         }
 
         private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
@@ -130,8 +131,11 @@ namespace tMod64Bot
 #else
                 LogLevel = LogSeverity.Info,
 #endif
+                ExclusiveBulkDelete = true,
+                UseSystemClock = true,
+                DefaultRetryMode = RetryMode.RetryRatelimit,
                 AlwaysDownloadUsers = true,
-                ConnectionTimeout = 10000,
+                ConnectionTimeout = 30000,
                 MessageCacheSize = 100
             }))
             .AddSingleton(new CommandService(new CommandServiceConfig
@@ -140,12 +144,14 @@ namespace tMod64Bot
                 //IgnoreExtraArgs = true,
                 DefaultRunMode = RunMode.Async
             }))
+            
+            .AddSingleton(new MemoryCache("GlobalCache"))
 
             // base services
             .AddSingleton<CommandHandler>()
             .AddSingleton<LoggingService>()
             .AddSingleton<ConfigService>()
-            .AddSingleton<UserLoggingService>()
+            .AddSingleton<BotLoggingService>()
             .BuildServiceProvider();
     }
 }

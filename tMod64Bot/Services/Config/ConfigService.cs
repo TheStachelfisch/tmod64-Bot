@@ -64,7 +64,7 @@ namespace tMod64Bot.Services.Config
                 return;
             }
 
-            _log.Log(LogSeverity.Info, LogSource.Service, "Successfully Saved Data");
+            _log.Log(LogSeverity.Verbose, LogSource.Service, "Successfully Saved Data");
         }
 
         public void SaveData(string json)
@@ -127,8 +127,8 @@ namespace tMod64Bot.Services.Config
             }
             catch (Exception e)
             {
-                _log.Log(LogSeverity.Critical, LogSource.Service, "Failed completing first-time Config setup");
-                throw;
+                _log.Log(LogSeverity.Critical, LogSource.Service, "Failed completing first-time Config setup", e);
+                Environment.Exit(0x20);
             }
             
             _log.Log(LogSeverity.Info,LogSource.Service, "Completed first-time Setup");
