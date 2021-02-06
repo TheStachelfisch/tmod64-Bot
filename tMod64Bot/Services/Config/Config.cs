@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace tMod64Bot.Services.Config
 {
@@ -12,9 +13,13 @@ namespace tMod64Bot.Services.Config
         public HashSet<ulong> BannedWordsExemptChannel;
 
         public string BotPrefix;
+
+        [Space]
         
-        public ulong LoggingChannel;
+        public ulong UserLoggingChannel;
         public ulong ModerationLoggingChannel;
+
+        [Space]
         
         public ulong MutedRole;
         public ulong SoftbannedRole;

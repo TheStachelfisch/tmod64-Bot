@@ -46,8 +46,13 @@ namespace tMod64Bot.Modules
             var fieldText = "```\n";
 
             foreach (var fieldInfo in fields)
+            {
+                if (Attribute.IsDefined(fieldInfo, typeof(SpaceAttribute)))
+                    fieldText += "\n";
+                
                 fieldText += $"{fieldInfo.FieldType.Name, -25} {fieldInfo.Name}\n";
-            
+            }
+
             fieldText += "```";
             fieldText = fieldText.Replace(" ", "\u200b ");
 
@@ -66,7 +71,12 @@ namespace tMod64Bot.Modules
             var fieldText = "```\n";
 
             foreach (var fieldInfo in fields)
+            {
+                if (Attribute.IsDefined(fieldInfo, typeof(SpaceAttribute)))
+                    fieldText += "\n";
+                
                 fieldText += $"{fieldInfo.Name, -25} {fieldInfo.GetValue(fieldValue)}\n";
+            }
 
             fieldText += "```";
             fieldText = fieldText.Replace(" ", "\u200b ");

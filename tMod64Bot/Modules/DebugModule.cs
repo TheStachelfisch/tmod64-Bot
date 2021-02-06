@@ -1,34 +1,32 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
+using Discord.Webhook;
 using tMod64Bot.Services.Config;
+using tMod64Bot.Utils;
 
 namespace tMod64Bot.Modules
 {
     public class DebugModule : CommandBase
     {
-        [Command("ct")]
-        public async Task ConfigDebug(string key, string value)
+        [Command("wh")]
+        public async Task WebhookDebugging()
         {
-            await ReplyAsync($"Old Prefix {ConfigService.Config.BotPrefix}");
-
-            try
-            {
-                var success = ConfigService.ChangeKey(key, value);
-
-                if (!success)
-                {
-                    await ReplyAsync("Key does not exist");
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                await ReplyAsync($"`Error: {e.Message}`\n**Note: You can only change String And Integer config values**");
-                return;
-            }
-
-            await ReplyAsync("Successfully updated Data");
+            Stopwatch sw = Stopwatch.StartNew();
+            
+            var logChannel = Context.Guild.GetChannel(ConfigService.Config.UserLoggingChannel) as ITextChannel;
+            var webhook = logChannel!.GetWebhooksAsync().Result.FirstOrDefault(x => x.Name.Equals("tMod64-Logging"));
+            
+            using (var client = new DiscordWebhookClient(webhook.GetUrl()))
+            {   
+                await client.SendMessageAsync("Hello, World!");
+            };
+            
+            sw.Stop();
+            await ReplyAsync($"It took {sw.ElapsedMilliseconds}ms to execute");
         }
     }
 }

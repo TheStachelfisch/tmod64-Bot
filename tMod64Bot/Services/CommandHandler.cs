@@ -20,11 +20,16 @@ namespace tMod64Bot.Services
         public CommandHandler(IServiceProvider services) : base(services)
         {
             _commands = services.GetRequiredService<CommandService>();
-            
+            _loggingService = services.GetRequiredService<LoggingService>();
             _config = services.GetRequiredService<ConfigService>();
         }
-        
-        public async Task InitializeAsync() => Client.MessageReceived += HandleCommandAsync;
+
+        public async Task InitializeAsync()
+        {
+            Client.MessageReceived += HandleCommandAsync;
+            
+            _commands.
+        }
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {

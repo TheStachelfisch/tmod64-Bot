@@ -17,6 +17,8 @@ namespace tMod64Bot.Services.Config
         private readonly LoggingService _log;
         private Config _config;
 
+        private JsonSerializerSettings jsSettings;
+
         public Config Config
         {
             get => _config;
@@ -25,6 +27,11 @@ namespace tMod64Bot.Services.Config
 
         public ConfigService(IServiceProvider services) : base(services)
         {
+            jsSettings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            
             _log = Services.GetRequiredService<LoggingService>();
 
             if (!File.Exists(_configPath))
@@ -49,7 +56,7 @@ namespace tMod64Bot.Services.Config
         {
             try
             {
-                File.WriteAllText(_configPath, JsonConvert.SerializeObject(_config, Formatting.Indented));
+                File.WriteAllText(_configPath, JsonConvert.SerializeObject(_config, Formatting.Indented, jsSettings));
             }
             catch (Exception e)
             {
@@ -114,7 +121,7 @@ namespace tMod64Bot.Services.Config
                     BotPrefix = "64!"
                 };
             
-                string json = JsonConvert.SerializeObject(_config, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(_config, Formatting.Indented, jsSettings);
             
                 File.WriteAllText(_configPath, json);
             }

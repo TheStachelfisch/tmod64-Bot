@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using tMod64Bot.Services;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
+using tMod64Bot.Services.Logging.UserLogging;
 
 namespace tMod64Bot
 {
@@ -104,7 +105,12 @@ namespace tMod64Bot
         {
             _shuttingDown = true;
             
+            Stopwatch sw = Stopwatch.StartNew();
+            
             await _client.StopAsync();
+            sw.Stop();
+            await _log.Log(LogSeverity.Verbose, LogSource.Self, $"Successfully Disconnected in {sw.ElapsedMilliseconds}ms");
+
             await _services.DisposeAsync();
 
             Environment.Exit(0);
@@ -113,6 +119,7 @@ namespace tMod64Bot
         private static async Task InitializeServicesAsync()
         {
             await _services.GetRequiredService<CommandHandler>().InitializeAsync();
+            await _services.GetRequiredService<UserLoggingService>().InitializeAsync();
         }
 
         private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
@@ -138,6 +145,7 @@ namespace tMod64Bot
             .AddSingleton<CommandHandler>()
             .AddSingleton<LoggingService>()
             .AddSingleton<ConfigService>()
+            .AddSingleton<UserLoggingService>()
             .BuildServiceProvider();
     }
 }
