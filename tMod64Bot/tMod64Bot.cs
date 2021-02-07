@@ -20,17 +20,24 @@ namespace tMod64Bot
     
     internal sealed class tMod64bot
     {
-        public static readonly string GatewayToken = File.ReadAllText(@"token.txt");
+        public static long GetUptime => DateTimeOffset.Now.ToUnixTimeSeconds() - _startUpTime;
+
+        private static readonly string GatewayToken = File.ReadAllText(@"token.txt");
         
         internal static readonly ServiceProvider _services = BuildServiceProvider();
         private readonly DiscordSocketClient _client = _services.GetRequiredService<DiscordSocketClient>();
         private readonly CommandService _commands = _services.GetRequiredService<CommandService>();
         private readonly LoggingService _log = _services.GetRequiredService<LoggingService>();
 
+        private Stopwatch _startUpStopwatch;
         private bool _shuttingDown;
+        private static long _startUpTime;
 
         public async Task StartAsync()
         {
+            _startUpTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+            _startUpStopwatch = Stopwatch.StartNew();
+            
             if (!Directory.Exists(ServiceConstants.DATA_DIR))
                 Directory.CreateDirectory(ServiceConstants.DATA_DIR);
             
@@ -42,14 +49,13 @@ namespace tMod64Bot
                 SetupAsync().GetAwaiter().GetResult();
 
                 //Prevents Program from exiting without disposing services and disconnecting from gateway
-                AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
+                AppDomain.CurrentDomain.ProcessExit += (_, _) =>
                 {
                     if (!_shuttingDown)
                         ShutdownAsync().GetAwaiter().GetResult();
                 };
                 return Task.CompletedTask;
             };
-            
 
             HandleCmdLn();
 
@@ -63,9 +69,11 @@ namespace tMod64Bot
             var modules = await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
             sw.Stop();
+            _startUpStopwatch.Stop();
 
             await _log.Log($"Loaded {modules.Count()} modules and {modules.Sum(m => m.Commands.Count)}" +
                            $" commands in {sw.ElapsedMilliseconds}ms.");
+            await _log.Log($"Completed Startup in {_startUpStopwatch.ElapsedMilliseconds}ms");
         }
 
         private void HandleCmdLn()
@@ -87,9 +95,6 @@ namespace tMod64Bot
                             case "clear":
                                 Console.Clear();
                                 break;
-                            case "stop":
-                                ShutdownAsync().GetAwaiter();
-                                break;
                         }
                     } while (index < args.Length);
                 }
@@ -104,15 +109,21 @@ namespace tMod64Bot
 
         private async Task ShutdownAsync()
         {
+            // Calculating these in the String only returns Int64(Loss of precision)
+            decimal minuteUptime = Math.Round((decimal)GetUptime / 60, 2);
+            decimal hourUptime = Math.Round(minuteUptime / 60, 2);
+            
             _shuttingDown = true;
             
             Stopwatch sw = Stopwatch.StartNew();
             
             await _client.StopAsync();
+            
             sw.Stop();
             await _log.Log(LogSeverity.Info, LogSource.Self, $"Successfully Disconnected in {sw.ElapsedMilliseconds}ms");
+            await _log.Log(LogSeverity.Info, LogSource.Self, $"Bot uptime was {GetUptime}s or {minuteUptime}min or {hourUptime}h");
 
-            await _services.DisposeAsync();
+            _services.DisposeAsync().GetAwaiter().GetResult();
 
             Environment.Exit(0);
         }

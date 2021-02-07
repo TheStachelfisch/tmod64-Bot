@@ -27,7 +27,7 @@ namespace tMod64Bot.Services.Logging
         /// <returns></returns>
         public Task Log(LogSeverity severity, LogSource source, string msg, Exception e = null)
         {
-            Task.Run(() => LogInternal(severity, source, msg, e));
+            LogInternal(severity, source, msg, e);
             return Task.CompletedTask;
         }
 
@@ -38,7 +38,7 @@ namespace tMod64Bot.Services.Logging
         /// <returns></returns>
         public Task Log(LogMessage m)
         {
-            Task.Run(() => LogInternal(m.Severity, GetLogSrc(m), m.Message, m.Exception));
+            LogInternal(m.Severity, GetLogSrc(m), m.Message, m.Exception);
             return Task.CompletedTask;
 
             static LogSource GetLogSrc(LogMessage msg) => msg.Source switch
@@ -82,7 +82,7 @@ namespace tMod64Bot.Services.Logging
                 AppendText($"{e.Message}\n{e.StackTrace}", VerifySeverity(severity));
                 writer.Write($"{e.Message}\n{e.StackTrace}");
             }
-
+            
             Console.WriteLine();
             Console.ResetColor();
             writer.WriteLine();
