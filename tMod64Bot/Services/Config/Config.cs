@@ -24,5 +24,16 @@ namespace tMod64Bot.Services.Config
         public ulong MutedRole;
         public ulong SoftbannedRole;
         public ulong BotManagerRole;
+
+        [Space] 
+        
+        public bool LogUserLeft;
+        public bool LogUserUpdated;
+        public bool LogUserJoined;
+        public bool LogMessageUpdated;
+        public bool LogMessageDeleted;
+        public bool ModLogUserBanned;
+        public bool ModLogUserKicked;
+        public bool ModLogUserMuted;
     }
 }

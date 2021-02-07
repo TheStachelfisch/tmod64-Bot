@@ -118,7 +118,16 @@ namespace tMod64Bot.Services.Config
                     BannedWords = new HashSet<string>(),
                     MutedUsers = new Dictionary<ulong, ulong>(),
                     BannedWordsExemptChannel = new HashSet<ulong>(),
-                    BotPrefix = "64!"
+                    BotPrefix = "64!",
+                    
+                    LogMessageDeleted = true,
+                    LogMessageUpdated = true,
+                    LogUserJoined = true,
+                    LogUserLeft = true,
+                    LogUserUpdated = true,
+                    ModLogUserBanned = true,
+                    ModLogUserKicked = true,
+                    ModLogUserMuted = true,
                 };
             
                 string json = JsonConvert.SerializeObject(_config, Formatting.Indented, jsSettings);
