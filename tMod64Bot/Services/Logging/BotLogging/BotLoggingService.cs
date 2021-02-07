@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -30,8 +31,8 @@ namespace tMod64Bot.Services.Logging.BotLogging
             Client.UserJoined += HandleUserJoined;
             Client.UserLeft += HandleUserLeft;
             Client.MessageDeleted += HandleDeletedMessage;
-            // Client.MessageUpdated += HandleMessageUpdated;
-            // Client.GuildMemberUpdated += HandleUserUpdated;
+            Client.MessageUpdated += HandleMessageUpdated;
+            Client.GuildMemberUpdated += HandleUserUpdated;
 
             //Handle with custom Moderation events
             //Client.UserUnbanned
@@ -91,11 +92,14 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
             using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
             {
+                List<string> roles = new();
+                user.Roles.Where(z => z.IsEveryone == false).ToList().ForEach(x => roles.Add(MentionUtils.MentionRole(x.Id)));
+
                 EmbedBuilder embed = new()
                 {
                     Title = "User Left",
                     Color = Color.Orange,
-                    Description = $"{MentionUtils.MentionUser(user.Id)} {description}",
+                    Description = $"{MentionUtils.MentionUser(user.Id)} {description}{(roles.Any() ? $"\nRoles: {String.Join(' ', roles)}" : String.Empty)}",
                     Footer = new EmbedFooterBuilder
                     {
                         Text = $"id: {user.Id}"
@@ -115,11 +119,18 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
             if (userLoggingChannel == 0)
                 return;
+            
+            using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+            {
+                await client.SendMessageAsync($"Before: {userBefore.Nickname}\nAfter: {userAfter.Nickname}");
+            }
         }
 
         private async Task HandleUserJoined(SocketGuildUser user)
         {
-            var userLoggingChannel = _config.Config.UserLoggingChannel;
+            if (_config.Config.LogUserJoined)
+            {
+                            var userLoggingChannel = _config.Config.UserLoggingChannel;
 
             if (userLoggingChannel == 0)
                 return;
@@ -157,44 +168,50 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
                 await client.SendMessageAsync(embeds: new[] {embed.Build()});
             }
+            }
         }
 
-        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage message,
-            ISocketMessageChannel channel)
+        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage message, ISocketMessageChannel channel)
         {
-            var userLoggingChannel = _config.Config.UserLoggingChannel;
+            if (_config.Config.LogMessageUpdated)
+            {
+                var userLoggingChannel = _config.Config.UserLoggingChannel;
 
-            if (userLoggingChannel == 0)
-                return;
+                if (userLoggingChannel == 0)
+                    return;
 
-            var guildChannel = channel as SocketGuildChannel;
+                var guildChannel = channel as SocketGuildChannel;
+            }
         }
 
         private async Task HandleDeletedMessage(Cacheable<IMessage, ulong> messageBefore, ISocketMessageChannel channel)
         {
-            if (messageBefore.HasValue && (messageBefore.Value.Author.IsWebhook || messageBefore.Value.Embeds.Any()))
-                return;
-
-            var userLoggingChannel = _config.Config.UserLoggingChannel;
-
-            if (userLoggingChannel == 0)
-                return;
-            using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+            if (_config.Config.LogMessageDeleted)
             {
-                // Conditional Operator go brrrrrrr
-                EmbedBuilder embed = new()
+                if (messageBefore.HasValue && (messageBefore.Value.Author.IsWebhook || messageBefore.Value.Embeds.Any()))
+                    return;
+
+                var userLoggingChannel = _config.Config.UserLoggingChannel;
+
+                if (userLoggingChannel == 0)
+                    return;
+                using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
                 {
-                    Title = $"Message Deleted from #{channel.Name}",
-                    Color = Color.Red,
-                    Description = messageBefore.HasValue ? messageBefore.Value.Content : "Message could not be retrieved",
-                    Footer = new EmbedFooterBuilder {Text = messageBefore.Id.ToString()},
-                    Timestamp = messageBefore.HasValue ? messageBefore.Value.Timestamp : null
-                };
+                    // Conditional Operator go brrrrrrr
+                    EmbedBuilder embed = new()
+                    {
+                        Title = $"Message Deleted from #{channel.Name}",
+                        Color = Color.Red,
+                        Description = messageBefore.HasValue ? messageBefore.Value.Content : "Message could not be retrieved",
+                        Footer = new EmbedFooterBuilder {Text = messageBefore.Id.ToString()},
+                        Timestamp = messageBefore.HasValue ? messageBefore.Value.Timestamp : null
+                    };
 
-                if (messageBefore.HasValue)
-                    embed.WithAuthor(messageBefore.Value.Author);
+                    if (messageBefore.HasValue)
+                        embed.WithAuthor(messageBefore.Value.Author);
 
-                await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                }
             }
         }
     }

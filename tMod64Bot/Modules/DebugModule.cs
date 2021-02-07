@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.Webhook;
+using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using tMod64Bot.Services.Logging;
 using tMod64Bot.Services.Logging.BotLogging;
@@ -64,6 +65,12 @@ namespace tMod64Bot.Modules
             {
                 await LoggingService.Log(LogSeverity.Error, LogSource.Module, "Error while trimming Cache", e);
             }
+        }
+
+        [Command("channelCode")]
+        public async Task ChannelCode(SocketGuildChannel channel)
+        {
+            await ReplyAsync($"`{MentionUtils.MentionChannel(channel.Id)}`");
         }
     }
 }
