@@ -157,7 +157,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                     Title = "User joined",
                     Color = Color.Green,
                     Description =
-                        $"{MentionUtils.MentionUser(user.Id)} {user.Guild.MemberCount + 1}{(user.Guild.MemberCount).NumberEnding()} to join\n{description}",
+                        $"{MentionUtils.MentionUser(user.Id)} {user.Guild.MemberCount}{(user.Guild.MemberCount).NumberEnding()} to join\n{description}",
                     Footer = new EmbedFooterBuilder()
                     {
                         Text = $"id: {user.Id}"

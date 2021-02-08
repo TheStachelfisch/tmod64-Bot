@@ -20,18 +20,18 @@ namespace tMod64Bot
     
     internal sealed class tMod64bot
     {
-        public static long GetUptime => DateTimeOffset.Now.ToUnixTimeSeconds() - _startUpTime;
-
         private static readonly string GatewayToken = File.ReadAllText(@"token.txt");
         
         internal static readonly ServiceProvider _services = BuildServiceProvider();
-        private readonly DiscordSocketClient _client = _services.GetRequiredService<DiscordSocketClient>();
+        private static readonly DiscordSocketClient _client = _services.GetRequiredService<DiscordSocketClient>();
         private readonly CommandService _commands = _services.GetRequiredService<CommandService>();
         private readonly LoggingService _log = _services.GetRequiredService<LoggingService>();
 
         private Stopwatch _startUpStopwatch;
         private bool _shuttingDown;
         private static long _startUpTime;
+
+        public static long GetUptime => DateTimeOffset.Now.ToUnixTimeSeconds() - _startUpTime;
 
         public async Task StartAsync()
         {
@@ -116,6 +116,9 @@ namespace tMod64Bot
             _shuttingDown = true;
             
             Stopwatch sw = Stopwatch.StartNew();
+
+            Task tS = Task.Run(() => _client.StopAsync());
+            tS.Wait();
             
             await _client.StopAsync();
             
@@ -123,15 +126,15 @@ namespace tMod64Bot
             await _log.Log(LogSeverity.Info, LogSource.Self, $"Successfully Disconnected in {sw.ElapsedMilliseconds}ms");
             await _log.Log(LogSeverity.Info, LogSource.Self, $"Bot uptime was {GetUptime}s or {minuteUptime}min or {hourUptime}h");
 
-            _services.DisposeAsync().GetAwaiter().GetResult();
-
-            Environment.Exit(0);
+            Task tD = Task.Run(() => _services.DisposeAsync());
+            tD.Wait();
         }
 
         private static async Task InitializeServicesAsync()
         {
             await _services.GetRequiredService<CommandHandler>().InitializeAsync();
             await _services.GetRequiredService<BotLoggingService>().InitializeAsync();
+            await _services.GetRequiredService<TotalMemberService>().InitializeAsync();
         }
 
         private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
@@ -163,6 +166,7 @@ namespace tMod64Bot
             .AddSingleton<LoggingService>()
             .AddSingleton<ConfigService>()
             .AddSingleton<BotLoggingService>()
+            .AddSingleton<TotalMemberService>()
             .BuildServiceProvider();
     }
 }
