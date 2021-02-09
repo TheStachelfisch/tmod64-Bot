@@ -99,6 +99,8 @@ namespace tMod64Bot.Services.Config
 
             if (ulong.TryParse(value, out ulong ulongResult) && jObjects[key].Type == JTokenType.Integer)
                 jObjects[key] = ulongResult;
+            else if(Boolean.TryParse(value, out bool boolResult) && jObjects[key].Type == JTokenType.Boolean)
+                jObjects[key] = boolResult;
             else if(jObjects[key].Type == JTokenType.String)
                 jObjects[key] = value;
             else

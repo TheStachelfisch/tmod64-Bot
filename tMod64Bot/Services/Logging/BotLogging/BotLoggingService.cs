@@ -72,7 +72,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
         {
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
-            if (userLoggingChannel == 0)
+            if (userLoggingChannel == 0 || !_config.Config.LogUserLeft)
                 return;
 
             var fixedDate = DateTimeOffset.Now - user.JoinedAt!.Value;
@@ -81,25 +81,24 @@ namespace tMod64Bot.Services.Logging.BotLogging
             if (fixedDate.Days == 0 && fixedDate.Days == 0 && fixedDate.Hours == 0 && fixedDate.Minutes == 0)
                 description = $"Joined {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
             else if (fixedDate.Days == 0 && fixedDate.Hours == 0)
-                description =
-                    $"Joined {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
+                description = $"Joined {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
             else if (fixedDate.Days == 0)
-                description =
-                    $"Joined {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
+                description = $"Joined {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
             else
-                description =
-                    $"Joined {fixedDate.Days} {(fixedDate.Hours == 1 ? "Day" : "Days")}, {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
+                description = $"Joined {fixedDate.Days} {(fixedDate.Hours == 1 ? "Day" : "Days")}, {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
 
             using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
             {
                 List<string> roles = new();
-                user.Roles.Where(z => z.IsEveryone == false).ToList().ForEach(x => roles.Add(MentionUtils.MentionRole(x.Id)));
+                user.Roles.Where(z => z.IsEveryone == false).ToList()
+                    .ForEach(x => roles.Add(MentionUtils.MentionRole(x.Id)));
 
                 EmbedBuilder embed = new()
                 {
                     Title = "User Left",
                     Color = Color.Orange,
-                    Description = $"{MentionUtils.MentionUser(user.Id)} {description}{(roles.Any() ? $"\nRoles: {String.Join(' ', roles)}" : String.Empty)}",
+                    Description =
+                        $"{MentionUtils.MentionUser(user.Id)} {description}{(roles.Any() ? $"\nRoles: {string.Join(' ', roles)}" : string.Empty)}",
                     Footer = new EmbedFooterBuilder
                     {
                         Text = $"id: {user.Id}"
@@ -108,6 +107,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 };
 
                 embed.WithAuthor(user);
+                embed.WithCurrentTimestamp();
 
                 await client.SendMessageAsync(embeds: new[] {embed.Build()});
             }
@@ -115,24 +115,93 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
         private async Task HandleUserUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
         {
+            await _loggingService.Log("User Update called");
+
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
-            if (userLoggingChannel == 0)
+            if (userLoggingChannel == 0 || !_config.Config.LogUserUpdated)
                 return;
-            
+
             using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
             {
-                await client.SendMessageAsync($"Before: {userBefore.Nickname}\nAfter: {userAfter.Nickname}");
+                if (userBefore.Username != userAfter.Username)
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Title = $"Username changed",
+                        Color = Color.Gold,
+                        Description = $"**Before**: {userBefore.Username}\n**After**: {userAfter.Username}",
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = $"User id: {userAfter.Id}"
+                        }
+                    };
+
+                    embed.WithAuthor(userAfter);
+
+                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                }
+                else if (userBefore.Nickname != userAfter.Nickname)
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Title = $"{(userAfter.Nickname.IsNullOrWhitespace() ? "Nickname reset" : $"{(userBefore.Nickname.IsNullOrWhitespace() ? "Nickname added" : "Nickname changed")}")}",
+                        Color = Color.Gold,
+                        Description = $"{(userAfter.Nickname.IsNullOrWhitespace() ? $"**Before**: {userBefore.Nickname}" : $"{(userBefore.Nickname.IsNullOrWhitespace() ? $"**Nickname**: {userAfter.Nickname}" : $"**Before**: {userBefore.Nickname}\n**After**: {userAfter.Nickname}")}")}",
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = $"User id: {userAfter.Id}"
+                        }
+                    };
+
+                    embed.WithAuthor(userAfter);
+
+                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                }
+                else if (userBefore.DiscriminatorValue != userAfter.DiscriminatorValue)
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Discriminator changed",
+                        Color = Color.Gold,
+                        Description = $"**Before**: {userBefore.Discriminator}\n**After**: {userAfter.Discriminator},",
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = $"User id: {userAfter.Id}"
+                        }
+                    };
+
+                    embed.WithAuthor(userAfter);
+
+                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                }
+                else if (userBefore.GetAvatarUrl() != userAfter.GetAvatarUrl())
+                {
+                    await _loggingService.Log("Avatar update called");
+
+                    var embed = new EmbedBuilder
+                    {
+                        Title = "Avatar changed",
+                        Color = Color.Gold,
+                        ImageUrl = userAfter.GetAvatarUrl(),
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = $"User id: {userAfter.Id}"
+                        }
+                    };
+
+                    embed.WithAuthor(userAfter);
+
+                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                }
             }
         }
 
         private async Task HandleUserJoined(SocketGuildUser user)
         {
-            if (_config.Config.LogUserJoined)
-            {
-                            var userLoggingChannel = _config.Config.UserLoggingChannel;
+            var userLoggingChannel = _config.Config.UserLoggingChannel;
 
-            if (userLoggingChannel == 0)
+            if (userLoggingChannel == 0 || !_config.Config.LogUserJoined)
                 return;
 
             var fixedDate = DateTimeOffset.Now - user.CreatedAt;
@@ -141,14 +210,11 @@ namespace tMod64Bot.Services.Logging.BotLogging
             if (fixedDate.Days == 0 && fixedDate.Days == 0 && fixedDate.Hours == 0 && fixedDate.Minutes == 0)
                 description = $"Created {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
             else if (fixedDate.Days == 0 && fixedDate.Hours == 0)
-                description =
-                    $"Created {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
+                description = $"Created {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
             else if (fixedDate.Days == 0)
-                description =
-                    $"Created {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
+                description = $"Created {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
             else
-                description =
-                    $"Created {fixedDate.Days} {(fixedDate.Hours == 1 ? "Day" : "Days")}, {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
+                description = $"Created {fixedDate.Days} {(fixedDate.Hours == 1 ? "Day" : "Days")}, {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
 
             using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
             {
@@ -156,62 +222,83 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 {
                     Title = "User joined",
                     Color = Color.Green,
-                    Description =
-                        $"{MentionUtils.MentionUser(user.Id)} {user.Guild.MemberCount}{(user.Guild.MemberCount).NumberEnding()} to join\n{description}",
-                    Footer = new EmbedFooterBuilder()
+                    Description = $"{MentionUtils.MentionUser(user.Id)} {user.Guild.MemberCount}{user.Guild.MemberCount.NumberEnding()} to join\n{description}",
+                    Footer = new EmbedFooterBuilder
                     {
                         Text = $"id: {user.Id}"
                     }
                 };
 
                 embed.WithAuthor(user);
+                embed.WithTimestamp((DateTimeOffset) user.JoinedAt);
 
                 await client.SendMessageAsync(embeds: new[] {embed.Build()});
             }
-            }
         }
 
-        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage message, ISocketMessageChannel channel)
+        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage messageAfter, ISocketMessageChannel channel)
         {
             if (_config.Config.LogMessageUpdated)
             {
                 var userLoggingChannel = _config.Config.UserLoggingChannel;
 
-                if (userLoggingChannel == 0)
+                if (userLoggingChannel == 0 || !_config.Config.LogMessageUpdated)
                     return;
 
-                var guildChannel = channel as SocketGuildChannel;
+                if (messageAfter.Author.IsBot || messageAfter.Author.IsWebhook)
+                    return;
+
+                using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Title = $"Message edited in #{channel.Name}",
+                        Color = Color.DarkMagenta,
+                        Description =
+                            $"**Before:** {(messageBefore.HasValue ? messageBefore.Value.Content : "Message Content could not be retrieved")}\n" +
+                            $"**After:** {messageAfter.Content}",
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = $"id: {messageAfter.Id}"
+                        }
+                    };
+
+                    embed.WithAuthor(messageAfter.Author);
+                    embed.WithTimestamp(messageAfter.Timestamp);
+
+                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                }
             }
         }
 
         private async Task HandleDeletedMessage(Cacheable<IMessage, ulong> messageBefore, ISocketMessageChannel channel)
         {
-            if (_config.Config.LogMessageDeleted)
+            if (messageBefore.HasValue && (messageBefore.Value.Author.IsWebhook || messageBefore.Value.Embeds.Any()))
+                return;
+
+            var userLoggingChannel = _config.Config.UserLoggingChannel;
+
+            if (userLoggingChannel == 0 || !_config.Config.LogMessageDeleted)
+                return;
+            using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
             {
-                if (messageBefore.HasValue && (messageBefore.Value.Author.IsWebhook || messageBefore.Value.Embeds.Any()))
-                    return;
-
-                var userLoggingChannel = _config.Config.UserLoggingChannel;
-
-                if (userLoggingChannel == 0)
-                    return;
-                using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+                // Conditional Operator go brrrrrrr
+                EmbedBuilder embed = new()
                 {
-                    // Conditional Operator go brrrrrrr
-                    EmbedBuilder embed = new()
-                    {
-                        Title = $"Message Deleted from #{channel.Name}",
-                        Color = Color.Red,
-                        Description = messageBefore.HasValue ? messageBefore.Value.Content : "Message could not be retrieved",
-                        Footer = new EmbedFooterBuilder {Text = messageBefore.Id.ToString()},
-                        Timestamp = messageBefore.HasValue ? messageBefore.Value.Timestamp : null
-                    };
+                    Title = $"Message Deleted from #{channel.Name}",
+                    Color = Color.Red,
+                    Description = messageBefore.HasValue
+                        ? messageBefore.Value.Content
+                        : "Message could not be retrieved",
+                    Footer = new EmbedFooterBuilder {Text = messageBefore.Id.ToString()},
+                    Timestamp = messageBefore.HasValue ? messageBefore.Value.Timestamp : null
+                };
 
-                    if (messageBefore.HasValue)
-                        embed.WithAuthor(messageBefore.Value.Author);
+                if (messageBefore.HasValue)
+                    embed.WithAuthor(messageBefore.Value.Author);
+                embed.WithTimestamp(messageBefore.HasValue ? messageBefore.Value.Timestamp : DateTimeOffset.Now);
 
-                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
-                }
+                await client.SendMessageAsync(embeds: new[] {embed.Build()});
             }
         }
     }

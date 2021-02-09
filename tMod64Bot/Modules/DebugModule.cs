@@ -35,19 +35,19 @@ namespace tMod64Bot.Modules
         }
 
         [Command("purge")]
-        public async Task PurgeDebug(ulong channelId, ulong amount)
+        public async Task PurgeDebug(SocketGuildChannel channel, ulong amount)
         {
-            var channel = Context.Guild.GetChannel(channelId) as ITextChannel;
+            var channelText = Context.Guild.GetChannel(channel.Id) as ITextChannel;
             
-            var messages = await channel.GetMessagesAsync(Convert.ToInt32(amount)).FlattenAsync();
+            var messages = await channelText!.GetMessagesAsync(Convert.ToInt32(amount)).FlattenAsync();
             var filteredMessages = messages.Where(x => x.Timestamp < DateTimeOffset.Now.AddDays(14)).ToList();
 
             if (!filteredMessages.Any())
                 await ReplyAsync("Nothing to delete");
             else
             {
-                await channel.DeleteMessagesAsync(filteredMessages);
-                await ReplyAsync($"Deleted {filteredMessages.Count()}{(filteredMessages.Count() == 1 ? "message" : "messages")}.");
+                await channelText.DeleteMessagesAsync(filteredMessages);
+                await ReplyAsync($"Deleted {filteredMessages.Count}{(filteredMessages.Count() == 1 ? "message" : "messages")}.");
             }
         }
 
