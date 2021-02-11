@@ -17,7 +17,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
     {
         private readonly ConfigService _config;
         private readonly LoggingService _loggingService;
-        private MemoryCache _cache;
+        private readonly MemoryCache _cache;
 
         public BotLoggingService(IServiceProvider services) : base(services)
         {
@@ -124,11 +124,13 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
             using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
             {
+                await client.SendMessageAsync($"Before: {userBefore.GetAvatarUrl()}\nAfter: {userAfter.GetAvatarUrl()}");
+                
                 if (userBefore.Username != userAfter.Username)
                 {
                     var embed = new EmbedBuilder
                     {
-                        Title = $"Username changed",
+                        Title = "Username changed",
                         Color = Color.Gold,
                         Description = $"**Before**: {userBefore.Username}\n**After**: {userAfter.Username}",
                         Footer = new EmbedFooterBuilder

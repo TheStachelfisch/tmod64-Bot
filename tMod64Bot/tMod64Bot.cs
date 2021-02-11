@@ -150,7 +150,7 @@ namespace tMod64Bot
                 DefaultRetryMode = RetryMode.RetryRatelimit,
                 AlwaysDownloadUsers = true,
                 ConnectionTimeout = 30000,
-                MessageCacheSize = 100
+                MessageCacheSize = 100,
             }))
             .AddSingleton(new CommandService(new CommandServiceConfig
             {
