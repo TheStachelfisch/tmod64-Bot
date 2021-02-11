@@ -118,6 +118,8 @@ namespace tMod64Bot.Services.Config
                 _config = new Config
                 {
                     BannedWords = new HashSet<string>(),
+                    StickiedRoles = new HashSet<ulong>(),
+                    StickiedUsers = new Dictionary<ulong, List<ulong>>(),
                     MutedUsers = new Dictionary<ulong, ulong>(),
                     BannedWordsExemptChannel = new HashSet<ulong>(),
                     BotPrefix = "64!",

@@ -4,8 +4,10 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
+using tMod64Bot.Utils;
 
 namespace tMod64Bot.Services
 {
@@ -33,15 +35,14 @@ namespace tMod64Bot.Services
 #endif
         }
 
-        public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        private async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
-            if (!command.IsSpecified)
+            if (!command.IsSpecified || result.IsSuccess)
                 return;
-            
-            if (result.IsSuccess)
-                return;
-            
-            await context.Channel.SendMessageAsync($"error: {result}");
+
+            var error = EmbedHelper.ErrorEmbed(result.ToString());
+
+            await new InteractiveService(Client).ReplyAndDeleteAsync((SocketCommandContext) context, "", embed: error, timeout:TimeSpan.FromSeconds(5));
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)

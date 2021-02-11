@@ -17,13 +17,13 @@ namespace tMod64Bot.Services.Logging.BotLogging
     {
         private readonly ConfigService _config;
         private readonly LoggingService _loggingService;
-        private readonly MemoryCache _cache;
+        private readonly WebhookService _webhook;
 
         public BotLoggingService(IServiceProvider services) : base(services)
         {
             _loggingService = services.GetRequiredService<LoggingService>();
             _config = services.GetRequiredService<ConfigService>();
-            _cache = services.GetRequiredService<MemoryCache>();
+            _webhook = services.GetRequiredService<WebhookService>();
         }
 
         public async Task InitializeAsync()
@@ -37,35 +37,6 @@ namespace tMod64Bot.Services.Logging.BotLogging
             //Handle with custom Moderation events
             //Client.UserUnbanned
             //Client.UserUnbanned
-        }
-
-        public IWebhook GetOrCreateWebhook(ulong channelId)
-        {
-            if (_cache.Contains(channelId.ToString()))
-            {
-                _loggingService.Log(LogSeverity.Verbose, LogSource.Service, "Got Webhook from cache");
-                return (_cache.Get(channelId.ToString()) as IWebhook)!;
-            }
-
-            CacheItemPolicy policy = new()
-            {
-                AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(10)
-            };
-
-            var channel = Client.GetChannel(channelId) as ITextChannel;
-            var webhook = channel?.GetWebhooksAsync().Result
-                .FirstOrDefault(x => x.Name.Equals("tMod64-Logging"));
-
-            if (webhook == null)
-            {
-                FileStream avatar = new("Data/tmod_tree.png", FileMode.Open);
-
-                webhook = channel.CreateWebhookAsync("tMod64-Logging", avatar).Result;
-            }
-
-            _cache.Add(new CacheItem(channelId.ToString(), webhook), policy);
-
-            return webhook;
         }
 
         private async Task HandleUserLeft(SocketGuildUser user)
@@ -87,7 +58,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             else
                 description = $"Joined {fixedDate.Days} {(fixedDate.Hours == 1 ? "Day" : "Days")}, {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
 
-            using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
             {
                 List<string> roles = new();
                 user.Roles.Where(z => z.IsEveryone == false).ToList()
@@ -97,8 +68,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 {
                     Title = "User Left",
                     Color = Color.Orange,
-                    Description =
-                        $"{MentionUtils.MentionUser(user.Id)} {description}{(roles.Any() ? $"\nRoles: {string.Join(' ', roles)}" : string.Empty)}",
+                    Description = $"{MentionUtils.MentionUser(user.Id)} {description}{(roles.Any() ? $"\nRoles: {string.Join(' ', roles)}" : string.Empty)}",
                     Footer = new EmbedFooterBuilder
                     {
                         Text = $"id: {user.Id}"
@@ -120,9 +90,9 @@ namespace tMod64Bot.Services.Logging.BotLogging
             if (userLoggingChannel == 0 || !_config.Config.LogUserUpdated)
                 return;
 
-            using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+            if (userBefore.Username != userAfter.Username)
             {
-                if (userBefore.Username != userAfter.Username)
+                using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
                 {
                     var embed = new EmbedBuilder
                     {
@@ -139,7 +109,10 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
                     await client.SendMessageAsync(embeds: new[] {embed.Build()});
                 }
-                else if (userBefore.Nickname != userAfter.Nickname)
+            }
+            else if (userBefore.Nickname != userAfter.Nickname)
+            {
+                using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
                 {
                     var embed = new EmbedBuilder
                     {
@@ -156,7 +129,10 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
                     await client.SendMessageAsync(embeds: new[] {embed.Build()});
                 }
-                else if (userBefore.DiscriminatorValue != userAfter.DiscriminatorValue)
+            }
+            else if (userBefore.DiscriminatorValue != userAfter.DiscriminatorValue)
+            {
+                using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
                 {
                     var embed = new EmbedBuilder
                     {
@@ -173,10 +149,11 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
                     await client.SendMessageAsync(embeds: new[] {embed.Build()});
                 }
-                else if (userBefore.GetAvatarUrl() != userAfter.GetAvatarUrl())
+            }
+            else if (userBefore.GetAvatarUrl() != userAfter.GetAvatarUrl())
+            {
+                using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
                 {
-                    await _loggingService.Log("Avatar update called");
-
                     var embed = new EmbedBuilder
                     {
                         Title = "Avatar changed",
@@ -214,7 +191,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             else
                 description = $"Created {fixedDate.Days} {(fixedDate.Hours == 1 ? "Day" : "Days")}, {fixedDate.Hours} {(fixedDate.Hours == 1 ? "Hour" : "Hours")}, {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
 
-            using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
             {
                 EmbedBuilder embed = new()
                 {
@@ -234,7 +211,8 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage messageAfter, ISocketMessageChannel channel)
+        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage messageAfter,
+            ISocketMessageChannel channel)
         {
             if (_config.Config.LogMessageUpdated)
             {
@@ -246,15 +224,14 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 if (messageAfter.Author.IsBot || messageAfter.Author.IsWebhook)
                     return;
 
-                using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+                using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
                 {
                     var embed = new EmbedBuilder
                     {
                         Title = $"Message edited in #{channel.Name}",
                         Color = Color.DarkMagenta,
-                        Description =
-                            $"**Before:** {(messageBefore.HasValue ? messageBefore.Value.Content : "Message Content could not be retrieved")}\n" +
-                            $"**After:** {messageAfter.Content}",
+                        Description = $"**Before:** {(messageBefore.HasValue ? messageBefore.Value.Content : "Message Content could not be retrieved")}\n" +
+                                      $"**After:** {messageAfter.Content}",
                         Footer = new EmbedFooterBuilder
                         {
                             Text = $"id: {messageAfter.Id}"
@@ -278,16 +255,14 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
             if (userLoggingChannel == 0 || !_config.Config.LogMessageDeleted)
                 return;
-            using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
             {
                 // Conditional Operator go brrrrrrr
                 EmbedBuilder embed = new()
                 {
                     Title = $"Message Deleted from #{channel.Name}",
                     Color = Color.Red,
-                    Description = messageBefore.HasValue
-                        ? messageBefore.Value.Content
-                        : "Message could not be retrieved",
+                    Description = messageBefore.HasValue ? messageBefore.Value.Content : "Message could not be retrieved",
                     Footer = new EmbedFooterBuilder {Text = messageBefore.Id.ToString()},
                     Timestamp = messageBefore.HasValue ? messageBefore.Value.Timestamp : null
                 };

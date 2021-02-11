@@ -17,23 +17,6 @@ namespace tMod64Bot.Modules
     [RequireOwner]
     public class DebugModule : CommandBase
     {
-        [Command("wh")]
-        public async Task WebhookDebugging()
-        {
-            Stopwatch sw = Stopwatch.StartNew();
-            
-            var debug = Services.GetRequiredService<BotLoggingService>();
-
-            using (var client = new DiscordWebhookClient(debug.GetOrCreateWebhook(ConfigService.Config.UserLoggingChannel)))
-            {
-                await client.SendMessageAsync("Hello World!");
-            }
-
-            sw.Stop();
-            
-            await ReplyAsync($"Took {sw.ElapsedMilliseconds}ms to Execute");
-        }
-
         [Command("purge")]
         public async Task PurgeDebug(SocketGuildChannel channel, ulong amount)
         {

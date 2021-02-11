@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive;
 using tMod64Bot.Services;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
@@ -135,6 +136,7 @@ namespace tMod64Bot
             await _services.GetRequiredService<CommandHandler>().InitializeAsync();
             await _services.GetRequiredService<BotLoggingService>().InitializeAsync();
             await _services.GetRequiredService<TotalMemberService>().InitializeAsync();
+            await _services.GetRequiredService<StickyRolesHandler>().InitializeAsync();
         }
 
         private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
@@ -164,8 +166,11 @@ namespace tMod64Bot
             // base services
             .AddSingleton<CommandHandler>()
             .AddSingleton<LoggingService>()
+            .AddSingleton<WebhookService>()
+            .AddSingleton<InteractiveService>()
             .AddSingleton<ConfigService>()
             .AddSingleton<BotLoggingService>()
+            .AddSingleton<StickyRolesHandler>()
             .AddSingleton<TotalMemberService>()
             .BuildServiceProvider();
     }

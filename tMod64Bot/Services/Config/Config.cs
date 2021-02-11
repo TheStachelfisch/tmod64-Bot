@@ -5,10 +5,11 @@ namespace tMod64Bot.Services.Config
 {
     public record Config
     {
-        /// <summary>
-        /// Dictionary of Muted Users. Key value indicates the UserID of the muted Person. Value is the Mute duration.
-        /// </summary>
         public Dictionary<ulong, ulong> MutedUsers;
+        
+        public Dictionary<ulong, List<ulong>> StickiedUsers;
+        public HashSet<ulong> StickiedRoles;
+        
         public HashSet<string> BannedWords;
         public HashSet<ulong> BannedWordsExemptChannel;
 
