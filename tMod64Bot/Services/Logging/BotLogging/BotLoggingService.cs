@@ -115,8 +115,6 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
         private async Task HandleUserUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
         {
-            await _loggingService.Log("User Update called");
-
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
             if (userLoggingChannel == 0 || !_config.Config.LogUserUpdated)
@@ -124,8 +122,6 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
             using var client = new DiscordWebhookClient(GetOrCreateWebhook(userLoggingChannel));
             {
-                await client.SendMessageAsync($"Before: {userBefore.GetAvatarUrl()}\nAfter: {userAfter.GetAvatarUrl()}");
-                
                 if (userBefore.Username != userAfter.Username)
                 {
                     var embed = new EmbedBuilder
