@@ -8,7 +8,8 @@ namespace tMod64Bot.Services.Logging
     public sealed class LoggingService : ServiceBase
     {
         private readonly string _path = $"{ServiceConstants.DATA_DIR}log.txt";
-
+        private object locked = new object();
+        
         public LoggingService(IServiceProvider services) : base(services)
         {
             if (File.Exists(_path))
@@ -59,38 +60,42 @@ namespace tMod64Bot.Services.Logging
 
         private void LogInternal(LogSeverity severity, LogSource source, string msg, Exception e)
         {
-            using var writer = File.AppendText(_path);
+            lock (locked)
+            {
+                            
+                using var writer = File.AppendText(_path);
             
-            var color = VerifySeverity(severity);
-            AppendText(severity.ToString(), color);
-            AppendText("->", ConsoleColor.White);
+                var color = VerifySeverity(severity);
+                AppendText(severity.ToString(), color);
+                AppendText("->", ConsoleColor.White);
 
-            color = VerifySource(source);
-            AppendText(source.ToString(), color);
-            AppendText(":", ConsoleColor.White);
+                color = VerifySource(source);
+                AppendText(source.ToString(), color);
+                AppendText(":", ConsoleColor.White);
 
-            writer.Write($"{severity} -> {source} : ");
+                writer.Write($"{severity} -> {source} : ");
 
-            if (!msg.IsNullOrWhitespace())
-            {
-                AppendText(msg, ConsoleColor.White);
-                writer.Write(msg);
-            }
+                if (!msg.IsNullOrWhitespace())
+                {
+                    AppendText(msg, ConsoleColor.White);
+                    writer.Write(msg);
+                }
 
-            if (e != null)
-            {
-                AppendText($"{e.Message}\n{e.StackTrace}", VerifySeverity(severity));
-                writer.Write($"{e.Message}\n{e.StackTrace}");
-            }
+                if (e != null)
+                {
+                    AppendText($"{e.Message}\n{e.StackTrace}", VerifySeverity(severity));
+                    writer.Write($"{e.Message}\n{e.StackTrace}");
+                }
             
-            Console.WriteLine();
-            Console.ResetColor();
-            writer.WriteLine();
+                Console.WriteLine();
+                Console.ResetColor();
+                writer.WriteLine();
 
-            static void AppendText(string text, ConsoleColor color)
-            {
-                Console.ForegroundColor = color;
-                Console.Write(text + " ");
+                static void AppendText(string text, ConsoleColor color)
+                {
+                    Console.ForegroundColor = color;
+                    Console.Write(text + " ");
+                }
             }
         }
 

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using Discord.Addons.Interactive;
 using tMod64Bot.Services.Config;
+using tMod64Bot.Services.Logging;
 
 namespace tMod64Bot.Services
 {
@@ -11,7 +12,7 @@ namespace tMod64Bot.Services
         protected readonly IServiceProvider Services;
         protected readonly DiscordSocketClient Client;
 
-        public ServiceBase(IServiceProvider services)
+        protected ServiceBase(IServiceProvider services)
         {
             Services = services;
             Client = services.GetRequiredService<DiscordSocketClient>();

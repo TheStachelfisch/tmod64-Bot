@@ -14,6 +14,7 @@ using tMod64Bot.Services;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
 using tMod64Bot.Services.Logging.BotLogging;
+using tMod64Bot.Services.Tag;
 
 namespace tMod64Bot
 {
@@ -31,7 +32,7 @@ namespace tMod64Bot
         private Stopwatch _startUpStopwatch;
         private bool _shuttingDown;
         
-        private static bool _initialized = false;
+        private static bool _initialized;
         private static long _startUpTime;
 
         public static long GetUptime => DateTimeOffset.Now.ToUnixTimeSeconds() - _startUpTime;
@@ -175,6 +176,7 @@ namespace tMod64Bot
             .AddSingleton<LoggingService>()
             .AddSingleton<WebhookService>()
             .AddSingleton<InteractiveService>()
+            .AddSingleton<TagService>()
             .AddSingleton<ConfigService>()
             .AddSingleton<BotLoggingService>()
             .AddSingleton<StickyRolesHandler>()

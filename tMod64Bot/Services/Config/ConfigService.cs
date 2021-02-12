@@ -54,6 +54,8 @@ namespace tMod64Bot.Services.Config
 
         public void SaveData()
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            
             try
             {
                 File.WriteAllText(_configPath, JsonConvert.SerializeObject(_config, Formatting.Indented, jsSettings));
@@ -64,7 +66,8 @@ namespace tMod64Bot.Services.Config
                 return;
             }
 
-            _log.Log(LogSeverity.Verbose, LogSource.Service, "Successfully Saved Data");
+            sw.Stop();
+            _log.Log(LogSeverity.Verbose, LogSource.Service, $"Successfully Saved Data in {sw.ElapsedMilliseconds}ms");
         }
 
         public void SaveData(string json)
@@ -118,6 +121,7 @@ namespace tMod64Bot.Services.Config
                 _config = new Config
                 {
                     BannedWords = new HashSet<string>(),
+                    Tags = new HashSet<Tag>(),
                     StickiedRoles = new HashSet<ulong>(),
                     StickiedUsers = new Dictionary<ulong, List<ulong>>(),
                     MutedUsers = new Dictionary<ulong, ulong>(),

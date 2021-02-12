@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace tMod64Bot.Services.Config
 {
     public record Config
     {
+        public HashSet<Tag> Tags;
+        
         public Dictionary<ulong, ulong> MutedUsers;
         
         public Dictionary<ulong, List<ulong>> StickiedUsers;
