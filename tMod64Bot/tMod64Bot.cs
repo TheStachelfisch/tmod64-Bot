@@ -30,6 +30,8 @@ namespace tMod64Bot
 
         private Stopwatch _startUpStopwatch;
         private bool _shuttingDown;
+        
+        private static bool _initialized = false;
         private static long _startUpTime;
 
         public static long GetUptime => DateTimeOffset.Now.ToUnixTimeSeconds() - _startUpTime;
@@ -133,10 +135,15 @@ namespace tMod64Bot
 
         private static async Task InitializeServicesAsync()
         {
-            await _services.GetRequiredService<CommandHandler>().InitializeAsync();
-            await _services.GetRequiredService<BotLoggingService>().InitializeAsync();
-            await _services.GetRequiredService<TotalMemberService>().InitializeAsync();
-            await _services.GetRequiredService<StickyRolesHandler>().InitializeAsync();
+            if (!_initialized)
+            {
+                await _services.GetRequiredService<CommandHandler>().InitializeAsync();
+                await _services.GetRequiredService<BotLoggingService>().InitializeAsync();
+                await _services.GetRequiredService<TotalMemberService>().InitializeAsync();
+                await _services.GetRequiredService<StickyRolesHandler>().InitializeAsync();
+
+                _initialized = true;
+            }
         }
 
         private static ServiceProvider BuildServiceProvider() => new ServiceCollection()
