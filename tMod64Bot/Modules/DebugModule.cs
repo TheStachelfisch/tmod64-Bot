@@ -55,5 +55,11 @@ namespace tMod64Bot.Modules
         {
             await ReplyAsync($"`{MentionUtils.MentionChannel(channel.Id)}`");
         }
+
+        [Command("emote")]
+        public async Task EmoteTest(string emote)
+        {
+            await ReplyAsync($@"``{new Emoji(emote)}``");
+        }
     }
 }

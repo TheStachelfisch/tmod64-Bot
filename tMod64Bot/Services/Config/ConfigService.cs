@@ -125,6 +125,7 @@ namespace tMod64Bot.Services.Config
                     StickiedRoles = new HashSet<ulong>(),
                     StickiedUsers = new Dictionary<ulong, List<ulong>>(),
                     MutedUsers = new Dictionary<ulong, ulong>(),
+                    ReactionRoleMessages = new HashSet<Tuple<ulong, ulong, string>>(),
                     BannedWordsExemptChannel = new HashSet<ulong>(),
                     BotPrefix = "64!",
                     

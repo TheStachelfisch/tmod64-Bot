@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
 
 namespace tMod64Bot.Services.Config
 {
@@ -10,8 +10,8 @@ namespace tMod64Bot.Services.Config
         public Dictionary<ulong, ulong> MutedUsers;
         
         public Dictionary<ulong, List<ulong>> StickiedUsers;
+        public HashSet<Tuple<ulong, ulong, string>> ReactionRoleMessages;
         public HashSet<ulong> StickiedRoles;
-        
         public HashSet<string> BannedWords;
         public HashSet<ulong> BannedWordsExemptChannel;
 

@@ -46,6 +46,9 @@ namespace tMod64Bot.Services
             var error = EmbedHelper.ErrorEmbed(result.ToString()!);
 
             await context.Channel.SendMessageAsync(embed:error);
+#if DEBUG
+            _loggingService.Log(LogSeverity.Error, LogSource.Service, $"Error in command Execution");
+#endif
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
