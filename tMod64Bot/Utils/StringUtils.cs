@@ -16,7 +16,7 @@ namespace tMod64Bot
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static Tuple<ulong, ulong, ulong> DeconstructMessageLink(this string link)
+        public static Tuple<ulong, ulong, ulong>? DeconstructMessageLink(this string link)
         {
             Regex rx = new Regex(@"[\d]+",RegexOptions.Multiline);
             var matches = rx.Matches(link);

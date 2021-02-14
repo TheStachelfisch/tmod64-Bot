@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using tMod64Bot.Services.Config;
@@ -28,37 +29,53 @@ namespace tMod64Bot.Services
 
         private async Task HandleReactionRemoved(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)))
-                return;
-            
-            var current = _configService.Config.ReactionRoleMessages.First(x => x.Item1.Equals(reaction.MessageId));
-
-            if (Equals(reaction.Emote, new Emoji(current!.Item3)))
+            try
             {
-                var guildUser = await channel.GetUserAsync(reaction.UserId) as SocketGuildUser;
-
-                if (!guildUser.Roles.Any(x => x.Id.Equals(current.Item2)))
+                if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)))
                     return;
+            
+                var current = _configService.Config.ReactionRoleMessages.First(x => x.Item1.Equals(reaction.MessageId));
 
-                await guildUser!.RemoveRoleAsync(guildUser.Guild.GetRole(current.Item2));
+                if (Equals(reaction.Emote, new Emoji(current!.Item3)))
+                {
+                    var guildUser = await channel.GetUserAsync(reaction.UserId) as SocketGuildUser;
+
+                    if (!guildUser.Roles.Any(x => x.Id.Equals(current.Item2)))
+                        return;
+
+                    await guildUser!.RemoveRoleAsync(guildUser.Guild.GetRole(current.Item2));
+                }
+            }
+            catch (HttpException e)
+            {
+                // Ignore, happens when role is above bots highest role
+                await _loggingService.Log(LogSeverity.Warning, LogSource.Service, $"Reaction role is above bot role");
             }
         }
 
         private async Task HandleReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)))
-                return;
-
-            var current = _configService.Config.ReactionRoleMessages.First(x => x.Item1.Equals(reaction.MessageId));
-
-            if (Equals(reaction.Emote, new Emoji(current!.Item3)))
+            try
             {
-                var guildUser = await channel.GetUserAsync(reaction.UserId) as SocketGuildUser;
-
-                if (guildUser.Roles.Any(x => x.Id.Equals(current.Item2)))
+                if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)))
                     return;
 
-                await guildUser!.AddRoleAsync(guildUser.Guild.GetRole(current.Item2));
+                var current = _configService.Config.ReactionRoleMessages.First(x => x.Item1.Equals(reaction.MessageId));
+
+                if (Equals(reaction.Emote, new Emoji(current!.Item3)))
+                {
+                    var guildUser = await channel.GetUserAsync(reaction.UserId) as SocketGuildUser;
+
+                    if (guildUser.Roles.Any(x => x.Id.Equals(current.Item2)))
+                        return;
+
+                    await guildUser!.AddRoleAsync(guildUser.Guild.GetRole(current.Item2));
+                }
+            }
+            catch (HttpException e)
+            {
+                // Ignore, happens when role is above bots highest role
+                await _loggingService.Log(LogSeverity.Warning, LogSource.Service, $"Reaction role is above bot role");
             }
         }
     }
