@@ -32,10 +32,8 @@ namespace tMod64Bot.Services
         public async Task InitializeAsync()
         {
             Client.MessageReceived += HandleCommandAsync;
-
-#if DEBUG
-            _commands.CommandExecuted += CommandExecutedAsync;      
-#endif
+            
+            _commands.CommandExecuted += CommandExecutedAsync;
         }
 
         private async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
@@ -46,9 +44,8 @@ namespace tMod64Bot.Services
             var error = EmbedHelper.ErrorEmbed(result.ToString()!);
 
             await context.Channel.SendMessageAsync(embed:error);
-#if DEBUG
-            _loggingService.Log(LogSeverity.Error, LogSource.Service, $"Error in command Execution");
-#endif
+            
+            await _loggingService.Log(LogSeverity.Error, LogSource.Service, $"Error in command Execution");
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
