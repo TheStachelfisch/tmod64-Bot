@@ -7,7 +7,7 @@ namespace tMod64Bot.Services.Config
     {
         public HashSet<Tag> Tags;
         
-        public Dictionary<ulong, ulong> MutedUsers;
+        public HashSet<MutedUser> MutedUsers;
         
         public Dictionary<ulong, List<ulong>> StickiedUsers;
         public HashSet<Tuple<ulong, ulong, string>> ReactionRoleMessages;
