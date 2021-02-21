@@ -17,6 +17,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
     {
         private readonly ConfigService _config;
         private readonly LoggingService _loggingService;
+        private readonly ModerationService _moderationService;
         private readonly WebhookService _webhook;
 
         public BotLoggingService(IServiceProvider services) : base(services)
@@ -24,6 +25,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             _loggingService = services.GetRequiredService<LoggingService>();
             _config = services.GetRequiredService<ConfigService>();
             _webhook = services.GetRequiredService<WebhookService>();
+            _moderationService = services.GetRequiredService<ModerationService>();
         }
 
         public async Task InitializeAsync()
@@ -37,6 +39,13 @@ namespace tMod64Bot.Services.Logging.BotLogging
             //Handle with custom Moderation events
             //Client.UserUnbanned
             //Client.UserUnbanned
+
+            _moderationService.UserBanned += HandlerUserBanned;
+        }
+
+        private void HandlerUserBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
+        {
+            _loggingService.Log("User banned called");
         }
 
         private async Task HandleUserLeft(SocketGuildUser user)
@@ -211,8 +220,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage messageAfter,
-            ISocketMessageChannel channel)
+        private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage messageAfter, ISocketMessageChannel channel)
         {
             if (_config.Config.LogMessageUpdated)
             {

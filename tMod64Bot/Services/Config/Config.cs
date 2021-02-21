@@ -28,6 +28,12 @@ namespace tMod64Bot.Services.Config
         public ulong SoftbannedRole;
         public ulong BotManagerRole;
 
+        [Space]
+        
+        public bool MessageOnBan;
+        public bool MessageOnMute;
+        public bool MessageWithModerator;
+
         [Space] 
         
         public bool LogUserLeft;

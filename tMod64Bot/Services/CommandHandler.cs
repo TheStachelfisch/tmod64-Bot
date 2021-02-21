@@ -45,7 +45,7 @@ namespace tMod64Bot.Services
 
             await context.Channel.SendMessageAsync(embed:error);
             
-            await _loggingService.Log(LogSeverity.Error, LogSource.Service, $"Error in command Execution");
+            await _loggingService.Log(LogSeverity.Error, LogSource.Service, $"Error in command Execution: {result.Error!.Value}");
         }
 
         private async Task HandleCommandAsync(SocketMessage arg)
