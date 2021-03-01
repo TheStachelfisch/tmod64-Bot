@@ -16,7 +16,7 @@ jobs:
           debug: true
           directory: ./
           badge: ./output/badge.svg
-          ignore: 'node_modules/|README'
+          ignore: 'README|tMod64Bot.sln|tMod64Bot.sln.DotSettings|License'
 
       - name: Print the output
         run: |
@@ -26,7 +26,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_dir: ./output
-          publish_branch: image-data
+          publish_branch: badges
           github_token: ${{ secrets.GITHUB_TOKEN }}
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
