@@ -8,6 +8,7 @@ using System.Timers;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
 
@@ -20,9 +21,16 @@ namespace tMod64Bot.Services
         private readonly LoggingService _loggingService;
         
         public delegate void BanEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason);
+        public delegate void UnbanEventHandler(ulong userId, SocketGuildUser moderator, SocketGuild guild);
+        public delegate void TempBanEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan banTime, string reason);
         public delegate void MuteEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, TimeSpan muteTime);
+        public delegate void KickEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason);
         public event BanEventHandler UserBanned;
+        public event KickEventHandler UserKicked;
+        public event UnbanEventHandler UserUnbanned;
+        public event TempBanEventHandler UserTempBanned;
         public event MuteEventHandler UserMuted;
+        public event MuteEventHandler UserUnMuted;
 
         public ModerationService(IServiceProvider services) : base(services)
         {
@@ -43,32 +51,62 @@ namespace tMod64Bot.Services
 
         private async void CheckIfExpired(object sender, ElapsedEventArgs e)
         {
-            Stopwatch sw = Stopwatch.StartNew();
+            var currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
 
             if (_configService.Config.MutedRole == 0)
-                return;
-            
-            var currentTime = DateTimeOffset.Now.ToUnixTimeSeconds();
+                goto A;
             
             foreach (var mutedUser in _configService.Config.MutedUsers)
             {
                 if (mutedUser.ExpireTime <= currentTime)
                 {
-                    var guild = Client.GetGuild(mutedUser.ServerId);
-                    var user = guild.GetUser(mutedUser.UserId);
-                    
-                    if (user == null || user.Roles.All(x => x.Id != _configService.Config.MutedRole))
+                    await Task.Run(async () =>
                     {
-                        _configService.Config.MutedUsers.RemoveWhere(x => x.UserId == mutedUser.UserId);
-                        _configService.SaveData();
-                    }
+                        var guild = Client.GetGuild(mutedUser.ServerId);
+                        var user = guild.GetUser(mutedUser.UserId);
 
-                    await user!.RemoveRoleAsync(guild.GetRole(_configService.Config.MutedRole));
+                        if (user == null || user.Roles.All(x => x.Id != _configService.Config.MutedRole))
+                        {
+                            _configService.Config.MutedUsers.RemoveWhere(x => x.UserId == mutedUser.UserId);
+                            _configService.SaveData();
+                        }
+                        else
+                        {
+                            await user!.RemoveRoleAsync(guild.GetRole(_configService.Config.MutedRole));
+
+                            _configService.Config.MutedUsers.RemoveWhere(x => x.UserId == mutedUser.UserId);
+                            _configService.SaveData();
+
+                            await _loggingService.Log("User un-muted");
+                        }
+                    });
                 }
             }
+            A:
 
-            sw.Stop();
-            await _loggingService.Log($"Took {sw.ElapsedMilliseconds}ms to check if expired");
+            foreach (var tempBannedUser in _configService.Config.TempBannedUsers)
+            {
+                if (tempBannedUser.ExpireTime <= currentTime)
+                {
+                    await Task.Run(async () =>
+                    {
+                        var guild = Client.GetGuild(tempBannedUser.ServerId);
+
+                        if (guild.GetBansAsync().Result.All(x => x.User.Id != tempBannedUser.UserId))
+                        {
+                            _configService.Config.TempBannedUsers.RemoveWhere(x => x.UserId == tempBannedUser.UserId);
+                            _configService.SaveData();
+                        }
+
+                        await guild.RemoveBanAsync(tempBannedUser.UserId);
+
+                        _configService.Config.TempBannedUsers.RemoveWhere(x => x.UserId == tempBannedUser.UserId);
+                        _configService.SaveData();
+
+                        await _loggingService.Log("User un-banned");
+                    });
+                }
+            }
         }
 
         public static TimeSpan GetTimeSpan(string input)
@@ -93,13 +131,16 @@ namespace tMod64Bot.Services
             return temp;
         }
         
-        public async Task BanUser(SocketGuildUser moderator, SocketGuildUser user, string reason)
+        public async Task<TaskResult> BanUser(SocketGuildUser moderator, SocketGuildUser user, string reason)
         {
+            if (moderator.Guild.GetBansAsync().Result.Any(x => x.User.Id == user.Id))
+                return TaskResult.FromError("User is already banned");
+            
             try
             {
                 if (_configService.Config.MessageOnBan)
                 {
-                    List<EmbedFieldBuilder> fields = new List<EmbedFieldBuilder>();
+                    List<EmbedFieldBuilder> fields = new();
 
                     fields.Add(new()
                     {
@@ -113,7 +154,7 @@ namespace tMod64Bot.Services
                         fields.Add(new()
                         {
                             Name = "Responsible Moderator",
-                            Value = moderator.Username,
+                            Value = moderator.ToString(),
                             IsInline = true
                         });
                     }
@@ -131,17 +172,45 @@ namespace tMod64Bot.Services
             }
             catch (Exception) { /* Ignore */ }
             
-            await user.Guild.AddBanAsync(user, 0, reason);
+            await user.Guild.AddBanAsync(user, 0, $"{reason}\nBanned by {moderator}");
             UserBanned?.Invoke(user, moderator, user.Guild, reason);
+            
+            return TaskResult.FromSuccess();
         }
 
-        public async Task MuteUser(TimeSpan muteTime, SocketGuildUser moderator, SocketGuildUser user, string reason)
+        // SocketGuild is needed; Since it can't be retrieved from SocketUser
+        public async Task<TaskResult> UnbanUser(ulong userId, SocketGuild guild, SocketGuildUser moderator)
+        {
+            try
+            {
+                if (guild.GetBansAsync().Result.All(x => x.User.Id != userId))
+                    return TaskResult.FromError("User isn't banned");
+
+                await guild.RemoveBanAsync(userId);
+                
+                if (_configService.Config.TempBannedUsers.Any(x => x.UserId == userId))
+                {
+                    _configService.Config.TempBannedUsers.RemoveWhere(x => x.UserId == userId);
+                    _configService.SaveData();
+                }
+                
+            }
+            catch (Exception e)
+            {
+                return TaskResult.FromError(e.Message);
+            }
+            
+            UserUnbanned?.Invoke(userId, moderator, guild);
+            return TaskResult.FromSuccess();
+        }
+
+        public async Task<TaskResult> MuteUser( SocketGuildUser user, SocketGuildUser moderator, TimeSpan muteTime, string reason)
         {
             if (_configService.Config.MutedRole == 0)
-                return;
+                return TaskResult.FromError("No Muted-role has been assigned in the config");
 
             if (user.Roles.Any(x => x.Id == _configService.Config.MutedRole))
-                return;
+                return TaskResult.FromError("User is already muted");
 
             try
             {
@@ -159,7 +228,8 @@ namespace tMod64Bot.Services
                     fields.Add(new()
                     {
                         Name = "Mute Duration",
-                        Value = muteTime.ToString("g")
+                        Value = muteTime.ToString("g"),
+                        IsInline = true
                     });
 
                     if (_configService.Config.MessageWithModerator)
@@ -183,7 +253,7 @@ namespace tMod64Bot.Services
                     await user.SendMessageAsync(embed:embed.Build());
                 }
             }
-            catch (Exception) { /* Ignore */ }
+            catch (Exception) { /* Ignore -- Happens when unable to dm user*/ }
             
             await user.AddRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
             if (muteTime != TimeSpan.Zero && !_configService.Config.MutedUsers.Select(x => x.UserId).Contains(user.Id))
@@ -192,10 +262,165 @@ namespace tMod64Bot.Services
                 {
                     ExpireTime = DateTimeOffset.Now.Add(muteTime).ToUnixTimeSeconds(),
                     ServerId = moderator.Guild.Id,
-                    UserId = user.Id
+                    UserId = user.Id,
+                    Reason = reason
                 });
                 _configService.SaveData();
             }
+            
+            UserMuted?.Invoke(user, moderator, moderator.Guild, reason, muteTime);
+            return TaskResult.FromSuccess();
+        }
+
+        public async Task<TaskResult> UnMuteUser(SocketGuildUser user, SocketGuildUser moderator)
+        {
+            try
+            {
+                if (_configService.Config.MutedRole == 0)
+                    return TaskResult.FromError("No Muted-role has been assigned");
+
+                if (user.Roles.Any(x => x.Id == _configService.Config.MutedRole))
+                    await user.RemoveRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
+                else
+                    return TaskResult.FromError("User isn't muted");
+
+                if (_configService.Config.MutedUsers.Any(x => x.UserId == user.Id))
+                {
+                    _configService.Config.MutedUsers.RemoveWhere(x => x.UserId == user.Id);
+                    _configService.SaveData();
+                }
+            }
+            catch (Exception e)
+            {
+                return TaskResult.FromError(e.Message);
+            }
+
+            UserUnMuted?.Invoke(user, moderator, moderator.Guild, null, TimeSpan.Zero);
+            return TaskResult.FromSuccess();
+        }
+
+        public async Task<TaskResult> TempBanUser(SocketGuildUser user, SocketGuildUser moderator, TimeSpan banTime, string reason)
+        {
+            if (_configService.Config.TempBannedUsers.Any(x => x.UserId == user.Id))
+                return TaskResult.FromError("User is already temp-banned");
+
+            try
+            {
+                var bans = moderator.Guild.GetBansAsync();
+
+                // User is banned but not temp banned; Convert to tempban then
+                if (bans.Result.Any(x => x.User.Id == user.Id) && _configService.Config.TempBannedUsers.All(x => x.UserId != user.Id))
+                {
+                    _configService.Config.TempBannedUsers.Add(new TempBannedUser()
+                    {
+                        UserId = user.Id,
+                        ServerId = moderator.Guild.Id,
+                        Reason = reason,
+                        ExpireTime = DateTimeOffset.Now.AddSeconds(banTime.TotalSeconds).ToUnixTimeSeconds()
+                    });
+                    _configService.SaveData();
+                    
+                    return TaskResult.FromSuccess();
+                }
+
+                if (bans.Result.All(x => x.User.Id != user.Id) && _configService.Config.TempBannedUsers.All(x => x.UserId != user.Id))
+                {
+                    try
+                    {
+                        if (_configService.Config.MessageOnBan)
+                        {
+                            List<EmbedFieldBuilder> fields = new();
+
+                            fields.Add(new()
+                            {
+                                Name = "Reason",
+                                Value = reason,
+                                IsInline = true
+                            });
+
+                            if (_configService.Config.MessageWithModerator)
+                            {
+                                fields.Add(new()
+                                {
+                                    Name = "Responsible Moderator",
+                                    Value = moderator.ToString(),
+                                    IsInline = true
+                                });
+                            }
+                    
+                            EmbedBuilder embed = new()
+                            {
+                                Title = $"You have been banned from tModLoader 64 bit",
+                                Fields = fields,
+                                Color = Color.DarkRed,
+                                Timestamp = DateTimeOffset.Now
+                            };
+
+                            await user.SendMessageAsync(embed:embed.Build());
+                        }
+                    }
+                    catch (Exception) { /* Ignore */ }
+                    
+                    // TODO: Add config option for prune days
+                    await user.BanAsync(0, $"{reason}\nBanned by {moderator}");
+                    
+                    _configService.Config.TempBannedUsers.Add(new TempBannedUser()
+                    {
+                        UserId = user.Id,
+                        ServerId = moderator.Guild.Id,
+                        Reason = reason,
+                        ExpireTime = DateTimeOffset.Now.AddSeconds(banTime.TotalSeconds).ToUnixTimeSeconds()
+                    });
+                    _configService.SaveData();
+
+                    
+                    return TaskResult.FromSuccess();
+                }
+            }
+            catch (Exception e)
+            {
+                return TaskResult.FromError(e.Message);
+            }
+            
+            UserTempBanned?.Invoke(user, moderator, moderator.Guild, banTime, reason);
+            return TaskResult.FromSuccess();
+        }
+
+        public async Task<TaskResult> KickUser(SocketGuildUser user, SocketGuildUser moderator, string reason)
+        {
+            if (_configService.Config.MessageOnKick)
+            {
+                EmbedBuilder embed = new EmbedBuilder();
+
+                embed.WithTitle("You have been kicked from tModLoader 64 bit");
+                embed.WithCurrentTimestamp();
+                embed.WithColor(Color.Red);
+
+                embed.AddField(new EmbedFieldBuilder
+                {
+                    Name = reason,
+                    Value = reason,
+                    IsInline = true
+                });
+                if (_configService.Config.MessageWithModerator)
+                {
+                    embed.AddField(new EmbedFieldBuilder
+                    {
+                        Name = "Responsible Moderator",
+                        Value = moderator.ToString(),
+                        IsInline = true
+                    });
+                }
+
+                try { await user.SendMessageAsync(embed: embed.Build()); }
+                catch (Exception e) { /* Ignore */ }
+            }
+
+            try { await user.KickAsync(reason); }
+            catch (Exception e) { return TaskResult.FromError(e.Message); }
+            
+            UserKicked?.Invoke(user, moderator, moderator.Guild, reason);
+            return TaskResult.FromSuccess();
         }
     }
 }

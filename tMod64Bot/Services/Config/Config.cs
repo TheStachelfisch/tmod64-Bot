@@ -8,6 +8,7 @@ namespace tMod64Bot.Services.Config
         public HashSet<Tag> Tags;
         
         public HashSet<MutedUser> MutedUsers;
+        public HashSet<TempBannedUser> TempBannedUsers;
         
         public Dictionary<ulong, List<ulong>> StickiedUsers;
         public HashSet<Tuple<ulong, ulong, string>> ReactionRoleMessages;
@@ -32,6 +33,7 @@ namespace tMod64Bot.Services.Config
         
         public bool MessageOnBan;
         public bool MessageOnMute;
+        public bool MessageOnKick;
         public bool MessageWithModerator;
 
         [Space] 

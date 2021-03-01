@@ -1,6 +1,6 @@
 ﻿namespace tMod64Bot.Services.Config
 {
-    public record MutedUser
+    public record TempBannedUser
     {
         public ulong UserId;
         public ulong ServerId;

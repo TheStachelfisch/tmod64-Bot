@@ -65,20 +65,15 @@ namespace tMod64Bot.Services
                     var tagName = arg.Content.Remove(0, _config.Config.BotPrefix.Length).ToLower();
                     
                     TagService tagService = Services.GetRequiredService<TagService>();
-                    Stopwatch sw = Stopwatch.StartNew();
 
-                    Config.Tag tagResult;
+                    Config.Tag? tagResult = null;
                     
                     try { tagResult = await tagService.GetTag(tagName); }
-                    catch (Exception e)
-                    {
-                        await context.Channel.SendMessageAsync(embed:EmbedHelper.ErrorEmbed($"Tag '{tagName}' doesn't exist"));
+                    catch (Exception e) { /* ignore */ }
+                    
+                    if (tagResult == null)
                         return;
-                    }
-            
-                    sw.Stop();
-                    await _loggingService.Log($"Got tag in {sw.ElapsedTicks}ms");
-            
+
                     await context.Channel.SendMessageAsync($"**Tag: {tagName}**\n{tagResult.Content}");
                 }
             }

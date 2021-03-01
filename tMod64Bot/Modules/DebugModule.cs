@@ -8,6 +8,7 @@ using Discord.Commands;
 using Discord.Webhook;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Logging;
 using tMod64Bot.Services.Logging.BotLogging;
 
@@ -60,6 +61,17 @@ namespace tMod64Bot.Modules
         public async Task EmoteTest(string emote)
         {
             await ReplyAsync($@"``{new Emoji(emote)}``");
+        }
+
+        [Command("leftUser")]
+        public async Task LeftUserTest(SocketGuildUser user)
+        {
+            await ReplyAsync("Called");
+            
+            if (user == null)
+                await ReplyAsync("User is null");
+
+            await ReplyAsync($"Not null : {user.GetType()}");
         }
     }
 }

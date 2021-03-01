@@ -39,7 +39,7 @@ namespace tMod64Bot.Modules
             await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully changed the value of key '**{key}**' to '**{value}**'"));
         }
 
-        [Command("fields")]
+        [Command("fields"), Alias("list")]
         public async Task GetFields()
         {
             var fieldEmbed = new EmbedBuilder();

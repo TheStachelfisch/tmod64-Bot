@@ -40,14 +40,45 @@ namespace tMod64Bot.Services.Logging.BotLogging
             //Client.UserUnbanned
             //Client.UserUnbanned
 
+            _moderationService.UserUnbanned += HandleUserUnbanned;
+            _moderationService.UserKicked += HandleUserKicked;
+            _moderationService.UserUnMuted += HandlerUserUnmuted;
+            _moderationService.UserTempBanned += HandleUserTempBanned;
+            _moderationService.UserMuted += HandleUserMuted;
             _moderationService.UserBanned += HandlerUserBanned;
         }
 
-        private void HandlerUserBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
+        private async void HandleUserKicked(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
         {
-            _loggingService.Log("User banned called");
+            await _loggingService.Log("user kicekd called");
         }
 
+        private async void HandlerUserUnmuted(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, TimeSpan mutetime)
+        {
+            await _loggingService.Log("User unmuted called");
+        }
+
+        private async void HandleUserUnbanned(ulong userid, SocketGuildUser moderator, SocketGuild guild)
+        {
+            await _loggingService.Log("User unbanned called");
+        }
+
+        private async void HandleUserTempBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan bantime, string reason)
+        {
+            await _loggingService.Log("User temp banned called");
+        }
+
+        private async void HandleUserMuted(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, TimeSpan mutetime)
+        {
+            await _loggingService.Log("User muted called");
+        }
+
+        private async void HandlerUserBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
+        {
+            await _loggingService.Log("User banned called");
+        }
+
+        
         private async Task HandleUserLeft(SocketGuildUser user)
         {
             var userLoggingChannel = _config.Config.UserLoggingChannel;
