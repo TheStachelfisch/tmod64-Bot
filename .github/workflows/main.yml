@@ -1,5 +1,6 @@
-on: [push]
 name: Run Test
+
+on: [push]
 
 jobs:
   hello_world_job:
