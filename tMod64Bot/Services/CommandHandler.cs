@@ -41,7 +41,7 @@ namespace tMod64Bot.Services
             if (!command.IsSpecified || result.IsSuccess)
                 return;
 
-            var error = EmbedHelper.ErrorEmbed(result.ToString()!);
+            var error = EmbedHelper.ErrorEmbed(result.ErrorReason!);
 
             await context.Channel.SendMessageAsync(embed:error);
             

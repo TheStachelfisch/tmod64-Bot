@@ -113,20 +113,20 @@ namespace tMod64Bot.Services
         {
             TimeSpan temp = TimeSpan.Zero;
 
-            var dayMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)[d|day|days]");
+            var dayMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)d", RegexOptions.CultureInvariant);
             if (dayMatch.Success)
                 temp = temp.Add(TimeSpan.FromDays(int.Parse(dayMatch.Groups[1].Value)));
             
-            var hourMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)[h|hour|hours]");
+            var hourMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)h", RegexOptions.CultureInvariant);
             if (hourMatch.Success)
                 temp = temp.Add(TimeSpan.FromHours(int.Parse(hourMatch.Groups[1].Value)));
 
-            var minuteMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)[m|minute|minutes]");
+            var minuteMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)m", RegexOptions.CultureInvariant);
             if (minuteMatch.Success)
                 temp = temp.Add(TimeSpan.FromMinutes(int.Parse(minuteMatch.Groups[1].Value)));
 
             if (temp.TotalSeconds == 0)
-                throw new ArgumentNullException(nameof(input), "Value cannot be null or zero");
+                throw new ArgumentNullException(nameof(input), "Malformated string");
 
             return temp;
         }
@@ -228,7 +228,7 @@ namespace tMod64Bot.Services
                     fields.Add(new()
                     {
                         Name = "Mute Duration",
-                        Value = muteTime.ToString("g"),
+                        Value = muteTime != TimeSpan.Zero ? muteTime.ToString("g") : "Indefinitely",
                         IsInline = true
                     });
 
@@ -398,7 +398,7 @@ namespace tMod64Bot.Services
 
                 embed.AddField(new EmbedFieldBuilder
                 {
-                    Name = reason,
+                    Name = "Reason",
                     Value = reason,
                     IsInline = true
                 });

@@ -6,19 +6,19 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using tMod64Bot.Modules.Commons;
 using tMod64Bot.Services;
 using tMod64Bot.Services.Logging;
 using tMod64Bot.Utils;
 
 namespace tMod64Bot.Modules
 {
-    // TODO: Add hierarchy checking. IMPORTANT!!!
     public class ModerationModule : CommandBase
     {
         [Command("ban")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [RequireUserPermission(GuildPermission.BanMembers)]
-        public async Task BanAsync(SocketGuildUser user, [Remainder]string reason = "No Reason provided")
+        public async Task BanAsync([RequiresHierarchy]SocketGuildUser user, [Remainder]string reason = "No Reason provided")
         {
             if (Context.User.Id == user.Id)
             {
@@ -83,7 +83,7 @@ namespace tMod64Bot.Modules
         [Command("tempban")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [RequireUserPermission(GuildPermission.BanMembers)]
-        public async Task TempBanAsync(SocketGuildUser user, string? banTime = null, [Remainder]string reason = "No Reason provided")
+        public async Task TempBanAsync([RequiresHierarchy]SocketGuildUser user, string? banTime = null, [Remainder]string reason = "No Reason provided")
         {
             var span = banTime == null ? TimeSpan.Zero : ModerationService.GetTimeSpan(banTime);
 
@@ -117,7 +117,7 @@ namespace tMod64Bot.Modules
         [Command("mute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task MuteAsync(SocketGuildUser user, string? duration = null, [Remainder] string reason = "No Reason provided")
+        public async Task MuteAsync([RequiresHierarchy]SocketGuildUser user, string? duration = null, [Remainder] string reason = "No Reason provided")
         {
             var span = duration == null ? TimeSpan.Zero : ModerationService.GetTimeSpan(duration);
             
@@ -153,7 +153,7 @@ namespace tMod64Bot.Modules
         [Command("unmute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task UnMuteAsync(SocketGuildUser user)
+        public async Task UnMuteAsync([RequiresHierarchy]SocketGuildUser user)
         {
             if (user.Id == Context.User.Id)
             {
@@ -181,7 +181,7 @@ namespace tMod64Bot.Modules
         [Command("kick"), Alias("boot")]
         [RequireBotPermission(GuildPermission.KickMembers)]
         [RequireUserPermission(GuildPermission.KickMembers)]
-        public async Task KickUserAsync(SocketGuildUser user, [Remainder] string reason = "No reason provided")
+        public async Task KickUserAsync([RequiresHierarchy]SocketGuildUser user, [Remainder] string reason = "No reason provided")
         {
             if (Context.User.Id == user.Id)
             {
