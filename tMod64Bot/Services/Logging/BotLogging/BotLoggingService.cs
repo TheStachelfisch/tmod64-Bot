@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Webhook;
@@ -17,6 +18,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
         private readonly LoggingService _loggingService;
         private readonly ModerationService _moderationService;
         private readonly WebhookService _webhook;
+        private readonly InviteProtectionService _inviteProtectionService;
 
         public BotLoggingService(IServiceProvider services) : base(services)
         {
@@ -24,6 +26,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             _config = services.GetRequiredService<ConfigService>();
             _webhook = services.GetRequiredService<WebhookService>();
             _moderationService = services.GetRequiredService<ModerationService>();
+            _inviteProtectionService = services.GetRequiredService<InviteProtectionService>();
         }
 
         public async Task InitializeAsync()
@@ -34,16 +37,50 @@ namespace tMod64Bot.Services.Logging.BotLogging
             Client.MessageUpdated += HandleMessageUpdated;
             Client.GuildMemberUpdated += HandleUserUpdated;
 
-            //Handle with custom Moderation events
-            //Client.UserUnbanned
-            //Client.UserUnbanned
-
             _moderationService.UserUnbanned += HandleUserUnbanned;
             _moderationService.UserKicked += HandleUserKicked;
             _moderationService.UserUnMuted += HandlerUserUnmuted;
             _moderationService.UserTempBanned += HandleUserTempBanned;
             _moderationService.UserMuted += HandleUserMuted;
             _moderationService.UserBanned += HandlerUserBanned;
+
+            _inviteProtectionService.InviteDeleted += HandleInviteDeleted;
+        }
+
+        private void HandleInviteDeleted(SocketGuildUser user, SocketMessage message, Match match)
+        {
+            if (_config.Config.ModerationLoggingChannel == 0)
+                return;
+            
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(_config.Config.ModerationLoggingChannel));
+            {
+                List<EmbedFieldBuilder> fields = new();
+                EmbedBuilder embed = new();
+
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "User",
+                    Value = user.ToString(),
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Message",
+                    Value = message.Content
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Match",
+                    Value = match.Value
+                });
+                
+                embed.WithTitle($"Invite deleted from #{message.Channel}");
+                embed.WithColor(Color.Orange);
+                embed.WithFooter($"User id: {user.Id}");
+                embed.WithFields(fields);
+                embed.WithAuthor(user);
+
+                client.SendMessageAsync(embeds: new[] {embed.Build()}).GetAwaiter();
+            }
         }
 
         private async void HandleUserKicked(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)

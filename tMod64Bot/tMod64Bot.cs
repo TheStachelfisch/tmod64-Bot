@@ -144,6 +144,7 @@ namespace tMod64Bot
                 await _services.GetRequiredService<StickyRolesHandler>().InitializeAsync();
                 await _services.GetRequiredService<ReactionRolesService>().InitializeAsync();
                 await _services.GetRequiredService<ModerationService>().InitializeAsync();
+                await _services.GetRequiredService<InviteProtectionService>().InitializeAsync();
 
                 _initialized = true;
             }
@@ -183,6 +184,7 @@ namespace tMod64Bot
             .AddSingleton<ReactionRolesService>()
             .AddSingleton<ModerationService>()
             .AddSingleton<BotLoggingService>()
+            .AddSingleton<InviteProtectionService>()
             .AddSingleton<StickyRolesHandler>()
             .AddSingleton<TotalMemberService>()
             .BuildServiceProvider();
