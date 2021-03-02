@@ -104,7 +104,7 @@ namespace tMod64Bot.Modules
                 var success = await Services.GetRequiredService<ModerationService>().TempBanUser(user, (SocketGuildUser)Context.User, span, reason);
 
                 if (success.IsSuccess)
-                    await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"{user} has been successfully banned"));
+                    await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"{user} has been successfully banned for {span}"));
                 else
                     await ReplyAsync(embed: EmbedHelper.ErrorEmbed(success.ErrorReason!));
             }

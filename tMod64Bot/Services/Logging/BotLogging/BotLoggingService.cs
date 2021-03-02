@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Webhook;
@@ -50,34 +48,235 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
         private async void HandleUserKicked(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
         {
-            await _loggingService.Log("user kicekd called");
+            if (_config.Config.ModerationLoggingChannel == 0)
+                return;
+            
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(_config.Config.ModerationLoggingChannel));
+            {
+                List<EmbedFieldBuilder> fields = new();
+                EmbedBuilder embed = new();
+
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "User",
+                    Value = user.ToString(),
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Reason",
+                    Value = reason,
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = moderator.ToString(),
+                    IsInline = true
+                });
+                
+                embed.WithTitle("User kicked");
+                embed.WithColor(Color.LightOrange);
+                embed.WithFooter($"User id: {user.Id} | Moderator id: {moderator.Id}");
+                embed.WithFields(fields);
+                embed.WithAuthor(user);
+
+                await client.SendMessageAsync(embeds: new[] {embed.Build()});
+            }
         }
 
         private async void HandlerUserUnmuted(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, TimeSpan mutetime)
         {
-            await _loggingService.Log("User unmuted called");
+            if (_config.Config.ModerationLoggingChannel == 0)
+                return;
+            
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(_config.Config.ModerationLoggingChannel));
+            {
+                List<EmbedFieldBuilder> fields = new();
+                EmbedBuilder embed = new();
+
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "User",
+                    Value = user.ToString(),
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = moderator != null ? moderator.ToString() : "Automatic Unmute",
+                    IsInline = true
+                });
+                
+                embed.WithTitle("User Un-muted");
+                embed.WithColor(Color.Green);
+                embed.WithFooter($"User id: {user.Id} | Moderator id: {(moderator != null ? moderator.Id : "N/A")}");
+                embed.WithFields(fields);
+                embed.WithAuthor(user);
+
+                await client.SendMessageAsync(embeds: new[] {embed.Build()});
+            }
         }
 
         private async void HandleUserUnbanned(ulong userid, SocketGuildUser moderator, SocketGuild guild)
         {
-            await _loggingService.Log("User unbanned called");
+            if (_config.Config.ModerationLoggingChannel == 0)
+                return;
+            
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(_config.Config.ModerationLoggingChannel));
+            {
+                List<EmbedFieldBuilder> fields = new();
+                EmbedBuilder embed = new();
+
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "User id",
+                    Value = userid,
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = moderator != null ? moderator.ToString() : "Automatic unban",
+                    IsInline = true
+                });
+                
+                embed.WithTitle("User Un-banned");
+                embed.WithColor(Color.Green);
+                embed.WithFooter($"User id: {userid} | Moderator id: {(moderator != null ? moderator.Id : "N/A")}");
+                embed.WithFields(fields);
+                await client.SendMessageAsync(embeds: new[] {embed.Build()});
+            }
         }
 
         private async void HandleUserTempBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan bantime, string reason)
         {
-            await _loggingService.Log("User temp banned called");
+            if (_config.Config.ModerationLoggingChannel == 0)
+                return;
+            
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(_config.Config.ModerationLoggingChannel));
+            {
+                List<EmbedFieldBuilder> fields = new();
+                EmbedBuilder embed = new();
+
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "User",
+                    Value = user.ToString(),
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Ban Time",
+                    Value = bantime != TimeSpan.Zero ? $"{bantime.TotalHours}h" : "Indefinitely",
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Reason",
+                    Value = reason,
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = moderator.ToString(),
+                    IsInline = true
+                });
+                
+                embed.WithTitle("User Temp-banned");
+                embed.WithColor(Color.Red);
+                embed.WithFooter($"User id: {user.Id} | Moderator id: {moderator.Id}");
+                embed.WithFields(fields);
+                embed.WithAuthor(user);
+
+                await client.SendMessageAsync(embeds: new[] {embed.Build()});
+            }
         }
 
         private async void HandleUserMuted(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, TimeSpan mutetime)
         {
-            await _loggingService.Log("User muted called");
+            if (_config.Config.ModerationLoggingChannel == 0)
+                return;
+            
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(_config.Config.ModerationLoggingChannel));
+            {
+                List<EmbedFieldBuilder> fields = new();
+                EmbedBuilder embed = new();
+
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "User",
+                    Value = user.ToString(),
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Mute Time",
+                    Value = mutetime != TimeSpan.Zero ? $"{mutetime.TotalHours}h" : "Indefinitely",
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Reason",
+                    Value = reason,
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = moderator.ToString(),
+                    IsInline = true
+                });
+                
+                embed.WithTitle("User Muted");
+                embed.WithColor(Color.Red);
+                embed.WithFooter($"User id: {user.Id} | Moderator id: {moderator.Id}");
+                embed.WithFields(fields);
+                embed.WithAuthor(user);
+
+                await client.SendMessageAsync(embeds: new[] {embed.Build()});
+            }
         }
 
         private async void HandlerUserBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
         {
-            await _loggingService.Log("User banned called");
-        }
+            if (_config.Config.ModerationLoggingChannel == 0)
+                return;
+            
+            using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(_config.Config.ModerationLoggingChannel));
+            {
+                List<EmbedFieldBuilder> fields = new();
+                EmbedBuilder embed = new();
 
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "User",
+                    Value = user.ToString(),
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Reason",
+                    Value = reason,
+                    IsInline = true
+                });
+                fields.Add(new EmbedFieldBuilder
+                {
+                    Name = "Moderator",
+                    Value = moderator.ToString(),
+                    IsInline = true
+                });
+                
+                embed.WithTitle("User Banned");
+                embed.WithColor(Color.LightOrange);
+                embed.WithFooter($"User id: {user.Id} | Moderator id: {moderator.Id}");
+                embed.WithFields(fields);
+                embed.WithAuthor(user);
+
+                await client.SendMessageAsync(embeds: new[] {embed.Build()});
+            }
+        }
         
         private async Task HandleUserLeft(SocketGuildUser user)
         {

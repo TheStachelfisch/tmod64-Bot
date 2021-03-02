@@ -73,11 +73,10 @@ namespace tMod64Bot.Services
                         else
                         {
                             await user!.RemoveRoleAsync(guild.GetRole(_configService.Config.MutedRole));
+                            UserUnMuted?.Invoke(user, null, guild, null, TimeSpan.Zero);
 
                             _configService.Config.MutedUsers.RemoveWhere(x => x.UserId == mutedUser.UserId);
                             _configService.SaveData();
-
-                            await _loggingService.Log("User un-muted");
                         }
                     });
                 }
@@ -99,11 +98,10 @@ namespace tMod64Bot.Services
                         }
 
                         await guild.RemoveBanAsync(tempBannedUser.UserId);
+                        UserUnbanned?.Invoke(tempBannedUser.UserId, null, guild);
 
                         _configService.Config.TempBannedUsers.RemoveWhere(x => x.UserId == tempBannedUser.UserId);
                         _configService.SaveData();
-
-                        await _loggingService.Log("User un-banned");
                     });
                 }
             }
@@ -260,7 +258,7 @@ namespace tMod64Bot.Services
             {
                 _configService.Config.MutedUsers.Add(new()
                 {
-                    ExpireTime = DateTimeOffset.Now.Add(muteTime).ToUnixTimeSeconds(),
+                    ExpireTime = DateTimeOffset.Now.AddSeconds(muteTime.TotalSeconds).ToUnixTimeSeconds(),
                     ServerId = moderator.Guild.Id,
                     UserId = user.Id,
                     Reason = reason
@@ -363,6 +361,7 @@ namespace tMod64Bot.Services
                     
                     // TODO: Add config option for prune days
                     await user.BanAsync(0, $"{reason}\nBanned by {moderator}");
+                    UserTempBanned?.Invoke(user, moderator, moderator.Guild, banTime, reason);
                     
                     _configService.Config.TempBannedUsers.Add(new TempBannedUser()
                     {
@@ -382,7 +381,6 @@ namespace tMod64Bot.Services
                 return TaskResult.FromError(e.Message);
             }
             
-            UserTempBanned?.Invoke(user, moderator, moderator.Guild, banTime, reason);
             return TaskResult.FromSuccess();
         }
 
