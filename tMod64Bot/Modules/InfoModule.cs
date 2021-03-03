@@ -20,7 +20,7 @@ namespace tMod64Bot.Modules
                 Color = Color.Green,
                 Description = $"Current Prefix **{ConfigService.Config.BotPrefix}**\n" +
                               $"Current Bot uptime **{minuteUptime}min**\n" +
-                              $"Amount of tags: \n",
+                              $"Amount of tags: {ConfigService.Config.Tags.Count}\n",
                 ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl()
             }.Build();
 
