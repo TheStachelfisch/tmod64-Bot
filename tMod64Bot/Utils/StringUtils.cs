@@ -28,15 +28,21 @@ namespace tMod64Bot
             else
                 return null;
         }
-        public static bool ContainsAny(this string haystack, params string[] needles)
+        public static bool ContainsAny(this string haystack, out string word, params string[] needles)
         {
             foreach (string needle in needles)
             {
                 if (haystack.Contains(needle))
+                {
+                    word = needle;
                     return true;
+                }
             }
 
+            word = "";
             return false;
         }
+
+        public static bool ContainsAny(this string haystack, params string[] needles) => ContainsAny(haystack, out string _, needles);
     }
 }

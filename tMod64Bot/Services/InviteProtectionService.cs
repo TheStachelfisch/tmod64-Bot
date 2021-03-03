@@ -49,7 +49,7 @@ namespace tMod64Bot.Services
                 var embed = new EmbedBuilder
                 {
                     Title = "Message Removed",
-                    Description = $"Your message was removed from #{message.Channel.Name}\n\n**Message**: {message.Content}\n**Match**: {match.Value}",
+                    Description = $"Your message was removed from #{message.Channel.Name} because it may have contained a invite\n\n**Message**: {message.Content}\n**Match**: {match.Value}",
                     Color = Color.Orange
                 };
 

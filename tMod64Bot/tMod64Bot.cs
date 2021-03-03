@@ -145,6 +145,7 @@ namespace tMod64Bot
                 await _services.GetRequiredService<ReactionRolesService>().InitializeAsync();
                 await _services.GetRequiredService<ModerationService>().InitializeAsync();
                 await _services.GetRequiredService<InviteProtectionService>().InitializeAsync();
+                await _services.GetRequiredService<BadWordHandler>().InitializeAsync();
 
                 _initialized = true;
             }
@@ -181,6 +182,7 @@ namespace tMod64Bot
             .AddSingleton<InteractiveService>()
             .AddSingleton<TagService>()
             .AddSingleton<ConfigService>()
+            .AddSingleton<BadWordHandler>()
             .AddSingleton<ReactionRolesService>()
             .AddSingleton<ModerationService>()
             .AddSingleton<BotLoggingService>()
