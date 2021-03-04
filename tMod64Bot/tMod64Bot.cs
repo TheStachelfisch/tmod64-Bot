@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using tMod64Bot.Modules;
@@ -111,7 +112,14 @@ namespace tMod64Bot
                                 foreach (var module in modules)
                                 {
                                     commandString += $"{module.Name}{(module.GetCustomAttribute<PreconditionAttribute>() != null ? $" -- {module.GetCustomAttribute<PreconditionAttribute>()!.GetType().Name}" : "")}\n";
-                
+
+                                    if (module.CustomAttributes.Any(x => x.AttributeType == typeof(GroupAttribute)))
+                                        commandString += $" Group {String.Join(',', module.GetCustomAttribute<GroupAttribute>()!.Prefix)}\n";
+
+                                    
+                                    if (module.CustomAttributes.Any(x => x.AttributeType == typeof(AliasAttribute)))
+                                        commandString += $" Alias {String.Join(',', module.GetCustomAttribute<AliasAttribute>()!.Aliases)}\n";
+
                                     var commands = module.GetMethods().Where(x =>
                                         x.CustomAttributes.Any(x => x.AttributeType == typeof(CommandAttribute)));
 
