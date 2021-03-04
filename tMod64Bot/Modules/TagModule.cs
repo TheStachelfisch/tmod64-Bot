@@ -15,7 +15,7 @@ namespace tMod64Bot.Modules
     [Group("tag"), Alias("tags")]
     public class TagModule : CommandBase
     {
-        [Command("Add"), Alias("Create")]
+        [Command("add"), Alias("create")]
         [Priority(5)]
         public async Task AddTag(string name, [Remainder]string content)
         {
@@ -46,7 +46,7 @@ namespace tMod64Bot.Modules
             await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully added tag '{name}'"));
         }
 
-        [Command("Delete"), Alias("Remove")]
+        [Command("delete"), Alias("remove")]
         [Priority(5)]
         public async Task RemoveTag(string tagName)
         {
@@ -71,7 +71,7 @@ namespace tMod64Bot.Modules
             await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully removed tag '{tagName}'"));
         }
         
-        [Command("Edit")]
+        [Command("edit")]
         [Priority(5)]
         public async Task EditTag(string tagName, [Remainder]string newContent)
         {
@@ -96,7 +96,7 @@ namespace tMod64Bot.Modules
             await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully edited tag '{tagName}'"));
         }
 
-        [Command("List")]
+        [Command("list"), Alias("get")]
         [Priority(5)]
         public async Task ListTags()
         {

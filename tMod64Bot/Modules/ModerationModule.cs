@@ -79,7 +79,6 @@ namespace tMod64Bot.Modules
             }
         }
         
-
         [Command("tempban")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [RequireUserPermission(GuildPermission.BanMembers)]
@@ -207,6 +206,26 @@ namespace tMod64Bot.Modules
             catch (Exception e)
             {
                 await LoggingService.Log(LogSeverity.Error, LogSource.Module, "Error occured while kicking", e);
+            }
+        }
+
+        [Command("purge")]
+        [RequireBotPermission(GuildPermission.ManageMessages)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        public async Task PurgeChannel(ulong amount)
+        {
+            var channel = Context.Channel as ITextChannel;
+            
+            var messages = await channel.GetMessagesAsync(Convert.ToInt32(amount)).FlattenAsync();
+            var filteredMessages = messages.Where(x => x.Timestamp < DateTimeOffset.Now.AddDays(14)).ToList();
+
+            if (!filteredMessages.Any())
+                await ReplyAsync("Nothing to delete");
+            
+            else
+            {
+                await channel.DeleteMessagesAsync(filteredMessages);
+                await ReplyAsync($"Deleted {filteredMessages.Count} {(filteredMessages.Count == 1 ? "message" : "messages")}.");
             }
         }
     }

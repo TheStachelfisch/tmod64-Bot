@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using System.Reflection;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
+using tMod64Bot.Modules;
 using tMod64Bot.Services;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
@@ -99,6 +101,45 @@ namespace tMod64Bot
                             case "clear":
                                 Console.Clear();
                                 break;
+                            case "commands":
+                            {
+                                var modules = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes())
+                                    .Where(x => typeof(CommandBase).IsAssignableFrom(x));
+
+                                string commandString = "";
+            
+                                foreach (var module in modules)
+                                {
+                                    commandString += $"{module.Name}{(module.GetCustomAttribute<PreconditionAttribute>() != null ? $" -- {module.GetCustomAttribute<PreconditionAttribute>()!.GetType().Name}" : "")}\n";
+                
+                                    var commands = module.GetMethods().Where(x =>
+                                        x.CustomAttributes.Any(x => x.AttributeType == typeof(CommandAttribute)));
+
+                                    foreach (var command in commands)
+                                    {
+                                        var parameter = command.GetParameters();
+                    
+                                        commandString += $"   {command.GetCustomAttribute<CommandAttribute>()!.Text}{(parameter.Length != 0 ? $" ({String.Join(',', parameter.Select(x => x.ToString()))})" : "")}\n";
+
+                                        var aliasAttributes = command.GetCustomAttribute<AliasAttribute>();
+
+                                        if (aliasAttributes != null)
+                                            commandString += $"     - Alias {String.Join(',', aliasAttributes.Aliases).PadLeft(36)}\n";
+
+                                        var permissionsAttribute = String.Join(',', command.GetCustomAttributes<RequireUserPermissionAttribute>().Select(x => x.GuildPermission));
+                    
+                                        commandString += $"     - Permissions {(permissionsAttribute.IsNullOrWhitespace() ? "None" : permissionsAttribute).PadLeft(30)}\n\n";
+                                    }
+
+                                    commandString += "\n";
+                                }
+
+                                Console.WriteLine(commandString);
+                                
+                                File.WriteAllText($"{ServiceConstants.DATA_DIR}/Commands.txt", commandString);
+                                
+                                break;
+                            };
                         }
                     } while (index < args.Length);
                 }

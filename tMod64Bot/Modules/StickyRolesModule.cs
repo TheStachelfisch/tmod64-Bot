@@ -10,12 +10,12 @@ using tMod64Bot.Utils;
 
 namespace tMod64Bot.Modules
 {
-    [BotManagementPerms]
-    [Group("Sticky"), Alias("StickyRoles")]
+    [RequireBotManager]
+    [Group("sticky"), Alias("stickyRoles")]
     public class StickyRolesModule : CommandBase
     {
-        [Command("Remove")]
-        public async Task Remove(SocketRole role)
+        [Command("remove")]
+        public async Task RemoveRole(SocketRole role)
         {
             Embed embed;
 
@@ -31,8 +31,8 @@ namespace tMod64Bot.Modules
             await ReplyAsync(embed: embed);
         }
 
-        [Command("Add")]
-        public async Task Add(SocketRole role)
+        [Command("add")]
+        public async Task AddRole(SocketRole role)
         {
             Embed embed;
 
@@ -57,8 +57,8 @@ namespace tMod64Bot.Modules
             await ReplyAsync(embed: embed);
         }
         
-        [Command("Values"), Alias("Roles")]
-        public async Task Get(bool mention = true)
+        [Command("values"), Alias("roles")]
+        public async Task GetValues(bool mention = true)
         {
             string s = "";
             
@@ -75,8 +75,8 @@ namespace tMod64Bot.Modules
             await ReplyAsync(embed: embed);
         }
 
-        [Command("Remove")]
-        public async Task Remove(SocketGuildUser user)
+        [Command("remove")]
+        public async Task RemoveUser(SocketGuildUser user)
         {
             Embed embed;
 

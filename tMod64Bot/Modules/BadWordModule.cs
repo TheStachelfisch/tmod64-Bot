@@ -9,7 +9,7 @@ using tMod64Bot.Utils;
 namespace tMod64Bot.Modules
 {
     [Group("badword"), Alias("bw", "bannedword")]
-    [BotManagementPerms]
+    [RequireBotManager]
     public class BadWordModule : CommandBase
     {
         [Command("add")]

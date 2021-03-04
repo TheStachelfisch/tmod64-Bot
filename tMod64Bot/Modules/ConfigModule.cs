@@ -12,7 +12,7 @@ using tMod64Bot.Utils;
 namespace tMod64Bot.Modules
 {
     [Group("config"), Alias("cfg")]
-    [BotManagementPerms]
+    [RequireBotManager]
     public class ConfigModule : CommandBase
     {
         IEnumerable<FieldInfo> fields = typeof(Config).GetFields().Where(x => !x.FieldType.ToString().Contains("System.Collections.Generic"));

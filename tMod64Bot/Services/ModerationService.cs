@@ -43,8 +43,6 @@ namespace tMod64Bot.Services
 
         public async Task InitializeAsync()
         {
-            await _loggingService.Log("Init called");
-            
             _timer.Elapsed += CheckIfExpired;
             _timer.Start();
         }

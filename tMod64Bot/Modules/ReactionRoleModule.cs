@@ -10,7 +10,7 @@ using tMod64Bot.Utils;
 namespace tMod64Bot.Modules
 {
     [Group("rr"), Alias("ReactionMessage", "ReactionRole")]
-    [BotManagementPerms]
+    [RequireBotManager]
     public class ReactionRoleModule : CommandBase
     {
         [Command("add"), Alias("create")]
