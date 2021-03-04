@@ -8,7 +8,7 @@ using tMod64Bot.Services.Config;
 
 namespace tMod64Bot.Modules.Commons
 {
-    public class BotManagementPerms : PreconditionAttribute
+    public class RequiteBotManager : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
         {
