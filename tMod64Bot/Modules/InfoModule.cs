@@ -18,7 +18,8 @@ namespace tMod64Bot.Modules
             {
                 Title = "Bot Info",
                 Color = Color.Green,
-                Description = $"Current Prefix **{ConfigService.Config.BotPrefix}**\n" +
+                Description = $"The bot was made by {MentionUtils.MentionUser(442639987180306432)}\n\n" +
+                              $"Current Prefix **{ConfigService.Config.BotPrefix}**\n" +
                               $"Current Bot uptime **{minuteUptime}min**\n" +
                               $"Amount of tags: {ConfigService.Config.Tags.Count}\n",
                 ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl()
@@ -80,6 +81,19 @@ namespace tMod64Bot.Modules
             };
             
             await message.ModifyAsync(m => m.Embed = embed2.Build());
+        }
+
+        [Command("help")]
+        public async Task Help()
+        {
+            var embed = new EmbedBuilder
+            {
+                Title = "Command Documentation",
+                Color = Color.DarkGreen,
+                Description = "[Command documentation can be found here](https://github.com/TheStachelfisch/tmod64-Bot/tree/Documentation/Command%20Documentation)"
+            }.Build();
+
+            await ReplyAsync(embed:embed);
         }
     }
 }

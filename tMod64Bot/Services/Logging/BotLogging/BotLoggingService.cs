@@ -489,6 +489,9 @@ namespace tMod64Bot.Services.Logging.BotLogging
 
         private async Task HandleMessageUpdated(Cacheable<IMessage, ulong> messageBefore, SocketMessage messageAfter, ISocketMessageChannel channel)
         {
+            if (messageBefore.HasValue && messageBefore.Value.Content == messageAfter.Content)
+                return;
+
             if (_config.Config.LogMessageUpdated)
             {
                 var userLoggingChannel = _config.Config.UserLoggingChannel;
