@@ -13,10 +13,7 @@ namespace tMod64Bot.Utils
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "/bin/bash",
-                    Arguments = $"-c \"{escapedArgs}\"",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
+                    Arguments = $"-c \"{escapedArgs}\""
                 }
             };
             process.Start();

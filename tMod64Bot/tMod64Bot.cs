@@ -63,7 +63,7 @@ namespace tMod64Bot
                 return Task.CompletedTask;
             };
 
-            HandleCmdLn();
+            // HandleCmdLn();
 
             await ShutdownAsync();
         }
@@ -82,7 +82,7 @@ namespace tMod64Bot
             await _log.Log($"Completed Startup in {_startUpStopwatch.ElapsedMilliseconds}ms");
         }
 
-        private void HandleCmdLn()
+        /*private void HandleCmdLn()
         {
             var cmd = Console.ReadLine();
             while (cmd != "stop")
@@ -150,7 +150,7 @@ namespace tMod64Bot
 
                 cmd = Console.ReadLine();
             }
-        }
+        }*/
 
         private async Task ShutdownAsync()
         {

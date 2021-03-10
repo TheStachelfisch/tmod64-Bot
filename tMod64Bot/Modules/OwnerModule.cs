@@ -22,12 +22,7 @@ namespace tMod64Bot.Modules
             var result = "bash update.bash".Bash();
             
             if (result == "Newest")
-            {
                 await ReplyAsync(embed:EmbedHelper.ErrorEmbed("Nothing to pull"));
-                return;
-            }
-
-            await ReplyAsync($"Bot should already be down... Script most likely failed to execute\n```{result}```");
         }
     }
 }
