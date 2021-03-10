@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -18,16 +19,29 @@ namespace tMod64Bot.Modules
                 return;
             }
 
-            var output = "source update.bash".ExecuteShell();
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "source",
+                    Arguments = "update.bash",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+            process.Start();
+            string result = process.StandardOutput.ReadToEndAsync().Result;
+            process.WaitForExit();
+            
 
-            if (output == "Newest")
+            if (result == "Newest")
             {
                 await ReplyAsync(embed:EmbedHelper.ErrorEmbed("Nothing to pull"));
+                return;
             }
-            else
-            {
-                await ReplyAsync($"```{output}```");
-            }
+
+            await ReplyAsync($"Bot should already be down... Script most likely failed to execute\n```{result}```");
         }
     }
 }
