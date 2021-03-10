@@ -18,12 +18,15 @@ namespace tMod64Bot.Modules
                 return;
             }
 
-            var output = "source update.bash".Bash();
+            var output = "source update.bash".ExecuteShell();
 
             if (output == "Newest")
             {
                 await ReplyAsync(embed:EmbedHelper.ErrorEmbed("Nothing to pull"));
-                return;
+            }
+            else
+            {
+                await ReplyAsync($"```{output}```");
             }
         }
     }
