@@ -19,25 +19,8 @@ namespace tMod64Bot.Modules
                 return;
             }
 
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "source",
-                    Arguments = "update.bash",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = true,
-                    CreateNoWindow = true,
-                }
-            };
-
-            process.ToString();
+            var result = "bash update.bash".Bash();
             
-            process.Start();
-            string result = process.StandardOutput.ReadToEndAsync().Result;
-            process.WaitForExit();
-            
-
             if (result == "Newest")
             {
                 await ReplyAsync(embed:EmbedHelper.ErrorEmbed("Nothing to pull"));

@@ -4,13 +4,16 @@ namespace tMod64Bot.Utils
 {
     public static class ShellHelper
     {
-        public static string ExecuteShell(this string cmd)
+        public static string Bash(this string cmd)
         {
-            var process = new Process
+            var escapedArgs = cmd.Replace("\"", "\\\"");
+            
+            var process = new Process()
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = cmd,
+                    FileName = "/bin/bash",
+                    Arguments = $"-c \"{escapedArgs}\"",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
