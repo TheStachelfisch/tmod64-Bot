@@ -65,6 +65,8 @@ namespace tMod64Bot
 
             // HandleCmdLn();
 
+            await Task.Delay(-1);
+            
             await ShutdownAsync();
         }
 
