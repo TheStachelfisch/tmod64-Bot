@@ -24,7 +24,7 @@ namespace tMod64Bot
     
     internal sealed class tMod64bot
     {
-        private static readonly string GatewayToken = File.ReadAllText(@"token.txt");
+        private static readonly string GatewayToken = File.ReadAllText($@"{ServiceConstants.DATA_DIR}token.txt");
         
         internal static readonly ServiceProvider _services = BuildServiceProvider();
         private static readonly DiscordSocketClient _client = _services.GetRequiredService<DiscordSocketClient>();
