@@ -26,10 +26,13 @@ namespace tMod64Bot.Modules
                     FileName = "source",
                     Arguments = "update.bash",
                     RedirectStandardOutput = true,
-                    UseShellExecute = false,
+                    UseShellExecute = true,
                     CreateNoWindow = true,
                 }
             };
+
+            process.ToString();
+            
             process.Start();
             string result = process.StandardOutput.ReadToEndAsync().Result;
             process.WaitForExit();
