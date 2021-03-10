@@ -21,7 +21,7 @@ namespace tMod64Bot.Modules
 
             var result = "bash update.bash".Bash();
             
-            if (result == "Newest")
+            if (result.Contains("Newest"))
                 await ReplyAsync(embed:EmbedHelper.ErrorEmbed("Nothing to pull"));
         }
     }
