@@ -149,6 +149,12 @@ namespace tMod64Bot.Modules
             }
         }
 
+        [Command("mute")]
+        [RequireBotPermission(GuildPermission.ManageRoles)]
+        [RequireUserPermission(GuildPermission.ManageRoles)]
+        public async Task MuteAsync([RequiresHierarchy] SocketGuildUser user, [Remainder] string reason = "No Reason provided") 
+            => await MuteAsync(user, null, reason);
+
         [Command("unmute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
