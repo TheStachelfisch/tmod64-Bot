@@ -63,6 +63,12 @@ namespace tMod64Bot.Modules
             await ReplyAsync($@"``{new Emoji(emote)}``");
         }
 
+        [Command("test")]
+        public async Task IsAliveAndNew()
+        {
+            await ReplyAsync("Alive! Number: 1.0");
+        }
+        
         [Command("leftUser")]
         public async Task LeftUserTest(SocketGuildUser user)
         {
