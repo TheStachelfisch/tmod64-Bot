@@ -21,14 +21,14 @@ namespace tMod64Bot.Modules
 
             var message = await ReplyAsync(embed:new EmbedBuilder()
             {
-                Title = "Command Output",
+                Title = "Command output",
                 Description = "Starting command..."
             }.Build());
 
             string result = "../update.bash".Bash();
             await message.ModifyAsync(x => x.Embed = new EmbedBuilder
             {
-                Title = "Command Output",
+                Title = "Command output",
                 Description = result
             }.Build());
         }
