@@ -25,7 +25,7 @@ namespace tMod64Bot.Modules
             Process proc = new() {StartInfo = startInfo,};
             proc.Start();
 
-            string result = await proc.StandardOutput.ReadToEndAsync();
+            string result = proc.StandardOutput.ReadToEnd();
             await message.ModifyAsync(x => x.Content = result);
         }
     }
