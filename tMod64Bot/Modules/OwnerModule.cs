@@ -19,14 +19,18 @@ namespace tMod64Bot.Modules
                 return;
             }
 
-            var message = await ReplyAsync("Starting command...");
-            
-            ProcessStartInfo startInfo = new() { FileName = "/bin/bash", Arguments = "../update.bash", };
-            Process proc = new() {StartInfo = startInfo,};
-            proc.Start();
+            var message = await ReplyAsync(embed:new EmbedBuilder()
+            {
+                Title = "Command Output",
+                Description = "Starting command..."
+            }.Build());
 
-            string result = proc.StandardOutput.ReadToEnd();
-            await message.ModifyAsync(x => x.Content = result);
+            string result = "../update.bash".Bash();
+            await message.ModifyAsync(x => x.Embed = new EmbedBuilder
+            {
+                Title = "Command Output",
+                Description = result
+            }.Build());
         }
     }
 }
