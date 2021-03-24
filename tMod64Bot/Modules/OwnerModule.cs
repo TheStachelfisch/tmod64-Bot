@@ -13,16 +13,18 @@ namespace tMod64Bot.Modules
         [Command("update")]
         public async Task Update()
         {
-            if (!File.Exists("update.bash"))
-            {
-                await ReplyAsync(embed: EmbedHelper.ErrorEmbed("`update.bash` doesn't exist. Stachel forgot to add the script"));
-                return;
-            }
+            await ReplyAsync("Pong!");
 
-            var result = "bash update.bash".Bash();
-            
-            if (result.Contains("Newest"))
-                await ReplyAsync(embed:EmbedHelper.ErrorEmbed("Nothing to pull"));
+            // if (!File.Exists("update.bash"))
+            // {
+            //     await ReplyAsync(embed: EmbedHelper.ErrorEmbed("`update.bash` doesn't exist. Stachel forgot to add the script"));
+            //     return;
+            // }
+            //
+            // var result = "bash update.bash".Bash();
+            //
+            // if (result.Contains("Newest"))
+            //     await ReplyAsync(embed:EmbedHelper.ErrorEmbed("Nothing to pull"));
         }
     }
 }
