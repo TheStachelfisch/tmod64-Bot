@@ -22,10 +22,7 @@ namespace tMod64Bot.Services
         public IWebhook GetOrCreateWebhook(ulong channelId)
         {
             if (_cache.Contains(channelId.ToString()))
-            {
-                _loggingService.Log(LogSeverity.Verbose, LogSource.Service, "Got Webhook from cache");
                 return (_cache.Get(channelId.ToString()) as IWebhook)!;
-            }
 
             CacheItemPolicy policy = new()
             {
