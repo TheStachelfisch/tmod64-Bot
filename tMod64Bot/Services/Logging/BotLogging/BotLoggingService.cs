@@ -35,7 +35,8 @@ namespace tMod64Bot.Services.Logging.BotLogging
             Client.UserLeft += HandleUserLeft;
             Client.MessageDeleted += HandleDeletedMessage;
             Client.MessageUpdated += HandleMessageUpdated;
-            Client.GuildMemberUpdated += HandleUserUpdated;
+            Client.UserUpdated += HandleUserUpdated;
+            Client.GuildMemberUpdated += HandleGuildMemberUpdated;
 
             _moderationService.UserUnbanned += HandleUserUnbanned;
             _moderationService.UserKicked += HandleUserKicked;
@@ -45,6 +46,35 @@ namespace tMod64Bot.Services.Logging.BotLogging
             _moderationService.UserBanned += HandlerUserBanned;
 
             _inviteProtectionService.InviteDeleted += HandleInviteDeleted;
+        }
+
+        private async Task HandleGuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
+        {
+            var userLoggingChannel = _config.Config.UserLoggingChannel;
+
+            if (userLoggingChannel == 0 || !_config.Config.LogUserUpdated)
+                return;
+            
+            if (userBefore.Nickname != userAfter.Nickname)
+            {
+                using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
+                {
+                    var embed = new EmbedBuilder
+                    {
+                        Title = $"{(userAfter.Nickname.IsNullOrWhitespace() ? "Nickname reset" : $"{(userBefore.Nickname.IsNullOrWhitespace() ? "Nickname added" : "Nickname changed")}")}",
+                        Color = Color.Gold,
+                        Description = $"{(userAfter.Nickname.IsNullOrWhitespace() ? $"**Before**: {userBefore.Nickname}" : $"{(userBefore.Nickname.IsNullOrWhitespace() ? $"**Nickname**: {userAfter.Nickname}" : $"**Before**: {userBefore.Nickname}\n**After**: {userAfter.Nickname}")}")}",
+                        Footer = new EmbedFooterBuilder
+                        {
+                            Text = $"User id: {userAfter.Id}"
+                        }
+                    };
+
+                    embed.WithAuthor(userAfter);
+
+                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
+                }
+            }
         }
 
         private void HandleInviteDeleted(SocketGuildUser user, SocketMessage message, Match match)
@@ -359,7 +389,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async Task HandleUserUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
+        private async Task HandleUserUpdated(SocketUser userBefore, SocketUser userAfter)
         {
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
@@ -375,26 +405,6 @@ namespace tMod64Bot.Services.Logging.BotLogging
                         Title = "Username changed",
                         Color = Color.Gold,
                         Description = $"**Before**: {userBefore.Username}\n**After**: {userAfter.Username}",
-                        Footer = new EmbedFooterBuilder
-                        {
-                            Text = $"User id: {userAfter.Id}"
-                        }
-                    };
-
-                    embed.WithAuthor(userAfter);
-
-                    await client.SendMessageAsync(embeds: new[] {embed.Build()});
-                }
-            }
-            else if (userBefore.Nickname != userAfter.Nickname)
-            {
-                using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
-                {
-                    var embed = new EmbedBuilder
-                    {
-                        Title = $"{(userAfter.Nickname.IsNullOrWhitespace() ? "Nickname reset" : $"{(userBefore.Nickname.IsNullOrWhitespace() ? "Nickname added" : "Nickname changed")}")}",
-                        Color = Color.Gold,
-                        Description = $"{(userAfter.Nickname.IsNullOrWhitespace() ? $"**Before**: {userBefore.Nickname}" : $"{(userBefore.Nickname.IsNullOrWhitespace() ? $"**Nickname**: {userAfter.Nickname}" : $"**Before**: {userBefore.Nickname}\n**After**: {userAfter.Nickname}")}")}",
                         Footer = new EmbedFooterBuilder
                         {
                             Text = $"User id: {userAfter.Id}"
@@ -508,7 +518,8 @@ namespace tMod64Bot.Services.Logging.BotLogging
                     {
                         Title = $"Message edited in #{channel.Name}",
                         Color = Color.DarkMagenta,
-                        Description = $"**Before:** {(messageBefore.HasValue ? messageBefore.Value.Content : "Message Content could not be retrieved")}\n" +
+                        Description = $"[Jump!]({messageAfter.GetJumpUrl()})" +
+                                      $"**Before:** {(messageBefore.HasValue ? messageBefore.Value.Content : "Message Content could not be retrieved")}\n" +
                                       $"**After:** {messageAfter.Content}",
                         Footer = new EmbedFooterBuilder
                         {

@@ -66,7 +66,7 @@ namespace tMod64Bot.Modules
         [Command("test")]
         public async Task IsAliveAndNew()
         {
-            await ReplyAsync("Alive! Number: 1.0");
+            await ReplyAsync("Alive! Number: 1.1");
         }
         
         [Command("leftUser")]

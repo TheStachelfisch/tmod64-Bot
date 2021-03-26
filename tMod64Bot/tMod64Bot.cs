@@ -49,6 +49,7 @@ namespace tMod64Bot
             
             await _client.LoginAsync(TokenType.Bot, GatewayToken);
             await _client.StartAsync();
+
             _client.Ready += () =>
             {
                 InitializeServicesAsync().GetAwaiter().GetResult();
