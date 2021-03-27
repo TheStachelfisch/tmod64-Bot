@@ -128,6 +128,7 @@ namespace tMod64Bot.Services.Config
                     TempBannedUsers = new HashSet<TempBannedUser>(),
                     ReactionRoleMessages = new HashSet<Tuple<ulong, ulong, string>>(),
                     BannedWordsExemptChannel = new HashSet<ulong>(),
+                    ExemptInvites = new HashSet<string>(),
                     BotPrefix = "64!",
                     
                     MessageOnBan = true,

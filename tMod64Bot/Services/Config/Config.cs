@@ -15,6 +15,7 @@ namespace tMod64Bot.Services.Config
         public HashSet<ulong> StickiedRoles;
         public HashSet<string> BannedWords;
         public HashSet<ulong> BannedWordsExemptChannel;
+        public HashSet<string> ExemptInvites;
 
         public string BotPrefix;
 

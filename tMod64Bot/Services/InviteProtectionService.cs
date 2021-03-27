@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using tMod64Bot.Services.Config;
@@ -71,9 +72,14 @@ namespace tMod64Bot.Services
             catch (Exception e) { /* Ignore - Happens when user has no roles */ }
 
             var match = ContainsInvite(message.Content);
-            
+
             if (match.Success)
             {
+                var id = GetInviteId(message.Content);
+                
+                if (id.Success && _configService.Config.ExemptInvites.Contains(id.Value))
+                    return;
+
                 await message.DeleteAsync();
                 InviteDeleted?.Invoke(user, message, match);
 
@@ -91,5 +97,7 @@ namespace tMod64Bot.Services
         }
 
         public Match ContainsInvite(string message) => Regex.Match(message, @"(?<![\w\d])(discord\.gg\/\w{1,20}|discord\.com\/invite\/\w{1,20})(?![\w\d])");
+        
+        public Group GetInviteId(string message) => Regex.Match(message, @"\/(\w{1,20}$)").Groups[1];
     }
 }
