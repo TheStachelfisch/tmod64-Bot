@@ -47,6 +47,7 @@ namespace tMod64Bot.Modules
             if (ConfigService.Config.ExemptInvites.Contains(id.Value))
             {
                 await ReplyAsync(embed: EmbedHelper.ErrorEmbed($"Exempt invites already contains {id}"));
+                return;
             }
             
             ConfigService.Config.ExemptInvites.Add(id.Value);
