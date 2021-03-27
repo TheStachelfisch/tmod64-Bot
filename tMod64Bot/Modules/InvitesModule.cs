@@ -44,6 +44,11 @@ namespace tMod64Bot.Modules
                 return;
             }
 
+            if (ConfigService.Config.ExemptInvites.Contains(id.Value))
+            {
+                await ReplyAsync(embed: EmbedHelper.ErrorEmbed($"Exempt invites already contains {id}"));
+            }
+            
             ConfigService.Config.ExemptInvites.Add(id.Value);
             await ReplyAsync(embed:EmbedHelper.SuccessEmbed($"Successfully added {id.Value} to the exempt invites list"));
         }
@@ -69,7 +74,7 @@ namespace tMod64Bot.Modules
                 return;
             }
 
-            await ReplyAsync(embed: EmbedHelper.ErrorEmbed($"Error while removing invite, may not be a valid invite"));
+            await ReplyAsync(embed: EmbedHelper.ErrorEmbed($"Error while removing invite, may not be a valid invite or list doesn't contain this invite"));
         }
     }
 }
