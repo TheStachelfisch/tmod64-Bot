@@ -518,7 +518,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                     {
                         Title = $"Message edited in #{channel.Name}",
                         Color = Color.DarkMagenta,
-                        Description = $"[Jump!]({messageAfter.GetJumpUrl()})" +
+                        Description = $"[Jump!]({messageAfter.GetJumpUrl()})\n\n" +
                                       $"**Before:** {(messageBefore.HasValue ? messageBefore.Value.Content : "Message Content could not be retrieved")}\n" +
                                       $"**After:** {messageAfter.Content}",
                         Footer = new EmbedFooterBuilder
