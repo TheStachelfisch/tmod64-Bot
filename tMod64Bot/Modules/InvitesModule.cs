@@ -51,7 +51,7 @@ namespace tMod64Bot.Modules
             }
             
             ConfigService.Config.ExemptInvites.Add(id.Value);
-            ConfigService.UpdateData();
+            ConfigService.SaveData();
             await ReplyAsync(embed:EmbedHelper.SuccessEmbed($"Successfully added {id.Value} to the exempt invites list"));
         }
 
@@ -65,7 +65,7 @@ namespace tMod64Bot.Modules
             if (inviteService.GetInviteId(invite).Success && ConfigService.Config.ExemptInvites.Contains(id.Value))
             {
                 ConfigService.Config.ExemptInvites.Remove(id.Value);
-                ConfigService.UpdateData();
+                ConfigService.SaveData();
                 await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully removed {id.Value} from the exempt invites list"));
                 return;
             }
@@ -73,7 +73,7 @@ namespace tMod64Bot.Modules
             if (ConfigService.Config.ExemptInvites.Contains(invite))
             {
                 ConfigService.Config.ExemptInvites.Remove(invite);
-                ConfigService.UpdateData();
+                ConfigService.SaveData();
                 await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully removed {invite} from the exempt invites list"));
                 return;
             }
