@@ -15,6 +15,8 @@ namespace tMod64Bot.Modules
         [Command("add")]
         public async Task AddWord([Remainder]string word)
         {
+            word = word.ToLower();
+            
             if (ConfigService.Config.BannedWords.Contains(word))
             {
                 await ReplyAsync(embed: EmbedHelper.ErrorEmbed($"Bad word list already contains {word}"));
@@ -29,6 +31,8 @@ namespace tMod64Bot.Modules
         [Command("remove")]
         public async Task RemoveWord([Remainder]string word)
         {
+            word = word.ToLower();
+            
             if (!ConfigService.Config.BannedWords.Contains(word))
             {
                 await ReplyAsync(embed: EmbedHelper.ErrorEmbed($"Bad word list doesn't contain {word}"));
