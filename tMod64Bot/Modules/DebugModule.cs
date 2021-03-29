@@ -51,18 +51,6 @@ namespace tMod64Bot.Modules
             }
         }
 
-        [Command("channelCode")]
-        public async Task ChannelCode(SocketGuildChannel channel)
-        {
-            await ReplyAsync($"`{MentionUtils.MentionChannel(channel.Id)}`");
-        }
-
-        [Command("emote")]
-        public async Task EmoteTest(string emote)
-        {
-            await ReplyAsync($@"``{new Emoji(emote)}``");
-        }
-
         [Command("test")]
         public async Task IsAliveAndNew()
         {
@@ -70,14 +58,11 @@ namespace tMod64Bot.Modules
         }
         
         [Command("leftUser")]
-        public async Task LeftUserTest(SocketGuildUser user)
+        public async Task LeftUserTest(ulong id)
         {
-            await ReplyAsync("Called");
-            
-            if (user == null)
-                await ReplyAsync("User is null");
+            var user = Context.Client.GetUser(id);
 
-            await ReplyAsync($"Not null : {user.GetType()}");
+            await ReplyAsync(user.ToString());
         }
     }
 }
