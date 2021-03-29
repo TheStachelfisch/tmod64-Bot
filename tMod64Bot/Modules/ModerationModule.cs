@@ -232,18 +232,20 @@ namespace tMod64Bot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task PurgeChannel(ulong amount)
         {
+            amount += 1;
             var channel = Context.Channel as ITextChannel;
             
-            var messages = await channel.GetMessagesAsync(Convert.ToInt32(amount)).FlattenAsync();
+            var messages = await channel!.GetMessagesAsync(Convert.ToInt32(amount)).FlattenAsync();
             var filteredMessages = messages.Where(x => x.Timestamp < DateTimeOffset.Now.AddDays(14)).ToList();
 
             if (!filteredMessages.Any())
+            {
                 await ReplyAsync("Nothing to delete");
-            
+            }
             else
             {
                 await channel.DeleteMessagesAsync(filteredMessages);
-                await ReplyAsync($"Deleted {filteredMessages.Count} {(filteredMessages.Count == 1 ? "message" : "messages")}.");
+                await ReplyAndDeleteAsync($"Deleted {filteredMessages.Count} {(filteredMessages.Count == 1 ? "message" : "messages")}.", timeout:TimeSpan.FromSeconds(5));
             }
         }
     }
