@@ -47,6 +47,12 @@ namespace tMod64Bot.Modules
             }
         }
 
+        [Command("ban")]
+        [RequireBotPermission(GuildPermission.BanMembers)]
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        public async Task BanAsync(ulong userId, [Remainder] string reason = "No Reason provided")
+            => await BanAsync(Context.Client.Rest.GetUserAsync(userId).Result, reason);
+
         [Command("unban"), Alias("Pardon")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [RequireUserPermission(GuildPermission.BanMembers)]
@@ -112,6 +118,12 @@ namespace tMod64Bot.Modules
                 await LoggingService.Log(LogSeverity.Error, LogSource.Module, "Error occured while banning", e);
             }
         }
+
+        [Command("tempban")]
+        [RequireBotPermission(GuildPermission.BanMembers)]
+        [RequireUserPermission(GuildPermission.BanMembers)]
+        public async Task TempBanAsync(ulong userId, string? banTime = null, [Remainder] string reason = "No Reason provided")
+            => await TempBanAsync(Context.Client.Rest.GetUserAsync(userId).Result, banTime, reason);
         
         [Command("mute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]

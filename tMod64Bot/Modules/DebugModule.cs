@@ -5,6 +5,7 @@ using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.Rest;
 using Discord.Webhook;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,7 +61,7 @@ namespace tMod64Bot.Modules
         [Command("leftUser")]
         public async Task LeftUserTest(ulong id)
         {
-            var user = Context.Client.GetUser(id);
+            var user = await Context.Client.Rest.GetUserAsync(id);
 
             await ReplyAsync(user.ToString());
         }
