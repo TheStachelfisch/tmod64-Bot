@@ -127,7 +127,7 @@ namespace tMod64Bot.Services
             return temp;
         }
         
-        public async Task<TaskResult> BanUser(SocketGuildUser moderator, SocketGuildUser user, string reason)
+        public async Task<TaskResult> BanUser(SocketGuildUser moderator, SocketUser user, string reason)
         {
             if (moderator.Guild.GetBansAsync().Result.Any(x => x.User.Id == user.Id))
                 return TaskResult.FromError("User is already banned");
@@ -168,8 +168,8 @@ namespace tMod64Bot.Services
             }
             catch (Exception) { /* Ignore */ }
             
-            await user.Guild.AddBanAsync(user, 0, $"{reason}\nBanned by {moderator}");
-            UserBanned?.Invoke(user, moderator, user.Guild, reason);
+            await moderator.Guild.AddBanAsync(user, 0, $"{reason}\nBanned by {moderator}");
+            UserBanned?.Invoke(user, moderator, moderator.Guild, reason);
             
             return TaskResult.FromSuccess();
         }
@@ -200,7 +200,7 @@ namespace tMod64Bot.Services
             return TaskResult.FromSuccess();
         }
 
-        public async Task<TaskResult> MuteUser( SocketGuildUser user, SocketGuildUser moderator, TimeSpan muteTime, string reason)
+        public async Task<TaskResult> MuteUser(SocketGuildUser user, SocketGuildUser moderator, TimeSpan muteTime, string reason)
         {
             if (_configService.Config.MutedRole == 0)
                 return TaskResult.FromError("No Muted-role has been assigned in the config");
@@ -295,7 +295,7 @@ namespace tMod64Bot.Services
             return TaskResult.FromSuccess();
         }
 
-        public async Task<TaskResult> TempBanUser(SocketGuildUser user, SocketGuildUser moderator, TimeSpan banTime, string reason)
+        public async Task<TaskResult> TempBanUser(SocketUser user, SocketGuildUser moderator, TimeSpan banTime, string reason)
         {
             if (_configService.Config.TempBannedUsers.Any(x => x.UserId == user.Id))
                 return TaskResult.FromError("User is already temp-banned");
@@ -358,7 +358,7 @@ namespace tMod64Bot.Services
                     catch (Exception) { /* Ignore */ }
                     
                     // TODO: Add config option for prune days
-                    await user.BanAsync(0, $"{reason}\nBanned by {moderator}");
+                    await moderator.Guild.AddBanAsync(user, 0, $"{reason}\nBanned by {moderator}");
                     UserTempBanned?.Invoke(user, moderator, moderator.Guild, banTime, reason);
                     
                     _configService.Config.TempBannedUsers.Add(new TempBannedUser()
