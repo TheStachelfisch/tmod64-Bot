@@ -1,4 +1,9 @@
-#Info Module
+# Info Module
+
+---
+#### Summary
+
+Commands for Info about the bot
 
 ---
 
@@ -8,7 +13,7 @@
 | **ping**    | 64!ping    | Gets the bots ping, gateway latency and delta
 | **help**    | 64!help    | Redirects you to the command documentation page
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | 

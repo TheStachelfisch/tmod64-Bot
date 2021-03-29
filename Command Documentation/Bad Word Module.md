@@ -1,4 +1,9 @@
-#Bad Word Module
+# Bad Word Module
+
+---
+#### Summary
+
+Blocks bad words from sent messages and edited messages
 
 ---
 
@@ -9,7 +14,7 @@
 | **[invites] list**                                      | 64!bw [all&#124;list]                      | Gets all whitelisted invites
 
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | **Requires Bot Manager**

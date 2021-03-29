@@ -1,4 +1,9 @@
-#Tag Module
+# Tag Module
+
+---
+#### Summary
+
+Commands to add|remove|edit|list tags
 
 ---
 
@@ -11,10 +16,10 @@
 | **[tag&#124;tags] &lt;tagName>**                                  | 64!tag Hello or 64!Hello          | Gets a tag (Also works with just 64!Hello)
 
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | **Requires Admin** (Only to delete/edit tags that aren't yours)
 | Guild Permission |
 
-######[R] = remainder
+###### [R] = remainder

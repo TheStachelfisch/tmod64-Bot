@@ -1,9 +1,10 @@
-#Sticky Roles Module
+# Sticky Roles Module
 
 ---
-####Summary
+#### Summary
 
-
+Commands to add|remove|list sticky roles.
+Sticky roles are roles that will be reassigned after a user left and joins again
 
 ---
 
@@ -14,7 +15,7 @@
 | **[sticky&#124;stickyRoles] remove <@User;userId>**         | 64!sticky remove @TheStachelfisch#0395    | Removes a user from the Sticky roles list
 | **[sticky&#124;stickyRoles] <values&#124;roles>**           | 64!sticky @Support Staff                  | Removes a user from the Sticky roles list
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | Requires Bot Manager

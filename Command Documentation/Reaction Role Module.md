@@ -1,9 +1,9 @@
-#Reaction Roles Module
+# Reaction Roles Module
 
 ---
-####Summary
+#### Summary
 
-
+Commands related to adding|removing|listing reaction role messages
 
 ---
 
@@ -13,7 +13,7 @@
 | **[sticky&#124;stickyRoles] <remove&#124;delete> &lt;messageLink>**                                           | 64!sticky remove https://discord.com/channels/574595004064989214/574702758133760010/766724697668059137          | Removes a reaction message
 | **[sticky&#124;stickyRoles] <values&#124;messages>**                                                          | 64!sticky values                                                                                                | Gets all reaction messages
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | Requires Bot Manager, Add Roles

@@ -1,9 +1,9 @@
-#Reaction Roles Module
+# Reaction Roles Module
 
 ---
-####Summary
+#### Summary
 
-
+Basic Moderation commands
 
 ---
 
@@ -17,10 +17,10 @@
 | **kick &lt;@User> [R]&lt;reason>**                  | 64!kick @TheStachelfisch No memes in #Genereal     | Kicks a user
 | **purge &lt;messageAmound>**                        | 64!purge                                           | Purges a specified amount of messages in a channel
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | Varies, Mostly self explaining
 | Guild Permission | ^
 
-######[R] = remainder
+###### [R] = remainder

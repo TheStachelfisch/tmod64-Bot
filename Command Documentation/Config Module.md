@@ -1,4 +1,9 @@
-#Config Module
+# Config Module
+
+---
+#### Summary
+
+Commands to edit the bot config
 
 ---
 
@@ -9,7 +14,7 @@
 | **[config&#124;cfg] values**                                                       | 64!config values                                  | Displays all the values
 
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | **Requires Bot Manager**

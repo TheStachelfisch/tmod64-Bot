@@ -1,4 +1,9 @@
-﻿#Bad Word Module
+﻿# Invites Module
+
+---
+#### Summary
+
+Commands to add|remove|list whitelisted invites
 
 ---
 
@@ -9,7 +14,7 @@
 | **[bw&#124;badword&#124;bannedword] list**              | 64!bw [get&#124;list] | Gets all the banned words
 
 ---
-###Permissions
+### Permissions
 | Permission       | Required
 | -----------------|:-------------
 | User Permission  | **Requires Bot Manager**
