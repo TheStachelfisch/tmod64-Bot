@@ -18,7 +18,7 @@ namespace tMod64Bot.Modules
         [Command("ban")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [RequireUserPermission(GuildPermission.BanMembers)]
-        public async Task BanAsync([RequiresHierarchy]SocketUser user, [Remainder]string reason = "No Reason provided")
+        public async Task BanAsync([RequiresHierarchy]IUser user, [Remainder]string reason = "No Reason provided")
         {
             if (Context.User.Id == user.Id)
             {
@@ -82,7 +82,7 @@ namespace tMod64Bot.Modules
         [Command("tempban")]
         [RequireBotPermission(GuildPermission.BanMembers)]
         [RequireUserPermission(GuildPermission.BanMembers)]
-        public async Task TempBanAsync([RequiresHierarchy]SocketUser user, string? banTime = null, [Remainder]string reason = "No Reason provided")
+        public async Task TempBanAsync([RequiresHierarchy]IUser user, string? banTime = null, [Remainder]string reason = "No Reason provided")
         {
             var span = banTime == null ? TimeSpan.Zero : ModerationService.GetTimeSpan(banTime);
 

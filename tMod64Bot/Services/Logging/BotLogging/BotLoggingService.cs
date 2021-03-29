@@ -216,7 +216,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async void HandleUserTempBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan bantime, string reason)
+        private async void HandleUserTempBanned(IUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan bantime, string reason)
         {
             if (_config.Config.ModerationLoggingChannel == 0)
                 return;
@@ -306,7 +306,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async void HandlerUserBanned(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
+        private async void HandlerUserBanned(IUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
         {
             if (_config.Config.ModerationLoggingChannel == 0)
                 return;

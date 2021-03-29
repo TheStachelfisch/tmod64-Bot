@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
 using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using tMod64Bot.Services.Commons;
@@ -20,9 +21,9 @@ namespace tMod64Bot.Services
         private readonly ConfigService _configService;
         private readonly LoggingService _loggingService;
         
-        public delegate void BanEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason);
+        public delegate void BanEventHandler(IUser user, SocketGuildUser moderator, SocketGuild guild, string reason);
         public delegate void UnbanEventHandler(ulong userId, SocketGuildUser moderator, SocketGuild guild);
-        public delegate void TempBanEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan banTime, string reason);
+        public delegate void TempBanEventHandler(IUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan banTime, string reason);
         public delegate void MuteEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, TimeSpan muteTime);
         public delegate void KickEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason);
         public event BanEventHandler UserBanned;
@@ -127,7 +128,7 @@ namespace tMod64Bot.Services
             return temp;
         }
         
-        public async Task<TaskResult> BanUser(SocketGuildUser moderator, SocketUser user, string reason)
+        public async Task<TaskResult> BanUser(SocketGuildUser moderator, IUser user, string reason)
         {
             if (moderator.Guild.GetBansAsync().Result.Any(x => x.User.Id == user.Id))
                 return TaskResult.FromError("User is already banned");
@@ -295,7 +296,7 @@ namespace tMod64Bot.Services
             return TaskResult.FromSuccess();
         }
 
-        public async Task<TaskResult> TempBanUser(SocketUser user, SocketGuildUser moderator, TimeSpan banTime, string reason)
+        public async Task<TaskResult> TempBanUser(IUser user, SocketGuildUser moderator, TimeSpan banTime, string reason)
         {
             if (_configService.Config.TempBannedUsers.Any(x => x.UserId == user.Id))
                 return TaskResult.FromError("User is already temp-banned");
