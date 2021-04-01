@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -20,8 +19,6 @@ using tMod64Bot.Services.Tag;
 
 namespace tMod64Bot
 {
-    //TODO: Log disconnects from Discord Gateway
-    
     internal sealed class tMod64bot
     {
         private static readonly string GatewayToken = File.ReadAllText($@"{ServiceConstants.DATA_DIR}token.txt");
