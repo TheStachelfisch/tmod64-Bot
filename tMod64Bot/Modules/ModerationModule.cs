@@ -249,5 +249,10 @@ namespace tMod64Bot.Modules
                 await ReplyAndDeleteAsync($"Deleted {filteredMessages.Count} {(filteredMessages.Count == 1 ? "message" : "messages")}.", timeout:TimeSpan.FromSeconds(5));
             }
         }
+
+        [Command("echo")]
+        [RequireBotManager]
+        public async Task EchoAsync(ISocketMessageChannel channel, [Remainder] string message)
+            => await channel.SendMessageAsync(message);
     }
 }
