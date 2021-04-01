@@ -22,7 +22,7 @@ namespace tMod64Bot.Modules
         {
             if (Context.User.Id == user.Id)
             {
-                await ReplyAsync("Look at this looser trying to ban himself");
+                await ReplyAsync("Look at this loser trying to ban himself");
                 return;
             }
 
