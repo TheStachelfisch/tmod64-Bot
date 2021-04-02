@@ -1,5 +1,4 @@
-﻿using System.Xml.Schema;
-using Discord;
+﻿using Discord;
 
 namespace tMod64Bot.Utils
 {

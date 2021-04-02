@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml.Schema;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;

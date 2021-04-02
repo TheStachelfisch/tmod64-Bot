@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using tMod64Bot.Modules.Commons;
 using tMod64Bot.Utils;
 

@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.Rest;
-using Discord.Webhook;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Logging;
-using tMod64Bot.Services.Logging.BotLogging;
 
 namespace tMod64Bot.Modules
 {
