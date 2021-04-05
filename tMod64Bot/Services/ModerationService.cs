@@ -107,21 +107,23 @@ namespace tMod64Bot.Services
         public static TimeSpan GetTimeSpan(string input)
         {
             TimeSpan temp = TimeSpan.Zero;
-
-            var dayMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)d", RegexOptions.CultureInvariant);
-            if (dayMatch.Success)
-                temp = temp.Add(TimeSpan.FromDays(int.Parse(dayMatch.Groups[1].Value)));
+            AddTimeSpan("d", i => temp += TimeSpan.FromDays(i));
+            AddTimeSpan("h", i => temp += TimeSpan.FromHours(i));
+            AddTimeSpan("m", i => temp += TimeSpan.FromMinutes(i));
+            AddTimeSpan("s", i => temp += TimeSpan.FromSeconds(i));
             
-            var hourMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)h", RegexOptions.CultureInvariant);
-            if (hourMatch.Success)
-                temp = temp.Add(TimeSpan.FromHours(int.Parse(hourMatch.Groups[1].Value)));
-
-            var minuteMatch = Regex.Match(input, @"(\d|\d\d|\d\d\d)m", RegexOptions.CultureInvariant);
-            if (minuteMatch.Success)
-                temp = temp.Add(TimeSpan.FromMinutes(int.Parse(minuteMatch.Groups[1].Value)));
-
-            if (temp.TotalSeconds == 0)
+            if (temp.TotalSeconds == 0) 
                 throw new ArgumentNullException(nameof(input), "Malformated string");
+            if (temp.TotalSeconds < 60)
+                throw new ArgumentException("Time may not be less than 60 seconds");
+
+            void AddTimeSpan(string letter, Action<int> additionMethod)
+            {
+                var match = Regex.Match(input, @"(\d|\d\d|\d\d\d)" + letter, RegexOptions.CultureInvariant);
+                
+                if (match.Success)
+                    additionMethod(int.Parse(match.Groups[1].Value));
+            }
 
             return temp;
         }
