@@ -108,7 +108,7 @@ namespace tMod64Bot.Modules
                 var success = await Services.GetRequiredService<ModerationService>().TempBanUser(user, (SocketGuildUser)Context.User, span, reason);
 
                 if (success.IsSuccess)
-                    await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"{user} has been successfully banned for {span}"));
+                    await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"{user} has been successfully temp-banned for {span.FormatString(true)}"));
                 else
                     await ReplyAsync(embed: EmbedHelper.ErrorEmbed(success.ErrorReason!));
             }
@@ -151,7 +151,7 @@ namespace tMod64Bot.Modules
                 var success = await service.MuteUser(user, (SocketGuildUser) Context.User, span,  reason);
 
                 if (success.IsSuccess)
-                    await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully muted {MentionUtils.MentionUser(user.Id)} {(span == TimeSpan.Zero ? "indefinitely" : $"for {span.TotalHours}h")}"));
+                    await ReplyAsync(embed: EmbedHelper.SuccessEmbed($"Successfully muted {MentionUtils.MentionUser(user.Id)} {(span == TimeSpan.Zero ? "indefinitely" : $"for {span.FormatString(true)}")}"));
                 else
                     await ReplyAsync(embed: EmbedHelper.ErrorEmbed(success.ErrorReason!));
             }

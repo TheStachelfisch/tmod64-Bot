@@ -235,7 +235,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 fields.Add(new EmbedFieldBuilder
                 {
                     Name = "Ban Time",
-                    Value = bantime != TimeSpan.Zero ? $"{bantime.TotalHours}h" : "Indefinitely",
+                    Value = bantime != TimeSpan.Zero ? bantime.FormatString(true) : "Indefinitely",
                     IsInline = true
                 });
                 fields.Add(new EmbedFieldBuilder
@@ -280,7 +280,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 fields.Add(new EmbedFieldBuilder
                 {
                     Name = "Mute Time",
-                    Value = mutetime != TimeSpan.Zero ? $"{mutetime.TotalHours}h" : "Indefinitely",
+                    Value = mutetime != TimeSpan.Zero ? mutetime.FormatString(true) : "Indefinitely",
                     IsInline = true
                 });
                 fields.Add(new EmbedFieldBuilder
