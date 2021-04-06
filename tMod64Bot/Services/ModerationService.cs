@@ -206,10 +206,10 @@ namespace tMod64Bot.Services
             if (_configService.Config.MutedRole == 0)
                 return TaskResult.FromError("No Muted-role has been assigned in the config");
 
-            await user.AddRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
-            
             if (_configService.Config.MutedUsers.Select(x => x.UserId).Contains(user.Id))
             {
+                await user.AddRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
+                
                 var entry = _configService.Config.MutedUsers.FirstOrDefault(x => x.UserId == user.Id);
                 entry.Reason = reason;
                 entry.ExpireTime = DateTimeOffset.Now.AddSeconds(muteTime.TotalSeconds).ToUnixTimeSeconds();
@@ -220,6 +220,8 @@ namespace tMod64Bot.Services
             {
                 if (user.Roles.Any(x => x.Id == _configService.Config.MutedRole))
                     return TaskResult.FromError("User is already muted");
+                
+                await user.AddRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
                 
                 _configService.Config.MutedUsers.Add(new()
                 {
