@@ -210,7 +210,14 @@ namespace tMod64Bot.Services
                 return TaskResult.FromError("User is already muted");
 
             await user.AddRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
-            if (muteTime != TimeSpan.Zero && !_configService.Config.MutedUsers.Select(x => x.UserId).Contains(user.Id))
+            
+            if (_configService.Config.MutedUsers.Select(x => x.UserId).Contains(user.Id))
+            {
+                var entry = _configService.Config.MutedUsers.FirstOrDefault(x => x.UserId == user.Id);
+                entry.Reason = reason;
+                entry.ExpireTime = DateTimeOffset.Now.AddSeconds(muteTime.TotalSeconds).ToUnixTimeSeconds();
+            }
+            else if (muteTime != TimeSpan.Zero)
             {
                 _configService.Config.MutedUsers.Add(new()
                 {
