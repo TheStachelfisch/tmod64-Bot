@@ -286,16 +286,16 @@ namespace tMod64Bot.Services
                 if (_configService.Config.MutedRole == 0)
                     return TaskResult.FromError("No Muted-role has been assigned");
 
-                if (user.Roles.Any(x => x.Id == _configService.Config.MutedRole))
-                    await user.RemoveRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
-                else
-                    return TaskResult.FromError("User isn't muted");
-
                 if (_configService.Config.MutedUsers.Any(x => x.UserId == user.Id))
                 {
                     _configService.Config.MutedUsers.RemoveWhere(x => x.UserId == user.Id);
                     _configService.SaveData();
                 }
+                
+                if (user.Roles.Any(x => x.Id == _configService.Config.MutedRole))
+                    await user.RemoveRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
+                else
+                    return TaskResult.FromError("User wasn't muted");
             }
             catch (Exception e)
             {
