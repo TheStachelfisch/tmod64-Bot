@@ -113,7 +113,7 @@ namespace tMod64Bot.Services
             AddTimeSpan("s", i => temp += TimeSpan.FromSeconds(i));
             
             if (temp.TotalSeconds == 0) 
-                throw new ArgumentNullException(nameof(input), "Malformated string");
+                throw new ArgumentException("Malformated string or time is less than or equal to 0 seconds");
             if (temp.TotalSeconds < 60)
                 throw new ArgumentException("Time may not be less than 60 seconds");
 
