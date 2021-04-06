@@ -119,7 +119,7 @@ namespace tMod64Bot.Services
 
             void AddTimeSpan(string letter, Action<int> additionMethod)
             {
-                var match = Regex.Match(input, @"(\d|\d\d|\d\d\d)" + letter, RegexOptions.CultureInvariant);
+                var match = Regex.Match(input, @"(\d{1,6})" + letter, RegexOptions.CultureInvariant);
                 
                 if (match.Success)
                     additionMethod(int.Parse(match.Groups[1].Value));
