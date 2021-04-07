@@ -18,7 +18,7 @@ namespace tMod64Bot.Modules
                 Color = Color.Green,
                 Description = $"The bot was made by {MentionUtils.MentionUser(442639987180306432)}\n\n" +
                               $"Current Prefix **{ConfigService.Config.BotPrefix}**\n" +
-                              $"Current Bot uptime **{tMod64bot.GetUptime.FormatString(true)}min**\n" +
+                              $"Current Bot uptime **{tMod64bot.GetUptime.FormatString(true)}**\n" +
                               $"Amount of tags: {ConfigService.Config.Tags.Count}\n",
                 ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl()
             }.Build();
