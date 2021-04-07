@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using tMod64Bot.Utils;
 
 namespace tMod64Bot.Modules
 {
@@ -11,15 +12,13 @@ namespace tMod64Bot.Modules
         [Command("info")]
         public async Task BotInfo()
         {
-            decimal minuteUptime = Math.Round((decimal) tMod64bot.GetUptime / 60, 2);
-            
             Embed embed = new EmbedBuilder
             {
                 Title = "Bot Info",
                 Color = Color.Green,
                 Description = $"The bot was made by {MentionUtils.MentionUser(442639987180306432)}\n\n" +
                               $"Current Prefix **{ConfigService.Config.BotPrefix}**\n" +
-                              $"Current Bot uptime **{minuteUptime}min**\n" +
+                              $"Current Bot uptime **{tMod64bot.GetUptime.FormatString(true)}min**\n" +
                               $"Amount of tags: {ConfigService.Config.Tags.Count}\n",
                 ThumbnailUrl = Context.Client.CurrentUser.GetAvatarUrl()
             }.Build();
