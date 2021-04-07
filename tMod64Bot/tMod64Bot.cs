@@ -65,9 +65,10 @@ namespace tMod64Bot
             }
 
             _client.Ready += ReadyEvent;
-
+            
+#if DEBUG
             new Thread(HandleCmdLn).Start();
-
+#endif
             //Prevents Program from exiting without disposing services and disconnecting from gateway
             AppDomain.CurrentDomain.ProcessExit += (_, _) =>
             {
@@ -95,8 +96,8 @@ namespace tMod64Bot
 
         private void HandleCmdLn()
         {
-            var cmd = Console.ReadLine();
-
+            var cmd = Console.In.ReadLineAsync().GetAwaiter().GetResult();
+            
             while (!_stopToken.IsCancellationRequested)
             {
                 var args = cmd.Split(' ');
@@ -162,8 +163,6 @@ namespace tMod64Bot
                 {
                     Console.WriteLine(e);
                 }
-
-                cmd = Console.ReadLine();
             }
         }
 
