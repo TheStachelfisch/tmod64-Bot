@@ -95,10 +95,12 @@ namespace tMod64Bot
 
         private void HandleCmdLn()
         {
-            var cmd = Console.In.ReadLineAsync().GetAwaiter().GetResult();
+            var cmd = "";
             
             while (!_stopToken.IsCancellationRequested)
             {
+                cmd = Console.In.ReadLineAsync().GetAwaiter().GetResult();
+                
                 var args = cmd.Split(' ');
                 var index = 0;
                 try
