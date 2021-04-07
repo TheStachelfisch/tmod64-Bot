@@ -66,9 +66,8 @@ namespace tMod64Bot
 
             _client.Ready += ReadyEvent;
             
-#if DEBUG
             new Thread(HandleCmdLn).Start();
-#endif
+            
             //Prevents Program from exiting without disposing services and disconnecting from gateway
             AppDomain.CurrentDomain.ProcessExit += (_, _) =>
             {
@@ -171,19 +170,20 @@ namespace tMod64Bot
             _stopTokenSource.Cancel();
 
             _shuttingDown = true;
-
-            var stopTask = _client.StopAsync();
             
+            Stopwatch sw = Stopwatch.StartNew();
+
+            Task tS = Task.Run(() => _client.StopAsync());
+            tS.Wait();
+            
+            await _client.StopAsync();
+            
+            sw.Stop();
+            await _log.Log(LogSeverity.Info, LogSource.Self, $"Successfully Disconnected in {sw.ElapsedMilliseconds}ms");
             await _log.Log(LogSeverity.Info, LogSource.Self, $"Bot uptime was {GetUptime.FormatString(false)}");
 
-            var tD = _services.DisposeAsync();
-
-            Task.WaitAll(stopTask, tD.AsTask());
-#if DEBUG            
-            await Task.Delay(1000);
-#endif
-
-            Environment.Exit(0);
+            Task tD = Task.Run(() => _services.DisposeAsync());
+            tD.Wait();
         }
 
         private static async Task InitializeServicesAsync()
