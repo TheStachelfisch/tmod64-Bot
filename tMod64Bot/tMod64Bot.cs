@@ -231,7 +231,8 @@ namespace tMod64Bot
                 .AddSingleton<BotLoggingService>()
                 .AddSingleton<InviteProtectionService>()
                 .AddSingleton<StickyRolesHandler>()
-                .AddSingleton<TotalMemberService>();
+                .AddSingleton<TotalMemberService>()
+                .AddSingleton<LogService>();
 
             return _serviceCollection.BuildServiceProvider();
         }
