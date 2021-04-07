@@ -13,7 +13,7 @@ using tMod64Bot.Services.Logging;
 
 namespace tMod64Bot.Services
 {
-    public class ModerationService : ServiceBase
+    public class ModerationService : ServiceBase, IInitializeable
     {
         private Timer _timer;
         private readonly ConfigService _configService;
@@ -40,7 +40,7 @@ namespace tMod64Bot.Services
             _timer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
         }
 
-        public async Task InitializeAsync()
+        public async Task Initialize()
         {
             _timer.Elapsed += CheckIfExpired;
             _timer.Start();

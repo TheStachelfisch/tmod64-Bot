@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 
 namespace tMod64Bot.Services
 {
-    public class StickyRolesHandler : ServiceBase
+    public class StickyRolesHandler : ServiceBase, IInitializeable
     {
         private readonly ConfigService _configService;
         private readonly WebhookService _webhook;
@@ -20,7 +21,7 @@ namespace tMod64Bot.Services
             _webhook = services.GetRequiredService<WebhookService>();
         }
 
-        public async Task InitializeAsync()
+        public async Task Initialize()
         {
             Client.UserLeft += HandlerUserLeft;
             Client.UserJoined += HandleUserJoined;

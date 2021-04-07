@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
 using tMod64Bot.Services.Tag;
@@ -11,7 +12,7 @@ using tMod64Bot.Utils;
 
 namespace tMod64Bot.Services
 {
-    public sealed class CommandHandler : ServiceBase
+    public sealed class CommandHandler : ServiceBase, IInitializeable
     {
         private static readonly CommandError IGNORED_ERRORS = CommandError.BadArgCount | CommandError.UnknownCommand | CommandError.UnmetPrecondition | CommandError.ObjectNotFound;
 
@@ -26,7 +27,7 @@ namespace tMod64Bot.Services
             _config = services.GetRequiredService<ConfigService>();
         }
 
-        public async Task InitializeAsync()
+        public async Task Initialize()
         {
             Client.MessageReceived += HandleCommandAsync;
             

@@ -5,12 +5,13 @@ using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
 
 namespace tMod64Bot.Services
 {
-    public class ReactionRolesService : ServiceBase
+    public class ReactionRolesService : ServiceBase, IInitializeable
     {
         private readonly ConfigService _configService;
         private readonly LoggingService _loggingService;
@@ -21,7 +22,7 @@ namespace tMod64Bot.Services
             _loggingService = services.GetRequiredService<LoggingService>();
         }
 
-        public async Task InitializeAsync()
+        public async Task Initialize()
         {
             Client.ReactionAdded += HandleReactionAdded;
             Client.ReactionRemoved += HandleReactionRemoved;

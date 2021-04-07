@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 
 namespace tMod64Bot.Services
 {
-    public class InviteProtectionService : ServiceBase
+    public class InviteProtectionService : ServiceBase, IInitializeable
     {
         private ConfigService _configService;
         
@@ -21,7 +22,7 @@ namespace tMod64Bot.Services
             _configService = services.GetRequiredService<ConfigService>();
         }
 
-        public async Task InitializeAsync()
+        public async Task Initialize()
         {
             Client.MessageReceived += HandleMessage;
             Client.MessageUpdated += HandleEdit;

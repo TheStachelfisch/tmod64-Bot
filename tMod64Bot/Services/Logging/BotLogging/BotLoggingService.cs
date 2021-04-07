@@ -7,12 +7,13 @@ using Discord;
 using Discord.Webhook;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Utils;
 
 namespace tMod64Bot.Services.Logging.BotLogging
 {
-    public class BotLoggingService : ServiceBase
+    public class BotLoggingService : ServiceBase, IInitializeable
     {
         private readonly ConfigService _config;
         private readonly LoggingService _loggingService;
@@ -29,7 +30,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             _inviteProtectionService = services.GetRequiredService<InviteProtectionService>();
         }
 
-        public async Task InitializeAsync()
+        public async Task Initialize()
         {
             Client.UserJoined += HandleUserJoined;
             Client.UserLeft += HandleUserLeft;

@@ -8,10 +8,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord.Addons.Interactive;
 using tMod64Bot.Modules;
 using tMod64Bot.Services;
+using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
 using tMod64Bot.Services.Logging.BotLogging;
@@ -21,6 +23,9 @@ namespace tMod64Bot
 {
     internal sealed class tMod64bot
     {
+        private static CancellationTokenSource _stopTokenSource = new ();
+        private CancellationToken _stopToken = _stopTokenSource.Token;
+        
         private static readonly string GatewayToken = File.ReadAllText($@"{ServiceConstants.DATA_DIR}token.txt");
         
         internal static readonly ServiceProvider _services = BuildServiceProvider();
@@ -31,7 +36,6 @@ namespace tMod64Bot
         private Stopwatch _startUpStopwatch;
         private bool _shuttingDown;
         
-        private static bool _initialized;
         private static long _startUpTime;
 
         public static long GetUptime => DateTimeOffset.Now.ToUnixTimeSeconds() - _startUpTime;
@@ -46,9 +50,11 @@ namespace tMod64Bot
             
             await _client.LoginAsync(TokenType.Bot, GatewayToken);
             await _client.StartAsync();
-
-            _client.Ready += () =>
+            
+            Task ReadyEvent()
             {
+                _client.Ready -= ReadyEvent;
+                
                 InitializeServicesAsync().GetAwaiter().GetResult();
                 SetupAsync().GetAwaiter().GetResult();
 
@@ -58,12 +64,16 @@ namespace tMod64Bot
                     if (!_shuttingDown)
                         ShutdownAsync().GetAwaiter().GetResult();
                 };
+                
                 return Task.CompletedTask;
-            };
+            }
 
-            HandleCmdLn();
+            _client.Ready += ReadyEvent;
 
-            await ShutdownAsync();
+            new Thread(HandleCmdLn).Start();
+
+            try { await Task.Delay(-1, _stopToken); }
+            catch (TaskCanceledException e) { }
         }
 
         private async Task SetupAsync()
@@ -83,7 +93,8 @@ namespace tMod64Bot
         private void HandleCmdLn()
         {
             var cmd = Console.ReadLine();
-            while (cmd != "stop")
+
+            while (!_stopToken.IsCancellationRequested)
             {
                 var args = cmd.Split(' ');
                 var index = 0;
@@ -98,6 +109,9 @@ namespace tMod64Bot
                                 break;
                             case "clear":
                                 Console.Clear();
+                                break;
+                            case "stop":
+                                ShutdownAsync().GetAwaiter().GetResult();
                                 break;
                             case "commands":
                             {
@@ -152,42 +166,31 @@ namespace tMod64Bot
 
         private async Task ShutdownAsync()
         {
+            _stopTokenSource.Cancel();
+            
             // Calculating these in the String only returns Int64(Loss of precision)
             decimal minuteUptime = Math.Round((decimal)GetUptime / 60, 2);
             decimal hourUptime = Math.Round(minuteUptime / 60, 2);
             
             _shuttingDown = true;
-            
-            Stopwatch sw = Stopwatch.StartNew();
 
-            Task tS = Task.Run(() => _client.StopAsync());
-            tS.Wait();
+            var stopTask = _client.StopAsync();
             
-            await _client.StopAsync();
-            
-            sw.Stop();
-            await _log.Log(LogSeverity.Info, LogSource.Self, $"Successfully Disconnected in {sw.ElapsedMilliseconds}ms");
             await _log.Log(LogSeverity.Info, LogSource.Self, $"Bot uptime was {GetUptime}s or {minuteUptime}min or {hourUptime}h");
 
-            Task tD = Task.Run(() => _services.DisposeAsync());
-            tD.Wait();
+            var tD = _services.DisposeAsync();
+
+            Task.WaitAll(stopTask, tD.AsTask());
+
+            await Task.Delay(1000);
+            
+            Environment.Exit(0);
         }
 
         private static async Task InitializeServicesAsync()
         {
-            if (!_initialized)
-            {
-                await _services.GetRequiredService<CommandHandler>().InitializeAsync();
-                await _services.GetRequiredService<BotLoggingService>().InitializeAsync();
-                await _services.GetRequiredService<TotalMemberService>().InitializeAsync();
-                await _services.GetRequiredService<StickyRolesHandler>().InitializeAsync();
-                await _services.GetRequiredService<ReactionRolesService>().InitializeAsync();
-                await _services.GetRequiredService<ModerationService>().InitializeAsync();
-                await _services.GetRequiredService<InviteProtectionService>().InitializeAsync();
-                await _services.GetRequiredService<BadWordHandler>().InitializeAsync();
-
-                _initialized = true;
-            }
+            foreach (var initializeable in _services.GetServices<IInitializeable>())
+                await initializeable.Initialize();
         }
 
         private static ServiceProvider BuildServiceProvider() => new ServiceCollection()

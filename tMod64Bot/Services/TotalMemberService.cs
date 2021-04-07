@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using System.Timers;
 using Discord;
+using tMod64Bot.Services.Commons;
 
 namespace tMod64Bot.Services
 {
-    public class TotalMemberService : ServiceBase, IDisposable
+    public class TotalMemberService : ServiceBase, IDisposable, IInitializeable
     {
         private Timer timer;
         
@@ -27,7 +28,7 @@ namespace tMod64Bot.Services
             timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
         }
 
-        public async Task InitializeAsync()
+        public async Task Initialize()
         {
             timer.Elapsed += UpdateStatus;
             timer.Start();
