@@ -180,9 +180,10 @@ namespace tMod64Bot
             var tD = _services.DisposeAsync();
 
             Task.WaitAll(stopTask, tD.AsTask());
-
+#if DEBUG            
             await Task.Delay(1000);
-            
+#endif
+
             Environment.Exit(0);
         }
 
