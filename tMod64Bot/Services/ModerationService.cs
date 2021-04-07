@@ -17,8 +17,7 @@ namespace tMod64Bot.Services
     {
         private Timer _timer;
         private readonly ConfigService _configService;
-        private readonly LoggingService _loggingService;
-        
+
         public delegate void BanEventHandler(IUser user, SocketGuildUser moderator, SocketGuild guild, string reason);
         public delegate void UnbanEventHandler(ulong userId, SocketGuildUser moderator, SocketGuild guild);
         public delegate void TempBanEventHandler(IUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan banTime, string reason);
@@ -34,8 +33,7 @@ namespace tMod64Bot.Services
         public ModerationService(IServiceProvider services) : base(services)
         {
             _configService = services.GetRequiredService<ConfigService>();
-            _loggingService = services.GetRequiredService<LoggingService>();
-            
+
             _timer = new();
             _timer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
         }
