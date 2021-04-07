@@ -61,13 +61,6 @@ namespace tMod64Bot
                 InitializeServicesAsync().GetAwaiter().GetResult();
                 SetupAsync().GetAwaiter().GetResult();
 
-                //Prevents Program from exiting without disposing services and disconnecting from gateway
-                AppDomain.CurrentDomain.ProcessExit += (_, _) =>
-                {
-                    if (!_shuttingDown)
-                        ShutdownAsync().GetAwaiter().GetResult();
-                };
-                
                 return Task.CompletedTask;
             }
 
@@ -75,6 +68,13 @@ namespace tMod64Bot
 
             new Thread(HandleCmdLn).Start();
 
+            //Prevents Program from exiting without disposing services and disconnecting from gateway
+            AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+            {
+                if (!_shuttingDown)
+                    ShutdownAsync().GetAwaiter().GetResult();
+            };
+            
             try { await Task.Delay(-1, _stopToken); }
             catch (TaskCanceledException e) { }
         }
