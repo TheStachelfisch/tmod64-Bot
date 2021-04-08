@@ -47,7 +47,7 @@ namespace tMod64Bot.Services
                     Embed embed = new EmbedBuilder
                     {
                         Color = Color.Green,
-                        Description = $"[Automatically generated paste]({link}) for [message]({message.GetJumpUrl()})",
+                        Description = $"[Automatically generated paste]({link}))",
                         Author = new EmbedAuthorBuilder
                         {
                             Name = $"Pastebin for {message.Author}"
