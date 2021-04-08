@@ -47,14 +47,14 @@ namespace tMod64Bot.Services
                     Embed embed = new EmbedBuilder
                     {
                         Color = Color.Green,
-                        Description = $"[Automatically generated paste]({link}))",
+                        Description = $"[Automatically generated paste]({link})",
                         Author = new EmbedAuthorBuilder
                         {
                             Name = $"Pastebin for {message.Author}"
                         }
                     }.WithCurrentTimestamp().Build();
 
-                    await message.Channel.SendMessageAsync(embed: embed, messageReference: message.Reference);
+                    await (message as IUserMessage).ReplyAsync(embed: embed, allowedMentions:AllowedMentions.None);
                 }
             }
         }
