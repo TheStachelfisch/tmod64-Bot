@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using tMod64Bot.Services.Commons;
@@ -52,7 +54,7 @@ namespace tMod64Bot.Services
                         }
                     }.WithCurrentTimestamp().Build();
 
-                    await message.Channel.SendMessageAsync(embed: embed);
+                    await message.Channel.SendMessageAsync(embed: embed, messageReference: message.Reference);
                 }
             }
         }
