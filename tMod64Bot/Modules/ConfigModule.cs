@@ -18,7 +18,7 @@ namespace tMod64Bot.Modules
         IEnumerable<FieldInfo> fields = typeof(Config).GetFields().Where(x => !x.FieldType.ToString().Contains("System.Collections.Generic"));
         
         [Command("change"), Alias("update", "edit", "set")]
-        public async Task ChangeValue(string key, string value)
+        public async Task ChangeValue(string key, [Remainder]string value)
         {
             try
             {
