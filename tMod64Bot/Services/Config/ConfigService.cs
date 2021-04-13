@@ -130,6 +130,7 @@ namespace tMod64Bot.Services.Config
                     BannedWordsExemptChannel = new HashSet<ulong>(),
                     ExemptInvites = new HashSet<string>(),
                     BotPrefix = "64!",
+                    WelcomeMessage = "",
                     
                     MessageOnBan = true,
                     MessageOnKick = true,

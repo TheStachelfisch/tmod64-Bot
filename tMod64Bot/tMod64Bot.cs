@@ -91,6 +91,12 @@ namespace tMod64Bot
             await _log.Log($"Loaded {modules.Count()} modules and {modules.Sum(m => m.Commands.Count)}" +
                            $" commands in {sw.ElapsedMilliseconds}ms.");
             await _log.Log($"Completed Startup in {_startUpStopwatch.ElapsedMilliseconds}ms");
+
+            new System.Timers.Timer(TimeSpan.FromMinutes(1).TotalMilliseconds)
+            {
+                AutoReset = true,
+                Enabled = true
+            }.Elapsed += async (_, _) => { await _client.SetActivityAsync(new MemberActivity(_client)); };
         }
 
         private void HandleCmdLn()
@@ -233,7 +239,7 @@ namespace tMod64Bot
                 .AddSingleton<BotLoggingService>()
                 .AddSingleton<InviteProtectionService>()
                 .AddSingleton<StickyRolesHandler>()
-                .AddSingleton<TotalMemberService>()
+                .AddSingleton<WelcomeService>()
                 .AddSingleton<LogService>();
 
             return _serviceCollection.BuildServiceProvider();

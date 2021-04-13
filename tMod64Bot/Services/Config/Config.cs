@@ -18,6 +18,7 @@ namespace tMod64Bot.Services.Config
         public HashSet<string> ExemptInvites;
 
         public string BotPrefix;
+        public string WelcomeMessage;
 
         [Space]
         
