@@ -8,6 +8,7 @@ using Discord.Rest;
 using Discord.WebSocket;
 using Newtonsoft.Json.Linq;
 using tMod64Bot.Services.Commons;
+using tMod64Bot.Utils;
 
 namespace tMod64Bot.Services
 {
@@ -31,30 +32,38 @@ namespace tMod64Bot.Services
             // ReSharper disable once PatternAlwaysOfType
             if (message.Attachments.Count == 1 && message.Attachments.ElementAt(0) is Attachment attachment)
             {
-                if (attachment.Filename.EndsWith(".log") && attachment.Size < 80000)
+                if (attachment.Filename.EndsWith(".log"))
                 {
-                    string link;
+                    if (attachment.Size < 80000)
+                    {
+                                            
+                        string link;
                     
-                    using (var client = new HttpClient())
-                    {
-                        var logContents = await client.GetStringAsync(attachment.Url);
-
-                        var response = await client.PostAsync("https://paste.mod.gg/documents", new StringContent(logContents));
-
-                        link = $"https://paste.mod.gg/{JObject.Parse(await response.Content.ReadAsStringAsync())["key"]!}";
-                    }
-
-                    Embed embed = new EmbedBuilder
-                    {
-                        Color = Color.Green,
-                        Description = $"[Automatically generated paste]({link})",
-                        Author = new EmbedAuthorBuilder
+                        using (var client = new HttpClient())
                         {
-                            Name = $"Pastebin for {message.Author}"
-                        }
-                    }.WithCurrentTimestamp().Build();
+                            var logContents = await client.GetStringAsync(attachment.Url);
 
-                    await (message as IUserMessage).ReplyAsync(embed: embed, allowedMentions:AllowedMentions.None);
+                            var response = await client.PostAsync("https://paste.mod.gg/documents", new StringContent(logContents));
+
+                            link = $"https://paste.mod.gg/{JObject.Parse(await response.Content.ReadAsStringAsync())["key"]!}";
+                        }
+
+                        Embed embed = new EmbedBuilder
+                        {
+                            Color = Color.Green,
+                            Description = $"[Automatically generated paste]({link})",
+                            Author = new EmbedAuthorBuilder
+                            {
+                                Name = $"Pastebin for {message.Author}"
+                            }
+                        }.WithCurrentTimestamp().Build();
+
+                        await (message as IUserMessage).ReplyAsync(embed: embed, allowedMentions:AllowedMentions.None);   
+                    }
+                    else
+                    {
+                        await (message as IUserMessage).ReplyAsync(embed: EmbedHelper.ErrorEmbed("paste.mod.gg max file size is 80kb"), allowedMentions:AllowedMentions.None);
+                    }
                 }
             }
         }

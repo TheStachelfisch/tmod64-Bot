@@ -230,6 +230,10 @@ namespace tMod64Bot.Services
                 });
                 _configService.SaveData();
             }
+            else if (muteTime == TimeSpan.Zero)
+            {
+                await user.AddRoleAsync(user.Guild.GetRole(_configService.Config.MutedRole));
+            }
             
             UserMuted?.Invoke(user, moderator, moderator.Guild, reason, muteTime);
             
