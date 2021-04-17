@@ -31,7 +31,7 @@ namespace tMod64Bot.Services
             // ReSharper disable once PatternAlwaysOfType
             if (message.Attachments.Count == 1 && message.Attachments.ElementAt(0) is Attachment attachment)
             {
-                if (attachment.Filename.EndsWith(".log") && attachment.Size < 80000)
+                if (attachment.Filename.EndsWith(".log") && attachment.Size < 300000)
                 {
                     string link;
                     
