@@ -127,7 +127,6 @@ namespace tMod64Bot.Modules
         [Command("mute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        [Priority(5)]
         public async Task MuteAsync([RequiresHierarchy]SocketGuildUser user, string? duration = null, [Remainder] string reason = "No Reason provided")
         {
             var span = duration == null ? TimeSpan.Zero : ModerationService.GetTimeSpan(duration);
@@ -164,6 +163,7 @@ namespace tMod64Bot.Modules
         [Command("mute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
+        [Priority(5)]
         public async Task MuteAsync([RequiresHierarchy] SocketGuildUser user, [Remainder] string reason = "No Reason provided") 
             => await MuteAsync(user, null, reason);
 
