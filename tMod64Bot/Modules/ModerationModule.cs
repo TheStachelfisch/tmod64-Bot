@@ -127,8 +127,7 @@ namespace tMod64Bot.Modules
         [Command("mute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        [Priority(5)]
-        public async Task MuteAsync([RequiresHierarchy]SocketGuildUser user, string? duration = null, [Remainder] string reason = "No Reason provided")
+        public async Task MuteAsync([RequiresHierarchy]SocketGuildUser user, string? duration, [Remainder] string reason = "No Reason provided")
         {
             var span = duration == null ? TimeSpan.Zero : ModerationService.GetTimeSpan(duration);
             
@@ -164,8 +163,21 @@ namespace tMod64Bot.Modules
         [Command("mute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task MuteAsync([RequiresHierarchy] SocketGuildUser user, [Remainder] string reason = "No Reason provided") 
-            => await MuteAsync(user, null, reason);
+        [Priority(5)]
+        public async Task MuteAsync([RequiresHierarchy] SocketGuildUser user, [Remainder] string reason = "No Reason provided")
+        {
+            try
+            {
+                ModerationService.GetTimeSpan(reason.Split(' ')[0]);
+            }
+            catch (Exception e)
+            {
+                await MuteAsync(user, null, reason);
+                return;
+            }
+
+            await MuteAsync(user, reason.Split(' ')[0], reason.Substring(1));
+        }
 
         [Command("unmute")]
         [RequireBotPermission(GuildPermission.ManageRoles)]
@@ -174,7 +186,7 @@ namespace tMod64Bot.Modules
         {
             if (user.Id == Context.User.Id)
             {
-                await ReplyAsync("Look at this looser trying to unmute himself");
+                await ReplyAsync("Look at this loser trying to unmute himself");
                 return;
             }
 
