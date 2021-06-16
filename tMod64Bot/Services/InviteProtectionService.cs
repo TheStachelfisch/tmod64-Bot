@@ -97,6 +97,6 @@ namespace tMod64Bot.Services
 
         public Match ContainsInvite(string message) => Regex.Match(message, @"(?<![\w\d])(discord\.gg\/\w{1,20}|discord\.com\/invite\/\w{1,20})(?![\w\d])");
         
-        public Group GetInviteId(string message) => Regex.Match(message, @"\/(\w{1,20}$)").Groups[1];
+        public Group GetInviteId(string message) => Regex.Match(message, @"\/(\w{1,20})\040").Groups[1];
     }
 }
