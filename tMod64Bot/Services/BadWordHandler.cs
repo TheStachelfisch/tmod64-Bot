@@ -13,7 +13,7 @@ namespace tMod64Bot.Services
     {
         private readonly ConfigService _configService;
         private readonly ModerationService _moderationService;
-        
+
         public BadWordHandler(IServiceProvider services) : base(services)
         {
             _configService = services.GetRequiredService<ConfigService>();
@@ -53,29 +53,26 @@ namespace tMod64Bot.Services
         private async Task HandleBadWordMessage(SocketMessage message)
         {
             var user = message.Author as SocketGuildUser;
-            
+
             if (message.Author.IsBot || message.Author.IsWebhook || (message.Author as SocketGuildUser)!.GuildPermissions.Administrator || String.Join(' ', user.Roles.Select(x => x.Name)).ToLower().ContainsAny("support staff", "moderator"))
                 return;
 
             if (ContainsBadWord(message.Content.ToLower(), out string word))
             {
-                _ = Task.Run(async () =>
+                await message.DeleteAsync();
+
+                var embed = new EmbedBuilder
                 {
-                    await message.DeleteAsync();
+                    Title = "Kicked due to possible scam bot",
+                    Description = $"Your message was removed from #{message.Channel.Name} and you were kicked from tModLoader 64 bit, because it contained a possibly malicious word\n\n",
+                    Color = Color.Orange
+                };
 
-                    var embed = new EmbedBuilder
-                    {
-                        Title = "Kicked due to possible scam bot",
-                        Description = $"Your message was removed from #{message.Channel.Name} and you were kicked from tModLoader 64 bit, because it contained a possibly malicious word\n\n",
-                        Color = Color.Orange
-                    };
+                embed.WithCurrentTimestamp();
 
-                    embed.WithCurrentTimestamp();
-
-                    await message.Author.SendMessageAsync($"If you believe this was falsely done, then please join the server again and ping TheStachelfisch#0395.\n\n https://discord.gg/DY8cx5T", embed: embed.Build());
-                    // This is a fucking mess, ignore all of this
-                    await _moderationService.KickUser(user, user.Guild.GetUser(Client.CurrentUser.Id), "Possible scam bot", $"Possible scam bot\n\n{message.Content}");
-                });
+                await message.Author.SendMessageAsync($"If you believe this was falsely done, then please join the server again and ping TheStachelfisch#0395.\n\n https://discord.gg/DY8cx5T", embed: embed.Build());
+                // This is a fucking mess, ignore all of this
+                await _moderationService.KickUser(user, user.Guild.GetUser(Client.CurrentUser.Id), "Possible scam bot", $"Possible scam bot\n\n{message.Content}");
             }
         }
 
