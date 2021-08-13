@@ -12,19 +12,21 @@ namespace tMod64Bot.Services
     public class BadWordHandler : ServiceBase, IInitializeable
     {
         private readonly ConfigService _configService;
+        private readonly ModerationService _moderationService;
         
         public BadWordHandler(IServiceProvider services) : base(services)
         {
             _configService = services.GetRequiredService<ConfigService>();
+            _moderationService = services.GetRequiredService<ModerationService>();
         }
 
         public async Task Initialize()
         {
             Client.MessageReceived += HandleBadWordMessage;
-            Client.MessageUpdated += HandleBadWordMessageEdit;
+            // Client.MessageUpdated += HandleBadWordMessageEdit;
         }
 
-        private async Task HandleBadWordMessageEdit(Cacheable<IMessage, ulong> oldMessage, SocketMessage message, ISocketMessageChannel channel)
+        /*private async Task HandleBadWordMessageEdit(Cacheable<IMessage, ulong> oldMessage, SocketMessage message, ISocketMessageChannel channel)
         {
             var user = message.Author as SocketGuildUser;
             
@@ -46,7 +48,7 @@ namespace tMod64Bot.Services
                 
                 await message.Author.SendMessageAsync(embed: embed.Build());
             }
-        }
+        }*/
 
         private async Task HandleBadWordMessage(SocketMessage message)
         {
@@ -61,14 +63,15 @@ namespace tMod64Bot.Services
 
                 var embed = new EmbedBuilder
                 {
-                    Title = "Message Removed",
-                    Description = $"Your message was removed from #{message.Channel.Name}, because it contained a banned word\n\n**Message**: {message.Content}\n**Banned Word**: {word}",
+                    Title = "Kicked due to possible scam bot",
+                    Description = $"Your message was removed from #{message.Channel.Name} and you were kicked from tModLoader 64 bit, because it contained a possibly malicious word\n\n",
                     Color = Color.Orange
                 };
 
                 embed.WithCurrentTimestamp();
                 
-                await message.Author.SendMessageAsync(embed: embed.Build());
+                await message.Author.SendMessageAsync($"If you believe this was falsely done, then please join the server again and ping TheStachelfisch#0395.\n\n https://discord.gg/DY8cx5T", embed: embed.Build());
+                await _moderationService.KickUser(user, null, "Possible scam bot");
             }
         }
 
