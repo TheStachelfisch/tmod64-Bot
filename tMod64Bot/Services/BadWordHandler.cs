@@ -64,16 +64,16 @@ namespace tMod64Bot.Services
                 var embed = new EmbedBuilder
                 {
                     Title = "Kicked due to possible scam bot",
-                    Description = $"Your message was removed from #{message.Channel.Name} and you were kicked from tModLoader 64 bit, because it contained a possibly malicious word",
+                    Description = $"Your message was removed from #{message.Channel.Name} and you were kicked from tModLoader 64 bit, because it contained a word that is often used in scam messages.\nIf you believe this was falsely done, then please join the server again and report the error to TheStachelfisch#0395.\n\nhttps://discord.gg/DY8cx5T",
                     Color = Color.Orange
                 };
 
                 embed.WithCurrentTimestamp();
 
-                await message.Author.SendMessageAsync($"If you believe this was falsely done, then please join the server again and ping TheStachelfisch#0395.\n\n https://discord.gg/DY8cx5T", embed: embed.Build());
+                await user.SendMessageAsync(embed: embed.Build());
                 await user.KickAsync("Possible scam bot").ConfigureAwait(false);
                 // This is a fucking mess, ignore all of this
-                _moderationService.InvokeKick(user, user.Guild.GetUser(Client.CurrentUser.Id), user.Guild, $"Possible scam bot\n\n{message.Content}");
+                _moderationService.InvokeKick(user, user.Guild.GetUser(Client.CurrentUser.Id), user.Guild, $"Possible scam bot.\n\n\"{message.Content}\"");
             }
         }
 
