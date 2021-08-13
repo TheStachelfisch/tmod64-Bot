@@ -22,7 +22,7 @@ namespace tMod64Bot.Services
         public delegate void UnbanEventHandler(ulong userId, SocketGuildUser moderator, SocketGuild guild);
         public delegate void TempBanEventHandler(IUser user, SocketGuildUser moderator, SocketGuild guild, TimeSpan banTime, string reason);
         public delegate void MuteEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, TimeSpan muteTime);
-        public delegate void KickEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason);
+        public delegate void KickEventHandler(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, string moderationLogReason = "");
         public event BanEventHandler UserBanned;
         public event KickEventHandler UserKicked;
         public event UnbanEventHandler UserUnbanned;
@@ -402,7 +402,7 @@ namespace tMod64Bot.Services
             try { await user.KickAsync(reason); }
             catch (Exception e) { return TaskResult.FromError(e.Message); }
             
-            UserKicked?.Invoke(user, moderator, moderator.Guild, reason);
+            UserKicked?.Invoke(user, moderator, moderator.Guild, reason, moderationLogReason);
             
             if (_configService.Config.MessageOnKick)
             {
@@ -415,7 +415,7 @@ namespace tMod64Bot.Services
                 embed.AddField(new EmbedFieldBuilder
                 {
                     Name = "Reason",
-                    Value = moderationLogReason.IsNullOrWhitespace() ? reason : moderationLogReason,
+                    Value = reason,
                     IsInline = true
                 });
                 if (_configService.Config.MessageWithModerator)

@@ -114,7 +114,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async void HandleUserKicked(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
+        private async void HandleUserKicked(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, string moderationLogReason)
         {
             if (_config.Config.ModerationLoggingChannel == 0)
                 return;
@@ -133,7 +133,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 fields.Add(new EmbedFieldBuilder
                 {
                     Name = "Reason",
-                    Value = reason,
+                    Value = moderationLogReason.IsNullOrWhitespace() ? reason : moderationLogReason,
                     IsInline = true
                 });
                 fields.Add(new EmbedFieldBuilder
