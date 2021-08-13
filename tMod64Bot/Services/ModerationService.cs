@@ -397,7 +397,7 @@ namespace tMod64Bot.Services
             return TaskResult.FromSuccess();
         }
 
-        public async Task<TaskResult> KickUser(SocketGuildUser user, SocketGuildUser moderator, string reason)
+        public async Task<TaskResult> KickUser(SocketGuildUser user, SocketGuildUser moderator, string reason, string moderationLogReason = "")
         {
             try { await user.KickAsync(reason); }
             catch (Exception e) { return TaskResult.FromError(e.Message); }
@@ -415,7 +415,7 @@ namespace tMod64Bot.Services
                 embed.AddField(new EmbedFieldBuilder
                 {
                     Name = "Reason",
-                    Value = reason,
+                    Value = moderationLogReason.IsNullOrWhitespace() ? reason : moderationLogReason,
                     IsInline = true
                 });
                 if (_configService.Config.MessageWithModerator)
