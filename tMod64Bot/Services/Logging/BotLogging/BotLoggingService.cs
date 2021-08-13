@@ -139,7 +139,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                 fields.Add(new EmbedFieldBuilder
                 {
                     Name = "Moderator",
-                    Value = moderator.ToString(),
+                    Value = moderator.ToString() ?? "No moderator",
                     IsInline = true
                 });
                 

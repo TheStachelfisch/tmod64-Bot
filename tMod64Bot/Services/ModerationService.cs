@@ -30,6 +30,12 @@ namespace tMod64Bot.Services
         public event MuteEventHandler UserMuted;
         public event MuteEventHandler UserUnMuted;
 
+        public Task InvokeUserKicked(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason)
+        {
+            UserKicked?.Invoke(user, moderator, guild, reason);
+            return Task.CompletedTask;
+        }
+        
         public ModerationService(IServiceProvider services) : base(services)
         {
             _configService = services.GetRequiredService<ConfigService>();
