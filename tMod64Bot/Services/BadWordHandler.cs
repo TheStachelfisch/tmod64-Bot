@@ -71,8 +71,7 @@ namespace tMod64Bot.Services
                 embed.WithCurrentTimestamp();
                 
                 await message.Author.SendMessageAsync($"If you believe this was falsely done, then please join the server again and ping TheStachelfisch#0395.\n\n https://discord.gg/DY8cx5T", embed: embed.Build());
-                await user.KickAsync("Possible scam bot");
-                await _moderationService.InvokeUserKicked(message.Author, null, user.Guild, "Possible scam bot");
+                await _moderationService.KickUser(user, null, "Possible scam bot");
             }
         }
 
