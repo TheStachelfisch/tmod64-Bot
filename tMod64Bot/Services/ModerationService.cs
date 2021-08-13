@@ -38,6 +38,11 @@ namespace tMod64Bot.Services
             _timer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
         }
 
+        public void InvokeKick(SocketUser user, SocketGuildUser moderator, SocketGuild guild, string reason, string moderationLogReason = "")
+        {
+            UserKicked?.Invoke(user, moderator, guild, reason, moderationLogReason = "");
+        }
+        
         public async Task Initialize()
         {
             _timer.Elapsed += CheckIfExpired;
