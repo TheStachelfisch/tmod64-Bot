@@ -34,7 +34,7 @@ namespace tMod64Bot.Services
             {
                 if (attachment.Filename.EndsWith(".log"))
                 {
-                    if (attachment.Size < 80000)
+                    if (attachment.Size < 120000)
                     {
                                             
                         string link;
@@ -43,9 +43,9 @@ namespace tMod64Bot.Services
                         {
                             var logContents = await client.GetStringAsync(attachment.Url);
 
-                            var response = await client.PostAsync("https://paste.mod.gg/documents", new StringContent(logContents));
+                            var response = await client.PostAsync("https://hastebin.com/documents", new StringContent(logContents));
 
-                            link = $"https://paste.mod.gg/{JObject.Parse(await response.Content.ReadAsStringAsync())["key"]!}";
+                            link = $"https://hastebin.com/{JObject.Parse(await response.Content.ReadAsStringAsync())["key"]!}";
                         }
 
                         Embed embed = new EmbedBuilder
@@ -54,7 +54,7 @@ namespace tMod64Bot.Services
                             Description = $"[Automatically generated paste]({link})",
                             Author = new EmbedAuthorBuilder
                             {
-                                Name = $"Pastebin for {message.Author}"
+                                Name = $"Hastebin for {message.Author}"
                             }
                         }.WithCurrentTimestamp().Build();
 
@@ -62,7 +62,7 @@ namespace tMod64Bot.Services
                     }
                     else
                     {
-                        await (message as IUserMessage).ReplyAsync(embed: EmbedHelper.ErrorEmbed("paste.mod.gg max file size is 80kb"), allowedMentions:AllowedMentions.None);
+                        await (message as IUserMessage).ReplyAsync(embed: EmbedHelper.ErrorEmbed("Log exceeds max file size for hastebin.com"), allowedMentions:AllowedMentions.None);
                     }
                 }
             }
