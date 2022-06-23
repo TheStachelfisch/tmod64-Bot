@@ -43,9 +43,9 @@ namespace tMod64Bot.Services
                         {
                             var logContents = await client.GetStringAsync(attachment.Url);
 
-                            var response = await client.PostAsync("https://hastebin.com/documents", new StringContent(logContents));
+                            var response = await client.PostAsync("https://hst.sh/documents", new StringContent(logContents));
 
-                            link = $"https://hastebin.com/{JObject.Parse(await response.Content.ReadAsStringAsync())["key"]!}";
+                            link = $"https://hst.sh/{JObject.Parse(await response.Content.ReadAsStringAsync())["key"]!}";
                         }
 
                         Embed embed = new EmbedBuilder
@@ -62,7 +62,7 @@ namespace tMod64Bot.Services
                     }
                     else
                     {
-                        await (message as IUserMessage).ReplyAsync(embed: EmbedHelper.ErrorEmbed("Log exceeds max file size for hastebin.com"), allowedMentions:AllowedMentions.None);
+                        await (message as IUserMessage).ReplyAsync(embed: EmbedHelper.ErrorEmbed("Log exceeds max file size fot hst.sh"), allowedMentions:AllowedMentions.None);
                     }
                 }
             }
