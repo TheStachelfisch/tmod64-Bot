@@ -20,8 +20,6 @@ using tMod64Bot.Services.Logging.BotLogging;
 using tMod64Bot.Services.Tag;
 using tMod64Bot.Utils;
 
-#pragma warning disable 8618
-
 namespace tMod64Bot
 {
     // ReSharper disable once InconsistentNaming
