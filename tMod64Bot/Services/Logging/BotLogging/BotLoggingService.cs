@@ -346,7 +346,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
         
-        private async Task HandleUserLeft(SocketGuildUser user)
+        private async Task HandleUserLeft(SocketGuild guild, SocketUser user, Task task)
         {
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
@@ -356,7 +356,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             var fixedDate = DateTimeOffset.Now - user.JoinedAt!.Value;
             string description = "";
 
-            if (fixedDate.Days == 0 && fixedDate.Days == 0 && fixedDate.Hours == 0 && fixedDate.Minutes == 0)
+            if (fixedDate.Days == 0 && fixedDate.Hours == 0 && fixedDate.Minutes == 0)
                 description = $"Joined {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
             else if (fixedDate.Days == 0 && fixedDate.Hours == 0)
                 description = $"Joined {fixedDate.Minutes} {(fixedDate.Minutes == 1 ? "Minute" : "Minutes")} and {fixedDate.Seconds} {(fixedDate.Seconds == 1 ? "Second" : "Seconds")} ago";
@@ -380,7 +380,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
                     {
                         Text = $"id: {user.Id}"
                     },
-                    Timestamp = user.JoinedAt
+                    Timestamp = user.JoinedAt().ToListAsync
                 };
 
                 embed.WithAuthor(user);
@@ -536,7 +536,7 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async Task HandleDeletedMessage(Cacheable<IMessage, ulong> messageBefore, ISocketMessageChannel channel)
+        private async Task HandleDeletedMessage(Cacheable<IMessage, ulong> messageBefore, Cacheable<IMessageChannel ,ulong> channel, Task task)
         {
             if (messageBefore.HasValue && (messageBefore.Value.Author.IsWebhook || messageBefore.Value.Embeds.Any()))
                 return;
