@@ -64,9 +64,10 @@ namespace tMod64Bot
             }
 
             _client.Ready += ReadyEvent;
-            
-            new Thread(HandleCmdLn).Start();
-            
+
+            if (Environment.GetEnvironmentVariable("DISABLE_CONSOLE") != null)
+                new Thread(HandleCmdLn).Start();
+
             //Prevents Program from exiting without disposing services and disconnecting from gateway
             AppDomain.CurrentDomain.ProcessExit += (_, _) =>
             {
