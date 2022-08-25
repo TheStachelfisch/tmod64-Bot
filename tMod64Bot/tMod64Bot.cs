@@ -10,7 +10,6 @@ using System.Reflection;
 using System.Runtime.Caching;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.Addons.Interactive;
 using tMod64Bot.Modules;
 using tMod64Bot.Services;
 using tMod64Bot.Services.Commons;
@@ -30,7 +29,7 @@ namespace tMod64Bot
         private static CancellationTokenSource _stopTokenSource = new ();
         private CancellationToken _stopToken = _stopTokenSource.Token;
         
-        private static readonly string GatewayToken = File.ReadAllText($@"{ServiceConstants.DATA_DIR}token.txt");
+        private static readonly string? GatewayToken = File.Exists($@"{ServiceConstants.DATA_DIR}token.txt") ? File.ReadAllText($@"{ServiceConstants.DATA_DIR}token.txt") : Environment.GetEnvironmentVariable("TOKEN");
 
         private static IServiceCollection _serviceCollection;
         
@@ -211,8 +210,8 @@ namespace tMod64Bot
 #else
                     LogLevel = LogSeverity.Info,
 #endif
-                    ExclusiveBulkDelete = true,
                     UseSystemClock = true,
+                    GatewayIntents = GatewayIntents.All,
                     DefaultRetryMode = RetryMode.RetryRatelimit,
                     AlwaysDownloadUsers = true,
                     ConnectionTimeout = 30000,
@@ -230,7 +229,6 @@ namespace tMod64Bot
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<LoggingService>()
                 .AddSingleton<WebhookService>()
-                .AddSingleton<InteractiveService>()
                 .AddSingleton<TagService>()
                 .AddSingleton<ConfigService>()
                 .AddSingleton<BadWordHandler>()

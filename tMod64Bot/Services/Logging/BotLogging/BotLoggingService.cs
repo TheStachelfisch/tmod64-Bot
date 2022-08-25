@@ -49,13 +49,14 @@ namespace tMod64Bot.Services.Logging.BotLogging
             _inviteProtectionService.InviteDeleted += HandleInviteDeleted;
         }
 
-        private async Task HandleGuildMemberUpdated(SocketGuildUser userBefore, SocketGuildUser userAfter)
+        private async Task HandleGuildMemberUpdated(Cacheable<SocketGuildUser, ulong> cacheable, SocketGuildUser userAfter)
         {
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
-            if (userLoggingChannel == 0 || !_config.Config.LogUserUpdated)
+            if (userLoggingChannel == 0 || !_config.Config.LogUserUpdated || !cacheable.HasValue)
                 return;
-            
+
+            var userBefore = cacheable.Value;
             if (userBefore.Nickname != userAfter.Nickname)
             {
                 using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
@@ -346,8 +347,9 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
         
-        private async Task HandleUserLeft(SocketGuildUser user)
+        private async Task HandleUserLeft(SocketGuild socketGuild, SocketUser socketUser)
         {
+            var user = socketUser as SocketGuildUser;
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
             if (userLoggingChannel == 0 || !_config.Config.LogUserLeft)
@@ -536,18 +538,18 @@ namespace tMod64Bot.Services.Logging.BotLogging
             }
         }
 
-        private async Task HandleDeletedMessage(Cacheable<IMessage, ulong> messageBefore, ISocketMessageChannel channel)
+        private async Task HandleDeletedMessage(Cacheable<IMessage, ulong> messageBefore, Cacheable<IMessageChannel, ulong> cacheable)
         {
-            if (messageBefore.HasValue && (messageBefore.Value.Author.IsWebhook || messageBefore.Value.Embeds.Any()))
+            if (messageBefore.HasValue && (messageBefore.Value.Author.IsWebhook || messageBefore.Value.Embeds.Any()) || !cacheable.HasValue)
                 return;
 
+            var channel = cacheable.Value;
             var userLoggingChannel = _config.Config.UserLoggingChannel;
 
             if (userLoggingChannel == 0 || !_config.Config.LogMessageDeleted)
                 return;
             using var client = new DiscordWebhookClient(_webhook.GetOrCreateWebhook(userLoggingChannel));
             {
-                // Conditional Operator go brrrrrrr
                 EmbedBuilder embed = new()
                 {
                     Title = $"Message Deleted from #{channel.Name}",

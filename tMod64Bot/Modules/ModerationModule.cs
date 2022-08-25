@@ -103,6 +103,12 @@ namespace tMod64Bot.Modules
                 return;
             }
 
+            if (span == TimeSpan.Zero)
+            {
+                await ReplyAsync(embed: EmbedHelper.ErrorEmbed("Missing tempban time"));
+                return;
+            }
+            
             try
             {
                 var success = await Services.GetRequiredService<ModerationService>().TempBanUser(user, (SocketGuildUser)Context.User, span, reason);
@@ -257,7 +263,7 @@ namespace tMod64Bot.Modules
             else
             {
                 await channel.DeleteMessagesAsync(filteredMessages);
-                await ReplyAndDeleteAsync($"Deleted {filteredMessages.Count} {(filteredMessages.Count == 1 ? "message" : "messages")}.", timeout:TimeSpan.FromSeconds(5));
+                await ReplyAsync($"Deleted {filteredMessages.Count} {(filteredMessages.Count == 1 ? "message" : "messages")}.");
             }
         }
 

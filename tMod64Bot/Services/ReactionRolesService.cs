@@ -28,18 +28,18 @@ namespace tMod64Bot.Services
             Client.ReactionRemoved += HandleReactionRemoved;
         }
 
-        private async Task HandleReactionRemoved(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task HandleReactionRemoved(Cacheable<IUserMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> cacheable, SocketReaction reaction)
         {
             try
             {
-                if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)))
+                if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)) || !cacheable.HasValue)
                     return;
             
                 var current = _configService.Config.ReactionRoleMessages.First(x => x.Item1.Equals(reaction.MessageId));
 
                 if (Equals(reaction.Emote, new Emoji(current!.Item3)))
                 {
-                    var guildUser = await channel.GetUserAsync(reaction.UserId) as SocketGuildUser;
+                    var guildUser = await cacheable.Value.GetUserAsync(reaction.UserId) as SocketGuildUser;
 
                     if (!guildUser.Roles.Any(x => x.Id.Equals(current.Item2)))
                         return;
@@ -54,18 +54,18 @@ namespace tMod64Bot.Services
             }
         }
 
-        private async Task HandleReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, ISocketMessageChannel channel, SocketReaction reaction)
+        private async Task HandleReactionAdded(Cacheable<IUserMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> cacheable, SocketReaction reaction)
         {
             try
             {
-                if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)))
+                if (reaction.User.Value.IsBot || !_configService.Config.ReactionRoleMessages.Select(x => x.Item1).Any(y => y.Equals(reaction.MessageId)) || !cacheable.HasValue)
                     return;
 
                 var current = _configService.Config.ReactionRoleMessages.First(x => x.Item1.Equals(reaction.MessageId));
 
                 if (Equals(reaction.Emote, new Emoji(current!.Item3)))
                 {
-                    var guildUser = await channel.GetUserAsync(reaction.UserId) as SocketGuildUser;
+                    var guildUser = await cacheable.Value.GetUserAsync(reaction.UserId) as SocketGuildUser;
 
                     if (guildUser.Roles.Any(x => x.Id.Equals(current.Item2)))
                         return;
