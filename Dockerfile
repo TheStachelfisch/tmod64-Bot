@@ -8,7 +8,7 @@ RUN dotnet restore
 # Build and publish a release
 RUN dotnet publish -c RELEASE -o out --no-self-contained
 
-FROM mcr.microsoft.com/dotnet/runtime:6.0
+FROM mcr.microsoft.com/dotnet/runtime:6.0-alpine
 WORKDIR /app
 COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "tMod64Bot.dll"]
