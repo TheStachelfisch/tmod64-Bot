@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Runtime.Caching;
 using Discord;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,9 +37,7 @@ namespace tMod64Bot.Services
 
             if (webhook == null)
             {
-                FileStream avatar = new("Data/tmod_tree.png", FileMode.Open);
-
-                webhook = channel.CreateWebhookAsync("tMod64-Logging", avatar).Result;
+                webhook = channel.CreateWebhookAsync("tMod64-Logging", new HttpClient().GetStreamAsync("https://cdn.discordapp.com/attachments/630417470112399360/1012493237367345182/unknown.png").GetAwaiter().GetResult()).Result;
             }
 
             _cache.Add(new CacheItem(channelId.ToString(), webhook), policy);

@@ -32,29 +32,14 @@ namespace tMod64Bot.Services
             if (user.IsBot || !_configService.Config.StickiedUsers.ContainsKey(user.Id))
                 return;
 
-            List<IRole> roles = new();
-
-            foreach (var stickiedUsersValue in _configService.Config.StickiedUsers.Values)
-            {
-                foreach (var id in stickiedUsersValue)
-                {
-                    try
-                    {
-                        roles.Add(user.Guild.GetRole(id));
-                    }
-                    catch (ArgumentNullException e)
-                    {
-                        /* Ignore */
-                    }
-                }
-            } 
-            
-            await user.AddRolesAsync(roles);
+            await user.AddRolesAsync(_configService.Config.StickiedUsers[user.Id]);
         }
 
-        private async Task HandlerUserLeft(SocketGuildUser user)
+        private async Task HandlerUserLeft(SocketGuild socketGuild, SocketUser socketUser)
         {
-            if (user.IsBot || !user.Roles.Any())
+            var user = socketUser as SocketGuildUser;
+            
+            if (user == null || user.IsBot || !user.Roles.Any())
                 return;
             
             var roles = user.Roles.Select(x => x.Id).Where(p => _configService.Config.StickiedRoles.Any(p2 => p2 == p));

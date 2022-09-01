@@ -91,14 +91,14 @@ namespace tMod64Bot.Services
                     {
                         var guild = Client.GetGuild(tempBannedUser.ServerId);
 
-                        if (guild.GetBansAsync().Result.All(x => x.User.Id != tempBannedUser.UserId))
+                        if (await guild.GetBanAsync(tempBannedUser.UserId) != null)
                         {
                             _configService.Config.TempBannedUsers.RemoveWhere(x => x.UserId == tempBannedUser.UserId);
                             _configService.SaveData();
                         }
 
                         await guild.RemoveBanAsync(tempBannedUser.UserId);
-                        UserUnbanned?.Invoke(tempBannedUser.UserId, null, guild);
+                        UserUnbanned.Invoke(tempBannedUser.UserId, null, guild);
 
                         _configService.Config.TempBannedUsers.RemoveWhere(x => x.UserId == tempBannedUser.UserId);
                         _configService.SaveData();
@@ -183,7 +183,7 @@ namespace tMod64Bot.Services
         {
             try
             {
-                if (guild.GetBansAsync().Result.All(x => x.User.Id != userId))
+                if (await guild.GetBanAsync(userId) == null)
                     return TaskResult.FromError("User isn't banned");
 
                 await guild.RemoveBanAsync(userId);
@@ -322,10 +322,10 @@ namespace tMod64Bot.Services
 
             try
             {
-                var bans = moderator.Guild.GetBansAsync();
+                var bans = await moderator.Guild.GetBansAsync().ToListAsync();
 
                 // User is banned but not temp banned; Convert to tempban then
-                if (bans.Result.Any(x => x.User.Id == user.Id) && _configService.Config.TempBannedUsers.All(x => x.UserId != user.Id))
+                if (bans.Any(x => x.Any(ban => ban.User.Id == user.Id)) && _configService.Config.TempBannedUsers.All(x => x.UserId != user.Id))
                 {
                     _configService.Config.TempBannedUsers.Add(new TempBannedUser()
                     {
@@ -339,7 +339,7 @@ namespace tMod64Bot.Services
                     return TaskResult.FromSuccess();
                 }
 
-                if (bans.Result.All(x => x.User.Id != user.Id) && _configService.Config.TempBannedUsers.All(x => x.UserId != user.Id))
+                if (bans.Any(x => x.Any(ban => ban.User.Id != user.Id)) && _configService.Config.TempBannedUsers.All(x => x.UserId != user.Id))
                 {
                     try
                     {
