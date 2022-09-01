@@ -36,28 +36,35 @@ public class LtpService : ServiceBase, IInitializeable
         switch (component.Data.CustomId)
         {
             case "looking-to-play-request":
-            {
-                var ltpModal = new ModalBuilder().WithTitle("Add a looking to play Request")
-                    .WithCustomId("looking-to-play-modal")
-                    .WithCustomId("looking_menu")
-                    .AddTextInput(new TextInputBuilder
-                    {
-                        Label = "Mod list in Json format",
-                        CustomId = "mod_list",
-                        Required = true,
-                        Style = TextInputStyle.Paragraph,
-                        Placeholder = "Paste your modpack here:\n[\n\"Example Mod\"\n]",
-                        MinLength = 4
-                    })
+                {
+                    var ltpModal = new ModalBuilder().WithTitle("Add a looking to play Request")
+                        .WithCustomId("looking-to-play-modal")
+                        .WithCustomId("looking_menu")
+                        .AddTextInput(new TextInputBuilder
+                        {
+                            Label = "Special rules for laythrough",
+                            CustomId = "description",
+                            Required = false,
+                            Placeholder = "One of each class, fighting until moon lord and no further.",
+                            Style = TextInputStyle.Paragraph,
+                        })
                     .AddTextInput(new TextInputBuilder
                     {
                         Label = "Version of the game",
                         CustomId = "version",
                         Required = true,
-                        Placeholder = "vanilla 1.3, vanilla 1.4, tMl 1.3, tMl 1.4, tMl 1.4",
+                        Placeholder = "vanilla 1.3, vanilla 1.4, tMl 1.3, tMl 1.4",
                         Style = TextInputStyle.Short,
                         MinLength = 7,
                         MaxLength = 20
+                    })
+                    .AddTextInput(new TextInputBuilder
+                    {
+                        Label = "World Settings",
+                        CustomId = "world_settings",
+                        Required = false,
+                        Style = TextInputStyle.Paragraph,
+                        Placeholder = "Small, Expert, Seed 2135342364"
                     })
                     .AddTextInput(new TextInputBuilder
                     {
@@ -68,7 +75,17 @@ public class LtpService : ServiceBase, IInitializeable
                         Style = TextInputStyle.Short,
                         MaxLength = 2,
                         MinLength = 1
-                    });
+                    })
+					.AddTextInput(new TextInputBuilder
+					{
+						Label = "Mod list in Json format",
+						CustomId = "mod_list",
+						Required = true,
+						Style = TextInputStyle.Paragraph,
+						Placeholder = "Paste your modpack here:\n[\n\"Example Mod\"\n]" +
+						"\nUsually found in C:\\Users\\YOURUSER\\Documents\\My Games\\Terraria\\ModLoader\\Mods\\ModPacks",
+						MinLength = 4
+					});
                 await component.RespondWithModalAsync(ltpModal.Build());
                 break;
             }
