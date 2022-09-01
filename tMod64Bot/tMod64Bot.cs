@@ -16,6 +16,7 @@ using tMod64Bot.Services.Commons;
 using tMod64Bot.Services.Config;
 using tMod64Bot.Services.Logging;
 using tMod64Bot.Services.Logging.BotLogging;
+using tMod64Bot.Services.LtpService;
 using tMod64Bot.Services.Tag;
 using tMod64Bot.Utils;
 
@@ -239,7 +240,8 @@ namespace tMod64Bot
                 .AddSingleton<InviteProtectionService>()
                 .AddSingleton<StickyRolesHandler>()
                 .AddSingleton<WelcomeService>()
-                .AddSingleton<LogService>();
+                .AddSingleton<LogService>()
+                .AddSingleton<LtpService>();
 
             return _serviceCollection.BuildServiceProvider();
         }
