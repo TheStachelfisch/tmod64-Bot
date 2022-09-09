@@ -82,8 +82,7 @@ public class LtpService : ServiceBase, IInitializeable
 						CustomId = "mod_list",
 						Required = true,
 						Style = TextInputStyle.Paragraph,
-						Placeholder = "Paste your modpack here:\n[\n\"Example Mod\"\n]" +
-						"\nUsually found in C:\\Users\\YOURUSER\\Documents\\My Games\\Terraria\\ModLoader\\Mods\\ModPacks",
+						Placeholder = "[\n\"Example Mod\"\n]", //TODO: find a way to show where to find the modpacks folder
 						MinLength = 4
 					});
                 await component.RespondWithModalAsync(ltpModal.Build());
