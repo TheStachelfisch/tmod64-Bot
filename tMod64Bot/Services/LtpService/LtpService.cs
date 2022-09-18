@@ -36,7 +36,7 @@ public class LtpService : ServiceBase, IInitializeable
         string modlist;
 		switch (modal.Data.CustomId)
         {
-            case "looking-to-play-modal":
+            case "looking_menu":
                 {
 					List<SocketMessageComponentData> components =
 		            modal.Data.Components.ToList();
@@ -55,7 +55,7 @@ public class LtpService : ServiceBase, IInitializeable
 					ulong channel = _config.Config.LookingToPlayChannel;
 
                     var requestembed = new EmbedBuilder();
-                    requestembed.Author.WithName(modal.User.Mention);
+                    requestembed.WithAuthor(modal.User.ToString());
                     requestembed.WithTitle("tModLoader Version");
 					requestembed.WithDescription(version);
 
