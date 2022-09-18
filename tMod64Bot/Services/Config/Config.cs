@@ -24,6 +24,7 @@ namespace tMod64Bot.Services.Config
         
         public ulong UserLoggingChannel;
         public ulong ModerationLoggingChannel;
+        public ulong LookingToPlayChannel;
 
         [Space]
         
